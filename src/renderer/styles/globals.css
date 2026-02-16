@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+/* ─── ChapterForge Dark Theme ─────────────── */
+
+:root {
+  /* Background layers (darkest to lightest) */
+  --bg-base: #1a1a2e;
+  --bg-sidebar: #16162a;
+  --bg-editor: #1e1e3a;
+  --bg-chat: #16162a;
+  --bg-input: #252547;
+  --bg-hover: #2a2a4a;
+  --bg-active: #333366;
+
+  /* Text */
+  --text-primary: #e0e0f0;
+  --text-secondary: #8888aa;
+  --text-accent: #7c8aff;
+
+  /* Diff colors */
+  --diff-insert-bg: rgba(34, 197, 94, 0.15);
+  --diff-insert-text: #86efac;
+  --diff-delete-bg: rgba(239, 68, 68, 0.15);
+  --diff-delete-text: #fca5a5;
+
+  /* Status colors */
+  --status-outline: #94a3b8;
+  --status-draft: #fbbf24;
+  --status-revised: #60a5fa;
+  --status-final: #34d399;
+
+  /* Borders */
+  --border: #2a2a4a;
+  --border-active: #7c8aff;
+
+  /* Misc */
+  --scrollbar-thumb: #333366;
+  --scrollbar-track: transparent;
+}
+
+/* ─── Base Styles ─────────────────────────── */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbar Styles ────────────────────── */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-active);
+}
+
+/* ─── Selection ───────────────────────────── */
+
+::selection {
+  background: rgba(124, 138, 255, 0.3);
+  color: var(--text-primary);
+}
+
+/* ─── Focus Styles ────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--border-active);
+  outline-offset: -2px;
+}
+
+/* ─── Drag Handle for Panels ──────────────── */
+
+[data-panel-resize-handle-id] {
+  background: var(--border);
+  transition: background 0.15s ease;
+}
+
+[data-panel-resize-handle-id]:hover,
+[data-panel-resize-handle-id][data-resize-handle-active] {
+  background: var(--border-active);
+}

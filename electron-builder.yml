@@ -1,0 +1,28 @@
+appId: com.chapterforge.app
+productName: ChapterForge
+directories:
+  buildResources: resources
+  output: dist
+
+files:
+  - out/**/*
+  - "!out/**/*.map"
+
+mac:
+  category: public.app-category.productivity
+  target:
+    - target: dmg
+      arch: [universal]
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+
+linux:
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]
+  category: Office
