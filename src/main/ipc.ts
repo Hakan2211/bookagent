@@ -1,4 +1,5 @@
-import { ipcMain, dialog, BrowserWindow } from 'electron'
+import { ipcMain, dialog, BrowserWindow, app } from 'electron'
+import path from 'path'
 import { IPC } from '@shared/ipc-channels'
 import type {
   BookMetadata,
@@ -403,13 +404,20 @@ export function registerIPC(
     return result.canceled ? null : result.filePaths[0]
   })
 
-  ipcMain.handle(IPC.DIALOG_SAVE_FOLDER, async () => {
+  ipcMain.handle(IPC.DIALOG_SAVE_FOLDER, async (_event, args?: { defaultPath?: string }) => {
     const win = BrowserWindow.getFocusedWindow()
     if (!win) return null
     const result = await dialog.showOpenDialog(win, {
       properties: ['openDirectory', 'createDirectory'],
-      title: 'Choose Location for New Book'
+      title: 'Choose Location for New Book',
+      defaultPath: args?.defaultPath || undefined
     })
     return result.canceled ? null : result.filePaths[0]
+  })
+
+  // ── App Handlers ──────────────────────────
+
+  ipcMain.handle(IPC.APP_GET_DOCUMENTS_PATH, async () => {
+    return path.join(app.getPath('documents'), 'ChapterForge')
   })
 }

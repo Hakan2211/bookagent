@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useProjectStore } from '../../stores/projectStore'
 import { IPC } from '@shared/ipc-channels'
+import { ChevronRight, FileText } from 'lucide-react'
 
 export function NotesSection() {
   const manifest = useProjectStore((s) => s.manifest)
@@ -12,11 +13,12 @@ export function NotesSection() {
     <div className="mt-2">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-3 py-1.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+        className="w-full px-4 py-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
       >
-        <span className={`transition-transform text-[8px] ${expanded ? 'rotate-90' : ''}`}>
-          &#9654;
-        </span>
+        <ChevronRight
+          size={12}
+          className={`transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
+        />
         Notes
       </button>
 
@@ -53,13 +55,14 @@ function NoteItem({ noteId, title }: { noteId: string; title: string }) {
     <div>
       <button
         onClick={handleOpen}
-        className="w-full text-left px-3 py-1.5 pl-8 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+        className="w-full text-left px-4 py-2 pl-9 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] transition-all flex items-center gap-2"
       >
+        <FileText size={13} className="text-[var(--text-tertiary)] shrink-0" />
         {title}
       </button>
 
       {isOpen && (
-        <div className="px-2 pb-2">
+        <div className="px-3 pb-2">
           <textarea
             value={content}
             onChange={(e) => {
@@ -67,7 +70,7 @@ function NoteItem({ noteId, title }: { noteId: string; title: string }) {
               setIsDirty(true)
             }}
             onBlur={() => isDirty && handleSave()}
-            className="w-full h-32 text-xs bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded p-2 resize-y outline-none focus:border-[var(--border-active)]"
+            className="w-full h-32 text-xs bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-lg p-3 resize-y outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all leading-relaxed"
             placeholder={`Write ${title.toLowerCase()} here...`}
           />
         </div>

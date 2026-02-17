@@ -1,6 +1,7 @@
 import React from 'react'
 import { ProjectTree } from '../sidebar/ProjectTree'
 import { useProjectStore } from '../../stores/projectStore'
+import { BookOpen } from 'lucide-react'
 
 export function Sidebar() {
   const isOpen = useProjectStore((s) => s.isOpen)
@@ -8,10 +9,13 @@ export function Sidebar() {
   return (
     <div className="h-full bg-[var(--bg-sidebar)] flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="px-3 py-2 border-b border-[var(--border)] shrink-0">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-          Project
-        </h2>
+      <div className="px-4 py-3 border-b border-[var(--border)] shrink-0">
+        <div className="flex items-center gap-2">
+          <BookOpen size={13} className="text-[var(--text-tertiary)]" />
+          <h2 className="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-tertiary)]">
+            Project
+          </h2>
+        </div>
       </div>
 
       {/* Content */}
@@ -19,7 +23,7 @@ export function Sidebar() {
         {isOpen ? (
           <ProjectTree />
         ) : (
-          <div className="p-4 text-sm text-[var(--text-secondary)]">
+          <div className="p-5 text-sm text-[var(--text-tertiary)]">
             No project open
           </div>
         )}

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { X } from 'lucide-react'
 
 interface ModalProps {
   isOpen: boolean
@@ -34,29 +35,34 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ animation: 'fade-in 200ms ease-out' }}
+    >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/70 backdrop-blur-md"
         onClick={onClose}
       />
-      
+
       {/* Modal content */}
       <div
-        className={`relative ${sizeClasses[size]} w-full mx-4 bg-[var(--bg-base)] border border-[var(--border)] rounded-xl shadow-2xl overflow-hidden`}
+        className={`relative ${sizeClasses[size]} w-full mx-4 bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden`}
+        style={{
+          animation: 'scale-in 250ms cubic-bezier(0.16, 1, 0.3, 1)',
+          boxShadow: 'var(--shadow-xl), 0 0 0 1px rgba(255,255,255,0.03)'
+        }}
       >
         {title && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-            <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+            <h2 className="text-base font-semibold text-[var(--text-primary)] tracking-tight">
               {title}
             </h2>
             <button
               onClick={onClose}
-              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
+              className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--bg-hover)]"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
+              <X size={16} />
             </button>
           </div>
         )}

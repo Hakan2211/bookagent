@@ -36,9 +36,9 @@ export function ChapterHeader() {
   }
 
   return (
-    <div className="px-6 py-3 border-b border-[var(--border)] bg-[var(--bg-editor)] shrink-0">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+    <div className="px-8 py-4 border-b border-[var(--border)] bg-[var(--bg-editor)] shrink-0">
+      <div className="flex items-center justify-between max-w-4xl mx-auto">
+        <div className="flex items-center gap-4">
           {isEditingTitle ? (
             <input
               value={editTitle}
@@ -49,11 +49,11 @@ export function ChapterHeader() {
                 if (e.key === 'Escape') setIsEditingTitle(false)
               }}
               autoFocus
-              className="text-xl font-semibold bg-transparent border-b border-[var(--border-active)] outline-none text-[var(--text-primary)] px-0"
+              className="text-xl font-semibold bg-transparent border-b-2 border-[var(--border-active)] outline-none text-[var(--text-primary)] px-0 tracking-tight"
             />
           ) : (
             <h1
-              className="text-xl font-semibold text-[var(--text-primary)] cursor-pointer hover:opacity-80"
+              className="text-xl font-semibold text-[var(--text-primary)] cursor-pointer hover:text-[var(--text-accent-hover)] transition-colors tracking-tight"
               onClick={() => {
                 setEditTitle(chapter.title)
                 setIsEditingTitle(true)
@@ -63,7 +63,7 @@ export function ChapterHeader() {
             </h1>
           )}
 
-          <span className="text-xs text-[var(--text-secondary)]">
+          <span className="text-xs text-[var(--text-tertiary)] tabular-nums font-medium">
             {chapter.wordCount.toLocaleString()} words
           </span>
         </div>

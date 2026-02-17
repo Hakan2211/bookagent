@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useChatStore } from '../../stores/chatStore'
+import { SendHorizontal } from 'lucide-react'
 
 export function ChatInput() {
   const [input, setInput] = useState('')
@@ -29,7 +30,7 @@ export function ChatInput() {
   }
 
   return (
-    <div className="p-3 border-t border-[var(--border)] shrink-0">
+    <div className="p-3.5 border-t border-[var(--border)] shrink-0">
       <div className="flex items-end gap-2">
         <textarea
           ref={textareaRef}
@@ -39,19 +40,17 @@ export function ChatInput() {
           placeholder={isAgentWorking ? 'Agent is working...' : 'Type a prompt...'}
           disabled={isAgentWorking}
           rows={1}
-          className="flex-1 bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm resize-none outline-none focus:border-[var(--border-active)] placeholder:text-[var(--text-secondary)] disabled:opacity-50"
+          className="flex-1 bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-sm resize-none outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] placeholder:text-[var(--text-tertiary)] disabled:opacity-40 transition-all leading-relaxed"
         />
         <button
           onClick={handleSend}
           disabled={!input.trim() || isAgentWorking}
-          className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--text-accent)] text-white disabled:opacity-30 hover:opacity-90 transition-opacity"
+          className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white disabled:opacity-25 hover:shadow-[var(--shadow-glow-sm)] hover:brightness-110 transition-all active:scale-95"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-          </svg>
+          <SendHorizontal size={15} />
         </button>
       </div>
-      <div className="text-[10px] text-[var(--text-secondary)] mt-1 px-1">
+      <div className="text-[10px] text-[var(--text-tertiary)] mt-1.5 px-1 font-medium">
         Enter to send, Shift+Enter for new line
       </div>
     </div>

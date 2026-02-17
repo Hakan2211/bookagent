@@ -25,7 +25,13 @@ export function Tooltip({ content, children, position = 'top' }: TooltipProps) {
       {children}
       {visible && (
         <div
-          className={`absolute z-50 px-2 py-1 text-xs rounded bg-[var(--bg-active)] text-[var(--text-primary)] border border-[var(--border)] whitespace-nowrap pointer-events-none ${positionClasses[position]}`}
+          className={`absolute z-50 px-2.5 py-1.5 text-xs font-medium rounded-lg text-[var(--text-primary)] whitespace-nowrap pointer-events-none ${positionClasses[position]}`}
+          style={{
+            background: 'var(--bg-elevated)',
+            border: '1px solid var(--border)',
+            boxShadow: 'var(--shadow-md)',
+            animation: 'fade-in 100ms ease-out'
+          }}
         >
           {content}
         </div>

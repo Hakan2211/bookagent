@@ -3,48 +3,57 @@
 .tiptap-editor {
   height: 100%;
   overflow-y: auto;
-  padding: 2rem 3rem;
+  padding: 2.5rem 3.5rem;
   background: var(--bg-editor);
 }
 
 .tiptap-editor .ProseMirror {
   outline: none;
   min-height: 100%;
-  font-family: 'Georgia', 'Times New Roman', serif;
-  font-size: 16px;
-  line-height: 1.8;
+  max-width: 720px;
+  margin: 0 auto;
+  font-family: 'Lora', 'Georgia', 'Times New Roman', serif;
+  font-size: 17px;
+  line-height: 1.85;
   color: var(--text-primary);
+  letter-spacing: 0.005em;
 }
 
 .tiptap-editor .ProseMirror p {
-  margin-bottom: 1em;
+  margin-bottom: 1.15em;
 }
 
 .tiptap-editor .ProseMirror h1 {
-  font-size: 2em;
+  font-size: 1.85em;
   font-weight: 700;
-  margin-bottom: 0.5em;
-  margin-top: 1em;
+  margin-bottom: 0.6em;
+  margin-top: 1.4em;
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
 }
 
 .tiptap-editor .ProseMirror h2 {
-  font-size: 1.5em;
+  font-size: 1.4em;
+  font-weight: 600;
+  margin-bottom: 0.55em;
+  margin-top: 1.2em;
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.tiptap-editor .ProseMirror h3 {
+  font-size: 1.15em;
   font-weight: 600;
   margin-bottom: 0.5em;
   margin-top: 1em;
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-.tiptap-editor .ProseMirror h3 {
-  font-size: 1.25em;
-  font-weight: 600;
-  margin-bottom: 0.5em;
-  margin-top: 0.75em;
-  color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
 }
 
 .tiptap-editor .ProseMirror strong {
@@ -56,9 +65,11 @@
 }
 
 .tiptap-editor .ProseMirror blockquote {
-  border-left: 3px solid var(--border-active);
-  padding-left: 1em;
+  border-left: 3px solid rgba(129, 140, 248, 0.35);
+  padding-left: 1.25em;
   margin-left: 0;
+  margin-top: 1em;
+  margin-bottom: 1em;
   color: var(--text-secondary);
   font-style: italic;
 }
@@ -66,17 +77,18 @@
 .tiptap-editor .ProseMirror hr {
   border: none;
   border-top: 1px solid var(--border);
-  margin: 2em 0;
+  margin: 2.5em auto;
+  max-width: 120px;
 }
 
 .tiptap-editor .ProseMirror ul,
 .tiptap-editor .ProseMirror ol {
-  padding-left: 1.5em;
-  margin-bottom: 1em;
+  padding-left: 1.75em;
+  margin-bottom: 1.15em;
 }
 
 .tiptap-editor .ProseMirror li {
-  margin-bottom: 0.25em;
+  margin-bottom: 0.35em;
 }
 
 /* ─── Placeholder ─────────────────────────── */
@@ -84,10 +96,11 @@
 .tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   pointer-events: none;
   height: 0;
-  opacity: 0.5;
+  opacity: 0.6;
+  font-style: italic;
 }
 
 /* ─── Diff Styles ─────────────────────────── */
@@ -95,30 +108,31 @@
 .diff-insert {
   background-color: var(--diff-insert-bg);
   color: var(--diff-insert-text);
-  border-radius: 2px;
-  padding: 1px 0;
+  border-radius: 3px;
+  padding: 2px 1px;
+  text-decoration: none;
 }
 
 .diff-delete {
   background-color: var(--diff-delete-bg);
   color: var(--diff-delete-text);
   text-decoration: line-through;
-  border-radius: 2px;
-  padding: 1px 0;
-  opacity: 0.8;
+  border-radius: 3px;
+  padding: 2px 1px;
+  opacity: 0.75;
 }
 
 .diff-actions {
   display: inline-flex;
-  gap: 2px;
-  margin-left: 4px;
+  gap: 3px;
+  margin-left: 6px;
   vertical-align: middle;
 }
 
 .diff-actions button {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
   border: none;
   cursor: pointer;
   font-size: 12px;
@@ -126,38 +140,47 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: all var(--transition-fast);
 }
 
 .diff-actions .accept {
-  background: rgba(34, 197, 94, 0.3);
+  background: rgba(52, 211, 153, 0.2);
   color: var(--diff-insert-text);
 }
 
 .diff-actions .accept:hover {
-  background: rgba(34, 197, 94, 0.5);
+  background: rgba(52, 211, 153, 0.35);
+  transform: scale(1.05);
 }
 
 .diff-actions .reject {
-  background: rgba(239, 68, 68, 0.3);
+  background: rgba(248, 113, 113, 0.2);
   color: var(--diff-delete-text);
 }
 
 .diff-actions .reject:hover {
-  background: rgba(239, 68, 68, 0.5);
+  background: rgba(248, 113, 113, 0.35);
+  transform: scale(1.05);
 }
 
 /* ─── Word Count Badge ────────────────────── */
 
 .word-count-badge {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: var(--bg-input);
+  bottom: 32px;
+  right: 32px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: var(--text-secondary);
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.6;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
 }

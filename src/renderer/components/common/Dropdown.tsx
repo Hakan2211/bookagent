@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { ChevronDown, Check } from 'lucide-react'
 
 interface DropdownOption {
   value: string
@@ -39,26 +40,25 @@ export function Dropdown({
     <div ref={ref} className={`relative ${className}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-md text-[var(--text-primary)] hover:border-[var(--border-active)] transition-colors"
+        className="w-full flex items-center justify-between px-3 py-2 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] hover:border-[var(--border-active)] transition-all shadow-[var(--shadow-xs)]"
       >
-        <span className={selectedOption ? '' : 'text-[var(--text-secondary)]'}>
+        <span className={selectedOption ? '' : 'text-[var(--text-tertiary)]'}>
           {selectedOption?.label || placeholder}
         </span>
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
+        <ChevronDown
+          size={14}
+          className={`text-[var(--text-tertiary)] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-[var(--bg-input)] border border-[var(--border)] rounded-md shadow-lg overflow-hidden">
+        <div
+          className="absolute z-50 w-full mt-1.5 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg overflow-hidden py-1"
+          style={{
+            animation: 'slide-up 150ms cubic-bezier(0.16, 1, 0.3, 1)',
+            boxShadow: 'var(--shadow-lg)'
+          }}
+        >
           {options.map((option) => (
             <button
               key={option.value}
@@ -66,13 +66,16 @@ export function Dropdown({
                 onChange(option.value)
                 setIsOpen(false)
               }}
-              className={`w-full text-left px-3 py-2 text-sm hover:bg-[var(--bg-hover)] transition-colors ${
+              className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between hover:bg-[var(--bg-hover)] transition-colors ${
                 option.value === value
-                  ? 'text-[var(--text-accent)] bg-[var(--bg-hover)]'
+                  ? 'text-[var(--text-accent)]'
                   : 'text-[var(--text-primary)]'
               }`}
             >
               {option.label}
+              {option.value === value && (
+                <Check size={14} className="text-[var(--text-accent)]" />
+              )}
             </button>
           ))}
         </div>

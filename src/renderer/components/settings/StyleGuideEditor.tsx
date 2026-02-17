@@ -57,27 +57,29 @@ export function StyleGuideEditor() {
 
   if (!manifest) {
     return (
-      <p className="text-sm text-[var(--text-secondary)]">
+      <p className="text-sm text-[var(--text-tertiary)]">
         Open a project to edit its style guide.
       </p>
     )
   }
 
+  const inputClasses = "w-full px-3.5 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div>
-        <label className="block text-xs text-[var(--text-secondary)] mb-1">Genre</label>
+        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Genre</label>
         <input
           value={genre}
           onChange={(e) => setGenre(e.target.value)}
           placeholder="e.g., literary fiction, sci-fi, thriller"
-          className="w-full px-3 py-2 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-md text-[var(--text-primary)] outline-none focus:border-[var(--border-active)]"
+          className={inputClasses}
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs text-[var(--text-secondary)] mb-1">Point of View</label>
+          <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Point of View</label>
           <Dropdown
             options={[
               { value: '', label: 'Not specified' },
@@ -91,7 +93,7 @@ export function StyleGuideEditor() {
           />
         </div>
         <div>
-          <label className="block text-xs text-[var(--text-secondary)] mb-1">Tense</label>
+          <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Tense</label>
           <Dropdown
             options={[
               { value: '', label: 'Not specified' },
@@ -105,29 +107,29 @@ export function StyleGuideEditor() {
       </div>
 
       <div>
-        <label className="block text-xs text-[var(--text-secondary)] mb-1">Tone</label>
+        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Tone</label>
         <input
           value={tone}
           onChange={(e) => setTone(e.target.value)}
           placeholder="e.g., introspective, lyrical, fast-paced"
-          className="w-full px-3 py-2 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-md text-[var(--text-primary)] outline-none focus:border-[var(--border-active)]"
+          className={inputClasses}
         />
       </div>
 
       <div>
-        <label className="block text-xs text-[var(--text-secondary)] mb-1">
+        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
           Words to Avoid (comma-separated)
         </label>
         <input
           value={avoidWords}
           onChange={(e) => setAvoidWords(e.target.value)}
           placeholder="e.g., suddenly, very, really, literally"
-          className="w-full px-3 py-2 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-md text-[var(--text-primary)] outline-none focus:border-[var(--border-active)]"
+          className={inputClasses}
         />
       </div>
 
       <div>
-        <label className="block text-xs text-[var(--text-secondary)] mb-1">
+        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
           Custom AI Instructions
         </label>
         <textarea
@@ -135,7 +137,7 @@ export function StyleGuideEditor() {
           onChange={(e) => setCustomInstructions(e.target.value)}
           placeholder="e.g., Short paragraphs. Show don't tell. Hemingway-esque clarity."
           rows={3}
-          className="w-full px-3 py-2 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-md text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] resize-y"
+          className={`${inputClasses} resize-y leading-relaxed`}
         />
       </div>
 

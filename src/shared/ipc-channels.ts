@@ -55,6 +55,9 @@ export const IPC = {
   DIALOG_OPEN_FOLDER: 'dialog:open-folder',
   DIALOG_OPEN_FILE: 'dialog:open-file',
   DIALOG_SAVE_FOLDER: 'dialog:save-folder',
+
+  // ── App ────────────────────────────────────
+  APP_GET_DOCUMENTS_PATH: 'app:get-documents-path',
 } as const
 
 export type IPCChannel = (typeof IPC)[keyof typeof IPC]

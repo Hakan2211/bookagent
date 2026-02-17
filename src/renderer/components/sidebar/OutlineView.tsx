@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { IPC } from '@shared/ipc-channels'
 import { useProjectStore } from '../../stores/projectStore'
+import { ChevronRight } from 'lucide-react'
 
 export function OutlineView() {
   const isOpen = useProjectStore((s) => s.isOpen)
@@ -18,7 +19,7 @@ export function OutlineView() {
       const outline = (await window.api.invoke(IPC.NOTE_READ, { noteId: 'outline' })) as string
       setContent(outline)
     } catch {
-      // Outline might not exist yet — try reading the file directly
+      // Outline might not exist yet -- try reading the file directly
       setContent('')
     }
   }
@@ -27,17 +28,20 @@ export function OutlineView() {
     <div>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-3 py-1.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+        className="w-full px-4 py-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
       >
-        <span className={`transition-transform text-[8px] ${expanded ? 'rotate-90' : ''}`}>
-          &#9654;
-        </span>
+        <ChevronRight
+          size={12}
+          className={`transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
+        />
         Outline
       </button>
 
       {expanded && (
-        <div className="px-3 py-1 text-xs text-[var(--text-secondary)] whitespace-pre-wrap max-h-48 overflow-y-auto">
-          {content || 'No outline generated yet'}
+        <div className="px-4 py-1.5 text-xs text-[var(--text-secondary)] whitespace-pre-wrap max-h-48 overflow-y-auto leading-relaxed">
+          {content || (
+            <span className="text-[var(--text-tertiary)] italic">No outline generated yet</span>
+          )}
         </div>
       )}
     </div>

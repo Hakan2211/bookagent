@@ -27,13 +27,16 @@ export function SettingsModal() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 text-sm transition-colors ${
+            className={`px-5 py-3 text-sm font-medium transition-all relative ${
               activeTab === tab.id
-                ? 'text-[var(--text-accent)] border-b-2 border-[var(--text-accent)]'
-                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                ? 'text-[var(--text-accent)]'
+                : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
             }`}
           >
             {tab.label}
+            {activeTab === tab.id && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-400 rounded-full" />
+            )}
           </button>
         ))}
       </div>

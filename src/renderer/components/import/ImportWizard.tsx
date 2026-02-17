@@ -9,6 +9,7 @@ import { useUIStore } from '../../stores/uiStore'
 import { useProjectStore } from '../../stores/projectStore'
 import { IPC } from '@shared/ipc-channels'
 import type { ProposedSplit, ProposedChapter, BookMetadata } from '@shared/types'
+import { ArrowLeft } from 'lucide-react'
 
 type WizardStep = 'upload' | 'parsing' | 'review' | 'confirm'
 
@@ -117,7 +118,7 @@ export function ImportWizard() {
     <Modal isOpen={isOpen} onClose={handleClose} title="Import Manuscript" size="xl">
       <div className="p-6">
         {error && (
-          <div className="mb-4 p-3 bg-red-600/15 border border-red-600/30 rounded-lg text-sm text-red-300">
+          <div className="mb-5 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-300">
             {error}
           </div>
         )}
@@ -127,9 +128,9 @@ export function ImportWizard() {
 
         {/* Step 2: Parsing */}
         {step === 'parsing' && (
-          <div className="text-center py-12">
-            <LoadingSpinner size="lg" className="mx-auto mb-4" />
-            <p className="text-sm text-[var(--text-primary)] mb-2">{progress.step}</p>
+          <div className="text-center py-16">
+            <LoadingSpinner size="lg" className="mx-auto mb-5" />
+            <p className="text-sm text-[var(--text-primary)] mb-3 font-medium">{progress.step}</p>
             <ProgressBar value={progress.percent} showPercentage className="max-w-xs mx-auto" />
           </div>
         )}
@@ -137,38 +138,38 @@ export function ImportWizard() {
         {/* Step 3: Review */}
         {step === 'review' && proposedSplit && (
           <div>
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-2 gap-4 mb-5">
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                   Book Title
                 </label>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="My Novel"
-                  className="w-full px-3 py-2 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-md text-[var(--text-primary)] outline-none focus:border-[var(--border-active)]"
+                  className="w-full px-3.5 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                   Author
                 </label>
                 <input
                   value={author}
                   onChange={(e) => setAuthor(e.target.value)}
                   placeholder="Jane Doe"
-                  className="w-full px-3 py-2 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-md text-[var(--text-primary)] outline-none focus:border-[var(--border-active)]"
+                  className="w-full px-3.5 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
                 />
               </div>
             </div>
 
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm text-[var(--text-primary)]">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm text-[var(--text-primary)] font-medium">
                 {chapters.length} chapters detected ({proposedSplit.totalWords.toLocaleString()} words)
               </span>
               {proposedSplit.detectedGenre && (
-                <span className="text-xs text-[var(--text-secondary)]">
-                  Genre: {proposedSplit.detectedGenre} | POV: {proposedSplit.detectedPOV} | Tense: {proposedSplit.detectedTense}
+                <span className="text-xs text-[var(--text-tertiary)]">
+                  {proposedSplit.detectedGenre} &middot; {proposedSplit.detectedPOV} &middot; {proposedSplit.detectedTense}
                 </span>
               )}
             </div>
@@ -182,8 +183,9 @@ export function ImportWizard() {
               }}
             />
 
-            <div className="flex justify-end gap-2 mt-4">
+            <div className="flex justify-end gap-2 mt-5">
               <Button variant="ghost" onClick={() => setStep('upload')}>
+                <ArrowLeft size={14} />
                 Back
               </Button>
               <Button variant="primary" onClick={handleConfirm} isLoading={isProcessing}>
@@ -195,9 +197,9 @@ export function ImportWizard() {
 
         {/* Step 4: Confirm (creating) */}
         {step === 'confirm' && (
-          <div className="text-center py-12">
-            <LoadingSpinner size="lg" className="mx-auto mb-4" />
-            <p className="text-sm text-[var(--text-primary)]">Creating project...</p>
+          <div className="text-center py-16">
+            <LoadingSpinner size="lg" className="mx-auto mb-5" />
+            <p className="text-sm text-[var(--text-primary)] font-medium">Creating project...</p>
           </div>
         )}
       </div>

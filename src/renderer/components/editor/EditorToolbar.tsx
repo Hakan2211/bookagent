@@ -1,5 +1,17 @@
 import React from 'react'
 import type { Editor } from '@tiptap/react'
+import {
+  Bold,
+  Italic,
+  Heading1,
+  Heading2,
+  Heading3,
+  Quote,
+  Minus,
+  List,
+  Undo2,
+  Redo2
+} from 'lucide-react'
 
 interface EditorToolbarProps {
   editor: Editor
@@ -22,10 +34,10 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
     <button
       onClick={onClick}
       title={title}
-      className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors ${
+      className={`w-8 h-8 flex items-center justify-center rounded-md transition-all ${
         isActive
-          ? 'bg-[var(--bg-active)] text-[var(--text-primary)]'
-          : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+          ? 'bg-[var(--bg-active)] text-[var(--text-accent)] shadow-[var(--shadow-xs)]'
+          : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
       }`}
     >
       {children}
@@ -33,13 +45,13 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   )
 
   return (
-    <div className="flex items-center gap-0.5 px-3 py-1.5 border-b border-[var(--border)] bg-[var(--bg-editor)] shrink-0">
+    <div className="flex items-center gap-0.5 px-4 py-2 border-b border-[var(--border)] bg-[var(--bg-editor)] shrink-0">
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBold().run()}
         isActive={editor.isActive('bold')}
         title="Bold (Ctrl+B)"
       >
-        <strong>B</strong>
+        <Bold size={15} />
       </ToolbarButton>
 
       <ToolbarButton
@@ -47,17 +59,17 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         isActive={editor.isActive('italic')}
         title="Italic (Ctrl+I)"
       >
-        <em>I</em>
+        <Italic size={15} />
       </ToolbarButton>
 
-      <div className="w-px h-5 bg-[var(--border)] mx-1" />
+      <div className="w-px h-5 bg-[var(--border)] mx-1.5" />
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         isActive={editor.isActive('heading', { level: 1 })}
         title="Heading 1"
       >
-        H1
+        <Heading1 size={15} />
       </ToolbarButton>
 
       <ToolbarButton
@@ -65,7 +77,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         isActive={editor.isActive('heading', { level: 2 })}
         title="Heading 2"
       >
-        H2
+        <Heading2 size={15} />
       </ToolbarButton>
 
       <ToolbarButton
@@ -73,24 +85,24 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         isActive={editor.isActive('heading', { level: 3 })}
         title="Heading 3"
       >
-        H3
+        <Heading3 size={15} />
       </ToolbarButton>
 
-      <div className="w-px h-5 bg-[var(--border)] mx-1" />
+      <div className="w-px h-5 bg-[var(--border)] mx-1.5" />
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         isActive={editor.isActive('blockquote')}
         title="Blockquote"
       >
-        &ldquo;
+        <Quote size={15} />
       </ToolbarButton>
 
       <ToolbarButton
         onClick={() => editor.chain().focus().setHorizontalRule().run()}
         title="Scene Break"
       >
-        &#8212;
+        <Minus size={15} />
       </ToolbarButton>
 
       <ToolbarButton
@@ -98,23 +110,23 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         isActive={editor.isActive('bulletList')}
         title="Bullet List"
       >
-        &#8226;
+        <List size={15} />
       </ToolbarButton>
 
-      <div className="w-px h-5 bg-[var(--border)] mx-1" />
+      <div className="w-px h-5 bg-[var(--border)] mx-1.5" />
 
       <ToolbarButton
         onClick={() => editor.chain().focus().undo().run()}
         title="Undo (Ctrl+Z)"
       >
-        &#8630;
+        <Undo2 size={15} />
       </ToolbarButton>
 
       <ToolbarButton
         onClick={() => editor.chain().focus().redo().run()}
         title="Redo (Ctrl+Shift+Z)"
       >
-        &#8631;
+        <Redo2 size={15} />
       </ToolbarButton>
     </div>
   )
