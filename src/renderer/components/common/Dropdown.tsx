@@ -40,23 +40,23 @@ export function Dropdown({
     <div ref={ref} className={`relative ${className}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] hover:border-[var(--border-active)] transition-all shadow-[var(--shadow-xs)]"
+        className="w-full flex items-center justify-between px-4 py-3 text-[14px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] hover:border-[var(--border-active)] transition-all shadow-[var(--shadow-xs)] focus-visible:shadow-[0_0_0_2px_var(--focus-ring-soft)]"
       >
         <span className={selectedOption ? '' : 'text-[var(--text-tertiary)]'}>
           {selectedOption?.label || placeholder}
         </span>
         <ChevronDown
-          size={14}
+          size={15}
           className={`text-[var(--text-tertiary)] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
       {isOpen && (
         <div
-          className="absolute z-50 w-full mt-1.5 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg overflow-hidden py-1"
+          className="absolute z-50 w-full mt-2 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl overflow-hidden py-1.5"
           style={{
             animation: 'slide-up 150ms cubic-bezier(0.16, 1, 0.3, 1)',
-            boxShadow: 'var(--shadow-lg)'
+            boxShadow: 'var(--elevation-3)'
           }}
         >
           {options.map((option) => (
@@ -66,7 +66,7 @@ export function Dropdown({
                 onChange(option.value)
                 setIsOpen(false)
               }}
-              className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between hover:bg-[var(--bg-hover)] transition-colors ${
+              className={`w-full text-left px-4 py-3 text-[14px] flex items-center justify-between hover:bg-[var(--bg-hover)] transition-colors ${
                 option.value === value
                   ? 'text-[var(--text-accent)]'
                   : 'text-[var(--text-primary)]'

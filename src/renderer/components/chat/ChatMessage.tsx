@@ -14,35 +14,35 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
   return (
     <div
-      className={`flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`}
+      className={`flex gap-4 ${isUser ? 'flex-row-reverse' : ''}`}
       style={{ animation: 'slide-up 200ms ease-out' }}
     >
       {/* Avatar */}
       <div
-        className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+        className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
           isUser
             ? 'bg-[var(--bg-active)]'
             : isError
-            ? 'bg-red-500/15'
-            : 'bg-gradient-to-br from-indigo-500/20 to-violet-500/20'
+            ? 'bg-[var(--color-error)]/15'
+            : 'bg-gradient-to-br from-[var(--accent-primary)]/20 to-[var(--accent-secondary)]/20'
         }`}
       >
         {isUser ? (
-          <User size={13} className="text-[var(--text-secondary)]" />
+          <User size={15} className="text-[var(--text-secondary)]" />
         ) : isError ? (
-          <AlertCircle size={13} className="text-red-400" />
+          <AlertCircle size={15} className="text-[var(--color-error)]" />
         ) : (
-          <Sparkles size={13} className="text-[var(--text-accent)]" />
+          <Sparkles size={15} className="text-[var(--text-accent)]" />
         )}
       </div>
 
       {/* Bubble */}
       <div
-        className={`max-w-[80%] rounded-xl px-3.5 py-2.5 text-sm ${
+        className={`max-w-[80%] rounded-xl px-5 py-3.5 text-[15px] ${
           isUser
-            ? 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-[var(--shadow-sm)]'
+            ? 'bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-primary-strong)] text-[var(--text-on-accent)] shadow-[var(--elevation-2)]'
             : isError
-            ? 'bg-red-500/8 text-red-300 border border-red-500/15'
+            ? 'bg-[var(--color-error)]/10 text-[var(--color-error)] border border-[var(--color-error)]/30'
             : 'bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)]'
         }`}
       >
@@ -56,8 +56,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
         {/* Timestamp */}
         <div
-          className={`text-[10px] mt-1.5 font-medium ${
-            isUser ? 'text-white/50' : 'text-[var(--text-tertiary)]'
+          className={`text-[11px] mt-2 font-medium ${
+            isUser ? 'text-white/65' : 'text-[var(--text-tertiary)]'
           }`}
         >
           {formatTimestamp(message.timestamp)}

@@ -105,17 +105,17 @@ export function QuickActions() {
   }
 
   return (
-    <div className="p-4 space-y-3">
-      <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-tertiary)]">
+    <div className="p-6 space-y-4">
+      <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
         {heading}
       </p>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-3.5">
         {actions.map((action) => (
           <button
             key={action.label}
             onClick={() => sendPrompt(action.prompt)}
             disabled={isAgentWorking}
-            className="text-xs px-3 py-1.5 rounded-lg bg-[var(--bg-input)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--border-active)] transition-all disabled:opacity-40 font-medium"
+            className="text-[14px] px-4 py-3 rounded-xl bg-[var(--bg-input)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--border-active)] hover:shadow-[var(--shadow-xs)] transition-all disabled:opacity-50 font-medium"
           >
             {action.label}
           </button>
@@ -124,9 +124,9 @@ export function QuickActions() {
           <button
             onClick={openImportWizard}
             disabled={isAgentWorking}
-            className="text-xs px-3 py-1.5 rounded-lg bg-[var(--bg-input)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--border-active)] transition-all disabled:opacity-40 font-medium inline-flex items-center gap-1.5"
+            className="text-[14px] px-4 py-3 rounded-xl bg-[var(--bg-input)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--border-active)] hover:shadow-[var(--shadow-xs)] transition-all disabled:opacity-50 font-medium inline-flex items-center gap-2"
           >
-            <FileUp size={12} />
+            <FileUp size={14} />
             Import a manuscript
           </button>
         )}

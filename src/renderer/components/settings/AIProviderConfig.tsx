@@ -93,39 +93,39 @@ export function AIProviderConfig() {
     <div className="space-y-8">
       {status && (
         <div
-          className={`p-3 rounded-xl text-sm flex items-center gap-2 ${
+          className={`p-4 rounded-xl text-sm flex items-center gap-2.5 ${
             isStatusError
               ? 'bg-red-500/10 text-red-300 border border-red-500/20'
               : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
           }`}
           style={{ animation: 'slide-up 200ms ease-out' }}
         >
-          {isStatusError ? <AlertCircle size={14} /> : <CheckCircle2 size={14} />}
+          {isStatusError ? <AlertCircle size={16} /> : <CheckCircle2 size={16} />}
           {status}
         </div>
       )}
 
       {/* Anthropic */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         <div className="flex items-center gap-2.5">
           <h3 className="text-sm font-semibold text-[var(--text-primary)]">Anthropic (Claude)</h3>
           {anthropicHasKey && (
-            <span className="text-[10px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 font-medium">
+            <span className="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 font-medium">
               Connected
             </span>
           )}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <input
             type="password"
             value={anthropicKey}
             onChange={(e) => setAnthropicKey(e.target.value)}
             placeholder={anthropicHasKey ? 'Key saved (enter new to replace)' : 'sk-ant-...'}
-            className="flex-1 px-3.5 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+            className="flex-1 px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
           />
           <Button
-            size="sm"
+            size="md"
             onClick={() => handleSaveKey('anthropic', anthropicKey)}
             isLoading={isValidating}
             disabled={!anthropicKey.trim()}
@@ -145,26 +145,26 @@ export function AIProviderConfig() {
       <div className="border-t border-[var(--border)]" />
 
       {/* OpenAI */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         <div className="flex items-center gap-2.5">
           <h3 className="text-sm font-semibold text-[var(--text-primary)]">OpenAI</h3>
           {openaiHasKey && (
-            <span className="text-[10px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 font-medium">
+            <span className="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 font-medium">
               Connected
             </span>
           )}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <input
             type="password"
             value={openaiKey}
             onChange={(e) => setOpenaiKey(e.target.value)}
             placeholder={openaiHasKey ? 'Key saved (enter new to replace)' : 'sk-...'}
-            className="flex-1 px-3.5 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+            className="flex-1 px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
           />
           <Button
-            size="sm"
+            size="md"
             onClick={() => handleSaveKey('openai', openaiKey)}
             isLoading={isValidating}
             disabled={!openaiKey.trim()}

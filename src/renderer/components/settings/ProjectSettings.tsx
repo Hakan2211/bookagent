@@ -28,12 +28,12 @@ export function ProjectSettings() {
     )
   }
 
-  const inputClasses = "w-full px-3.5 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+  const inputClasses = "w-full px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div>
-        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Book Title</label>
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Book Title</label>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -42,7 +42,7 @@ export function ProjectSettings() {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Author</label>
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Author</label>
         <input
           value={author}
           onChange={(e) => setAuthor(e.target.value)}
@@ -50,9 +50,9 @@ export function ProjectSettings() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-5">
         <div>
-          <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
+          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
             Total Word Target
           </label>
           <input
@@ -63,7 +63,7 @@ export function ProjectSettings() {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
+          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
             Chapter Word Target
           </label>
           <input
@@ -75,7 +75,7 @@ export function ProjectSettings() {
         </div>
       </div>
 
-      <Button variant="primary">
+      <Button variant="primary" size="md">
         Save Project Settings
       </Button>
     </div>

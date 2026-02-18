@@ -28,8 +28,8 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
 
   const sizeClasses = {
     sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
+    md: 'max-w-xl',
+    lg: 'max-w-3xl',
     xl: 'max-w-4xl',
     full: 'max-w-[90vw] max-h-[90vh]'
   }
@@ -50,19 +50,19 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
         className={`relative ${sizeClasses[size]} w-full mx-4 bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden`}
         style={{
           animation: 'scale-in 250ms cubic-bezier(0.16, 1, 0.3, 1)',
-          boxShadow: 'var(--shadow-xl), 0 0 0 1px rgba(255,255,255,0.03)'
+          boxShadow: 'var(--elevation-4)'
         }}
       >
         {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-            <h2 className="text-base font-semibold text-[var(--text-primary)] tracking-tight">
+          <div className="flex items-center justify-between px-8 py-6 border-b border-[var(--border)]">
+            <h2 className="text-lg font-semibold text-[var(--text-primary)] tracking-tight">
               {title}
             </h2>
             <button
               onClick={onClose}
-              className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--bg-hover)]"
+              className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors p-2 rounded-xl hover:bg-[var(--bg-hover)]"
             >
-              <X size={16} />
+              <X size={18} />
             </button>
           </div>
         )}

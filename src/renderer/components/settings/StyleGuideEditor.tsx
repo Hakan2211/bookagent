@@ -63,12 +63,12 @@ export function StyleGuideEditor() {
     )
   }
 
-  const inputClasses = "w-full px-3.5 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+  const inputClasses = "w-full px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div>
-        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Genre</label>
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Genre</label>
         <input
           value={genre}
           onChange={(e) => setGenre(e.target.value)}
@@ -77,9 +77,9 @@ export function StyleGuideEditor() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-5">
         <div>
-          <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Point of View</label>
+          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Point of View</label>
           <Dropdown
             options={[
               { value: '', label: 'Not specified' },
@@ -93,7 +93,7 @@ export function StyleGuideEditor() {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Tense</label>
+          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Tense</label>
           <Dropdown
             options={[
               { value: '', label: 'Not specified' },
@@ -107,7 +107,7 @@ export function StyleGuideEditor() {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Tone</label>
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Tone</label>
         <input
           value={tone}
           onChange={(e) => setTone(e.target.value)}
@@ -117,7 +117,7 @@ export function StyleGuideEditor() {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
           Words to Avoid (comma-separated)
         </label>
         <input
@@ -129,19 +129,19 @@ export function StyleGuideEditor() {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
           Custom AI Instructions
         </label>
         <textarea
           value={customInstructions}
           onChange={(e) => setCustomInstructions(e.target.value)}
           placeholder="e.g., Short paragraphs. Show don't tell. Hemingway-esque clarity."
-          rows={3}
+          rows={4}
           className={`${inputClasses} resize-y leading-relaxed`}
         />
       </div>
 
-      <Button variant="primary" onClick={handleSave}>
+      <Button variant="primary" onClick={handleSave} size="md">
         Save Style Guide
       </Button>
     </div>

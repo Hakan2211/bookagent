@@ -29,22 +29,22 @@ export function ProjectTree() {
   }
 
   return (
-    <div className="py-2">
+    <div className="py-4">
       {/* Outline */}
       <OutlineView />
 
       {/* Chapters */}
-      <div className="mt-1">
-        <div className="px-4 py-2 flex items-center justify-between">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-tertiary)]">
+      <div className="mt-4">
+        <div className="px-6 py-3.5 flex items-center justify-between">
+          <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)]">
             Chapters
           </span>
           <button
             onClick={handleAddChapter}
-            className="text-[var(--text-tertiary)] hover:text-[var(--text-accent)] transition-colors p-0.5 rounded hover:bg-[var(--bg-hover)]"
+            className="text-[var(--text-secondary)]/80 hover:text-[var(--text-accent)] transition-all p-2 rounded-lg hover:bg-[var(--bg-hover)] hover:shadow-[var(--shadow-xs)]"
             title="New chapter"
           >
-            <Plus size={14} />
+            <Plus size={15} />
           </button>
         </div>
         <div>
@@ -59,7 +59,7 @@ export function ProjectTree() {
           ))}
         </div>
         {manifest.chapters.length === 0 && (
-          <div className="px-4 py-3 text-xs text-[var(--text-tertiary)] italic">
+          <div className="px-6 py-4 text-[14px] text-[var(--text-secondary)]/75 italic">
             No chapters yet
           </div>
         )}

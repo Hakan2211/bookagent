@@ -28,19 +28,19 @@ export function OutlineView() {
     <div>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+        className="w-full px-6 py-3.5 flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
       >
         <ChevronRight
-          size={12}
+          size={13}
           className={`transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
         />
         Outline
       </button>
 
       {expanded && (
-        <div className="px-4 py-1.5 text-xs text-[var(--text-secondary)] whitespace-pre-wrap max-h-48 overflow-y-auto leading-relaxed">
+        <div className="px-6 py-4 text-[14px] text-[var(--text-secondary)] whitespace-pre-wrap max-h-48 overflow-y-auto leading-relaxed">
           {content || (
-            <span className="text-[var(--text-tertiary)] italic">No outline generated yet</span>
+            <span className="text-[var(--text-secondary)]/80 italic">No outline generated yet</span>
           )}
         </div>
       )}

@@ -18,23 +18,23 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-accent)]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)] disabled:opacity-40 disabled:pointer-events-none select-none'
+    'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)] disabled:opacity-50 disabled:pointer-events-none select-none'
 
   const variants = {
     primary:
-      'bg-gradient-to-r from-indigo-500 via-indigo-400 to-violet-400 text-white shadow-[0_1px_2px_rgba(0,0,0,0.3),0_0_12px_rgba(129,140,248,0.15)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.3),0_0_20px_rgba(129,140,248,0.25)] hover:brightness-110 active:brightness-95 active:scale-[0.98]',
+      'bg-gradient-to-r from-[var(--accent-primary)] via-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)] shadow-[var(--elevation-1)] hover:shadow-[var(--shadow-glow)] hover:brightness-110 active:brightness-95 active:scale-[0.98]',
     secondary:
-      'bg-[var(--bg-input)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--border-active)] shadow-[var(--shadow-xs)] active:scale-[0.98]',
+      'bg-[var(--bg-input)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--border-active)] shadow-[var(--shadow-xs)] hover:shadow-[var(--elevation-1)] active:scale-[0.98]',
     ghost:
       'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] active:scale-[0.98]',
     danger:
-      'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/30 active:scale-[0.98]'
+      'bg-[var(--color-error)]/10 text-[var(--color-error)] hover:bg-[var(--color-error)]/20 border border-[var(--color-error)]/30 hover:border-[var(--color-error)]/50 active:scale-[0.98]'
   }
 
   const sizes = {
-    sm: 'h-7 px-2.5 text-xs gap-1.5 rounded-md',
-    md: 'h-9 px-4 text-sm gap-2 rounded-lg',
-    lg: 'h-11 px-6 text-sm gap-2.5 rounded-lg font-semibold'
+    sm: 'h-9 px-3.5 text-[13px] gap-1.5 rounded-lg',
+    md: 'h-10 px-5 text-[14px] gap-2 rounded-xl',
+    lg: 'h-12 px-7 text-[15px] gap-2.5 rounded-xl font-semibold'
   }
 
   return (

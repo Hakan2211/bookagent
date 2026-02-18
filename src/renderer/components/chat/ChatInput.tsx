@@ -30,8 +30,8 @@ export function ChatInput() {
   }
 
   return (
-    <div className="p-3.5 border-t border-[var(--border)] shrink-0">
-      <div className="flex items-end gap-2">
+    <div className="p-6 border-t border-[var(--border)] shrink-0 bg-[var(--bg-chat)]">
+      <div className="flex items-end gap-3">
         <textarea
           ref={textareaRef}
           value={input}
@@ -40,17 +40,17 @@ export function ChatInput() {
           placeholder={isAgentWorking ? 'Agent is working...' : 'Type a prompt...'}
           disabled={isAgentWorking}
           rows={1}
-          className="flex-1 bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-sm resize-none outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] placeholder:text-[var(--text-tertiary)] disabled:opacity-40 transition-all leading-relaxed"
+          className="flex-1 bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-xl px-4 py-3.5 text-[15px] resize-none outline-none focus:border-[var(--border-active)] focus:shadow-[0_0_0_2px_var(--focus-ring-soft),var(--shadow-glow-sm)] placeholder:text-[var(--text-tertiary)]/85 disabled:opacity-50 transition-all leading-relaxed"
         />
         <button
           onClick={handleSend}
           disabled={!input.trim() || isAgentWorking}
-          className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white disabled:opacity-25 hover:shadow-[var(--shadow-glow-sm)] hover:brightness-110 transition-all active:scale-95"
+          className="shrink-0 w-11 h-11 flex items-center justify-center rounded-xl bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)] disabled:opacity-35 hover:shadow-[var(--shadow-glow)] hover:brightness-110 focus-visible:shadow-[0_0_0_2px_var(--bg-chat),0_0_0_4px_var(--focus-ring)] transition-all active:scale-95"
         >
-          <SendHorizontal size={15} />
+          <SendHorizontal size={16} />
         </button>
       </div>
-      <div className="text-[10px] text-[var(--text-tertiary)] mt-1.5 px-1 font-medium">
+      <div className="text-[12px] text-[var(--text-secondary)]/80 mt-3 px-1 font-medium">
         Enter to send, Shift+Enter for new line
       </div>
     </div>

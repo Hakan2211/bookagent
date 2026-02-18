@@ -27,7 +27,7 @@ export function SettingsModal() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-5 py-3 text-sm font-medium transition-all relative ${
+            className={`px-6 py-3.5 text-[15px] font-medium transition-all relative ${
               activeTab === tab.id
                 ? 'text-[var(--text-accent)]'
                 : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
@@ -41,7 +41,7 @@ export function SettingsModal() {
         ))}
       </div>
 
-      <div className="p-6">
+      <div className="p-8">
         {activeTab === 'ai' && <AIProviderConfig />}
         {activeTab === 'style' && <StyleGuideEditor />}
         {activeTab === 'project' && <ProjectSettings />}

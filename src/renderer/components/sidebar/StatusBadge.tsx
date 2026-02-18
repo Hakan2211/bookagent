@@ -17,10 +17,10 @@ export function StatusBadge({ status }: StatusBadgeProps) {
 
   return (
     <span
-      className="w-2 h-2 rounded-full shrink-0"
+      className="w-3 h-3 rounded-full shrink-0"
       style={{
         backgroundColor: config.color,
-        boxShadow: `0 0 6px ${config.bg}`
+        boxShadow: `0 0 12px ${config.bg}`
       }}
       title={status}
     />

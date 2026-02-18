@@ -10,13 +10,13 @@ export function NotesSection() {
   if (!manifest) return null
 
   return (
-    <div className="mt-2">
+    <div className="mt-4">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+        className="w-full px-6 py-3.5 flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
       >
         <ChevronRight
-          size={12}
+          size={13}
           className={`transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
         />
         Notes
@@ -55,14 +55,14 @@ function NoteItem({ noteId, title }: { noteId: string; title: string }) {
     <div>
       <button
         onClick={handleOpen}
-        className="w-full text-left px-4 py-2 pl-9 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] transition-all flex items-center gap-2"
+        className="w-full text-left px-6 py-3.5 pl-11 text-[15px] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] transition-all flex items-center gap-3"
       >
-        <FileText size={13} className="text-[var(--text-tertiary)] shrink-0" />
+        <FileText size={14} className="text-[var(--text-tertiary)] shrink-0" />
         {title}
       </button>
 
       {isOpen && (
-        <div className="px-3 pb-2">
+        <div className="px-6 pb-4">
           <textarea
             value={content}
             onChange={(e) => {
@@ -70,7 +70,7 @@ function NoteItem({ noteId, title }: { noteId: string; title: string }) {
               setIsDirty(true)
             }}
             onBlur={() => isDirty && handleSave()}
-            className="w-full h-32 text-xs bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-lg p-3 resize-y outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all leading-relaxed"
+            className="w-full h-40 text-[14px] bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-xl px-4 py-3.5 resize-y outline-none focus:border-[var(--border-active)] focus:shadow-[0_0_0_2px_var(--focus-ring-soft),var(--shadow-glow-sm)] placeholder:text-[var(--text-tertiary)]/85 transition-all leading-relaxed"
             placeholder={`Write ${title.toLowerCase()} here...`}
           />
         </div>

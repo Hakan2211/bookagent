@@ -17,11 +17,11 @@ export function StatusBar() {
   const provider = manifest?.ai.provider || 'none'
 
   return (
-    <div className="h-7 flex items-center px-4 gap-5 bg-[var(--bg-sidebar)] border-t border-[var(--border)] text-[11px] text-[var(--text-tertiary)] shrink-0 select-none">
+    <div className="h-9 flex items-center px-5 gap-5 bg-[var(--bg-sidebar)] border-t border-[var(--border)] text-sm text-[var(--text-secondary)] shrink-0 select-none">
       {/* Status */}
       {activeChapter && (
         <span
-          className="px-2 py-0.5 rounded-md text-[10px] uppercase font-semibold tracking-wide"
+          className="px-2.5 py-1 rounded-md text-xs uppercase font-semibold tracking-wide"
           style={{
             color:
               activeChapter.status === 'final'
@@ -47,8 +47,8 @@ export function StatusBar() {
 
       {/* Save indicator */}
       {isDirty && (
-        <span className="text-amber-400/80 flex items-center gap-1">
-          <span className="w-1 h-1 rounded-full bg-amber-400 animate-pulse" />
+        <span className="text-[var(--color-warning)]/95 flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-warning)] animate-pulse" />
           Unsaved
         </span>
       )}
@@ -62,9 +62,9 @@ export function StatusBar() {
           <span className="tabular-nums">
             {totalWords.toLocaleString()} / {targetWords.toLocaleString()} words
           </span>
-          <div className="w-20 h-1 bg-[var(--bg-active)] rounded-full overflow-hidden">
+          <div className="w-24 h-1.5 bg-[var(--bg-active)] rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-indigo-500 to-violet-400 rounded-full transition-all duration-500"
+              className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-full transition-all duration-500"
               style={{ width: `${Math.min(100, percentage)}%` }}
             />
           </div>
@@ -76,7 +76,7 @@ export function StatusBar() {
       <div className="flex items-center gap-1.5">
         <div
           className={`w-1.5 h-1.5 rounded-full ${
-            isAgentWorking ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400'
+            isAgentWorking ? 'bg-[var(--color-warning)] animate-pulse' : 'bg-[var(--color-success)]'
           }`}
         />
         <span className="capitalize">{provider}</span>

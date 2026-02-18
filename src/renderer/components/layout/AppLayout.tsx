@@ -14,10 +14,10 @@ export function AppLayout() {
     <div className="h-screen flex flex-col bg-[var(--bg-base)]">
       {/* Title bar drag region */}
       <div
-        className="h-9 flex items-center justify-center text-[11px] font-medium text-[var(--text-tertiary)] select-none shrink-0 border-b border-[var(--border-subtle)]"
+        className="h-10 flex items-center justify-center text-xs font-semibold text-[var(--text-secondary)]/85 select-none shrink-0 border-b border-[var(--border-subtle)]"
         style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
       >
-        <span className="pl-20 tracking-wide uppercase">ChapterForge</span>
+        <span className="pl-20 tracking-[0.12em] uppercase">ChapterForge</span>
       </div>
 
       {/* Main content area */}
@@ -28,14 +28,14 @@ export function AppLayout() {
             <>
               <Panel
                 id="sidebar"
-                defaultSize={15}
-                minSize={12}
+                defaultSize={18}
+                minSize={14}
                 maxSize={25}
                 order={1}
               >
                 <Sidebar />
               </Panel>
-              <PanelResizeHandle className="w-px hover:w-[3px] bg-[var(--border)] hover:bg-[var(--border-active)] transition-all duration-150" />
+              <PanelResizeHandle className="w-px hover:w-[3px] bg-[var(--border-subtle)] hover:bg-[var(--border-active)] transition-all duration-150" />
             </>
           )}
 
@@ -47,7 +47,7 @@ export function AppLayout() {
           {/* Chat Panel */}
           {!chatPanelCollapsed && (
             <>
-              <PanelResizeHandle className="w-px hover:w-[3px] bg-[var(--border)] hover:bg-[var(--border-active)] transition-all duration-150" />
+              <PanelResizeHandle className="w-[2px] hover:w-[4px] bg-[var(--border-subtle)] hover:bg-[var(--border-active)] transition-all duration-150" />
               <Panel
                 id="chat"
                 defaultSize={25}

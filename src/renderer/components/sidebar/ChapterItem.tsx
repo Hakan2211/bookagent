@@ -35,18 +35,18 @@ export function ChapterItem({ chapter, index, isActive, onClick }: ChapterItemPr
       <button
         onClick={onClick}
         onContextMenu={handleContextMenu}
-        className={`w-full text-left px-4 py-2 flex items-center gap-2.5 text-sm transition-all ${
+        className={`w-full text-left px-6 py-3.5 flex items-center gap-3 text-[15px] transition-all ${
           isActive
-            ? 'bg-[var(--bg-active)] text-[var(--text-primary)] border-l-2 border-l-[var(--text-accent)]'
-            : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] border-l-2 border-l-transparent'
+            ? 'bg-[var(--bg-active)] text-[var(--text-primary)] border-l-4 border-l-[var(--text-accent)] shadow-[inset_0_0_0_1px_var(--border-subtle)]'
+            : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] border-l-4 border-l-transparent'
         }`}
       >
-        <span className="text-[10px] text-[var(--text-tertiary)] w-5 text-right shrink-0 tabular-nums font-medium">
+        <span className="text-[12px] text-[var(--text-secondary)]/80 w-6 text-right shrink-0 tabular-nums font-medium">
           {String(index + 1).padStart(2, '0')}
         </span>
         <StatusBadge status={chapter.status} />
         <span className="truncate flex-1">{chapter.title}</span>
-        <span className="text-[10px] text-[var(--text-tertiary)] shrink-0 tabular-nums">
+        <span className="text-[12px] text-[var(--text-tertiary)] shrink-0 tabular-nums">
           {formatWordCount(chapter.wordCount)}
         </span>
       </button>
@@ -59,14 +59,14 @@ export function ChapterItem({ chapter, index, isActive, onClick }: ChapterItemPr
             onClick={() => setShowContextMenu(false)}
           />
           <div
-            className="absolute right-2 top-full z-50 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg py-1 min-w-[140px]"
+            className="absolute right-2 top-full z-50 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl py-1.5 min-w-[160px]"
             style={{ boxShadow: 'var(--shadow-lg)', animation: 'slide-up 100ms ease-out' }}
           >
             <button
               onClick={handleDelete}
-              className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-[var(--bg-hover)] flex items-center gap-2"
+              className="w-full text-left px-4 py-2.5 text-[14px] text-[var(--color-error)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
             >
-              <Trash2 size={13} />
+              <Trash2 size={14} />
               Delete
             </button>
           </div>

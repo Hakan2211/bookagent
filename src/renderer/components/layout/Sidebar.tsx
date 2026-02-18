@@ -7,12 +7,12 @@ export function Sidebar() {
   const isOpen = useProjectStore((s) => s.isOpen)
 
   return (
-    <div className="h-full bg-[var(--bg-sidebar)] flex flex-col overflow-hidden">
+    <div className="h-full bg-[var(--bg-sidebar)] flex flex-col overflow-hidden border-r border-[var(--border-subtle)]">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-[var(--border)] shrink-0">
-        <div className="flex items-center gap-2">
-          <BookOpen size={13} className="text-[var(--text-tertiary)]" />
-          <h2 className="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-tertiary)]">
+      <div className="px-6 py-5 border-b border-[var(--border)] shrink-0">
+        <div className="flex items-center gap-3">
+          <BookOpen size={16} className="text-[var(--text-accent)]" />
+          <h2 className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
             Project
           </h2>
         </div>
@@ -23,7 +23,7 @@ export function Sidebar() {
         {isOpen ? (
           <ProjectTree />
         ) : (
-          <div className="p-5 text-sm text-[var(--text-tertiary)]">
+          <div className="p-6 text-[15px] text-[var(--text-secondary)]/80">
             No project open
           </div>
         )}
