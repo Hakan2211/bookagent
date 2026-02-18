@@ -151,8 +151,9 @@ export function EditorPane() {
     )
   }
 
-  // State: Project open, chapters exist but none selected
-  if (!activeChapterId) {
+  // State: Project open, chapters exist but none selected (or stale reference to deleted chapter)
+  const chapterExists = manifest?.chapters.some((ch) => ch.id === activeChapterId)
+  if (!activeChapterId || !chapterExists) {
     return (
       <div className="h-full flex items-center justify-center bg-[var(--bg-editor)]">
         <div className="text-center" style={{ animation: 'fade-in 400ms ease-out' }}>

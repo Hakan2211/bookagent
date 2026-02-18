@@ -415,6 +415,23 @@ export function registerIPC(
     return result.canceled ? null : result.filePaths[0]
   })
 
+  ipcMain.handle(
+    IPC.DIALOG_CONFIRM,
+    async (_event, args: { message: string; title?: string; confirmLabel?: string }) => {
+      const win = BrowserWindow.getFocusedWindow()
+      if (!win) return false
+      const result = await dialog.showMessageBox(win, {
+        type: 'warning',
+        title: args.title || 'Confirm',
+        message: args.message,
+        buttons: [args.confirmLabel || 'Delete', 'Cancel'],
+        defaultId: 1,
+        cancelId: 1
+      })
+      return result.response === 0
+    }
+  )
+
   // ── App Handlers ──────────────────────────
 
   ipcMain.handle(IPC.APP_GET_DOCUMENTS_PATH, async () => {

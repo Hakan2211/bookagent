@@ -55,6 +55,7 @@ export const IPC = {
   DIALOG_OPEN_FOLDER: 'dialog:open-folder',
   DIALOG_OPEN_FILE: 'dialog:open-file',
   DIALOG_SAVE_FOLDER: 'dialog:save-folder',
+  DIALOG_CONFIRM: 'dialog:confirm',
 
   // ── App ────────────────────────────────────
   APP_GET_DOCUMENTS_PATH: 'app:get-documents-path',
