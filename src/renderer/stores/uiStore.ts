@@ -1,4 +1,7 @@
 import { create } from 'zustand'
+import { IPC } from '@shared/ipc-channels'
+
+export type ApiStatusState = 'connected' | 'unavailable' | 'checking' | 'no-key'
 
 interface UIState {
   sidebarCollapsed: boolean
@@ -7,6 +10,11 @@ interface UIState {
   searchQuery: string
   isSearchOpen: boolean
   isImportWizardOpen: boolean
+
+  apiStatus: ApiStatusState
+  apiProvider: string
+  apiModel: string
+  apiModelName: string
 
   toggleSidebar: () => void
   toggleChatPanel: () => void
@@ -17,6 +25,7 @@ interface UIState {
   setSearchQuery: (query: string) => void
   openImportWizard: () => void
   closeImportWizard: () => void
+  checkApiStatus: () => Promise<void>
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -26,6 +35,11 @@ export const useUIStore = create<UIState>((set) => ({
   searchQuery: '',
   isSearchOpen: false,
   isImportWizardOpen: false,
+
+  apiStatus: 'checking',
+  apiProvider: '',
+  apiModel: '',
+  apiModelName: '',
 
   toggleSidebar: () =>
     set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
@@ -45,5 +59,25 @@ export const useUIStore = create<UIState>((set) => ({
 
   openImportWizard: () => set({ isImportWizardOpen: true }),
 
-  closeImportWizard: () => set({ isImportWizardOpen: false })
+  closeImportWizard: () => set({ isImportWizardOpen: false }),
+
+  checkApiStatus: async () => {
+    set({ apiStatus: 'checking' })
+    try {
+      const result = (await window.api.invoke(IPC.SETTINGS_CHECK_API_STATUS)) as {
+        status: 'connected' | 'unavailable' | 'no-key'
+        provider: string
+        model: string
+        modelName: string
+      }
+      set({
+        apiStatus: result.status,
+        apiProvider: result.provider,
+        apiModel: result.model,
+        apiModelName: result.modelName
+      })
+    } catch {
+      set({ apiStatus: 'unavailable', apiProvider: '', apiModel: '', apiModelName: '' })
+    }
+  }
 }))

@@ -39,7 +39,7 @@ export class ProjectManager {
       modified: now,
       targets: {
         totalWords: metadata.targetWords || 80000,
-        chapterWords: metadata.chapterWords || 3000
+        chapterWords: metadata.chapterWords || 0
       },
       chapters: [],
       notes: [

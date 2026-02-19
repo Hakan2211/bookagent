@@ -42,7 +42,7 @@ export function ImportWizard() {
     try {
       const result = (await window.api.invoke(IPC.IMPORT_START, {
         filePath: path,
-        config: { targetChapterWords: 3000 }
+        config: { targetChapterWords: 5000 }
       })) as ProposedSplit
 
       setProposedSplit(result)

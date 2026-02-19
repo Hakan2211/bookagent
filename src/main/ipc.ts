@@ -14,6 +14,7 @@ import { AIRegistry } from './ai/registry'
 import { keychain } from './ai/keychain'
 import { AnthropicProvider } from './ai/providers/AnthropicProvider'
 import { OpenAIProvider } from './ai/providers/OpenAIProvider'
+import { OpenRouterProvider } from './ai/providers/OpenRouterProvider'
 import { ImportPipeline } from './import/ImportPipeline'
 import { Agent } from './agent/Agent'
 import { SnapshotManager } from './history/SnapshotManager'
@@ -25,6 +26,7 @@ const settingsStore = new Store<AppSettings>({
   defaults: {
     anthropicModel: 'claude-sonnet-4-5-20250929',
     openaiModel: 'gpt-4o',
+    openrouterModel: 'anthropic/claude-sonnet-4.6',
     theme: 'dark',
     sidebarWidth: 220,
     chatPanelWidth: 350,
@@ -325,6 +327,15 @@ export function registerIPC(
             new OpenAIProvider(args.key, settingsStore.get('openaiModel'))
           )
         }
+      } else if (args.provider === 'openrouter') {
+        const provider = new OpenRouterProvider(args.key)
+        valid = await provider.validateKey(args.key)
+        if (valid) {
+          await keychain.storeKey('openrouter', args.key)
+          aiRegistry.register(
+            new OpenRouterProvider(args.key, settingsStore.get('openrouterModel'))
+          )
+        }
       }
 
       return { valid }
@@ -336,7 +347,8 @@ export function registerIPC(
     async () => {
       return {
         anthropic: await keychain.hasKey('anthropic'),
-        openai: await keychain.hasKey('openai')
+        openai: await keychain.hasKey('openai'),
+        openrouter: await keychain.hasKey('openrouter')
       }
     }
   )
@@ -348,8 +360,112 @@ export function registerIPC(
         return new AnthropicProvider('').getModels()
       } else if (args.provider === 'openai') {
         return new OpenAIProvider('').getModels()
+      } else if (args.provider === 'openrouter') {
+        return new OpenRouterProvider('').getModels()
       }
       return []
+    }
+  )
+
+  ipcMain.handle(IPC.SETTINGS_CHECK_API_STATUS, async () => {
+    // Check which providers have keys and try a lightweight connectivity test
+    const providers: Array<'anthropic' | 'openai' | 'openrouter'> = [
+      'anthropic',
+      'openai',
+      'openrouter'
+    ]
+    let connected = false
+    let activeProvider = ''
+    let activeModel = ''
+
+    // Determine the active provider from the open project, or fall back to whichever has a key
+    const projectProvider = projectManager.project?.manifest.ai.provider
+    const projectModel = projectManager.project?.manifest.ai.model
+
+    // Preferred check order: project provider first, then others
+    const ordered = projectProvider
+      ? [projectProvider, ...providers.filter((p) => p !== projectProvider)]
+      : providers
+
+    for (const provider of ordered) {
+      if (aiRegistry.has(provider)) {
+        try {
+          const apiKey = await keychain.getKey(provider)
+          if (apiKey) {
+            let valid = false
+            if (provider === 'anthropic') {
+              valid = await new AnthropicProvider(apiKey).validateKey(apiKey)
+            } else if (provider === 'openai') {
+              valid = await new OpenAIProvider(apiKey).validateKey(apiKey)
+            } else if (provider === 'openrouter') {
+              valid = await new OpenRouterProvider(apiKey).validateKey(apiKey)
+            }
+            if (valid) {
+              connected = true
+              activeProvider = provider
+              // Get model name
+              if (provider === projectProvider && projectModel) {
+                activeModel = projectModel
+              } else {
+                const settingKey =
+                  provider === 'anthropic'
+                    ? 'anthropicModel'
+                    : provider === 'openai'
+                      ? 'openaiModel'
+                      : 'openrouterModel'
+                activeModel = settingsStore.get(settingKey) as string
+              }
+              break
+            }
+          }
+        } catch {
+          // continue to next provider
+        }
+      }
+    }
+
+    // If no registered provider was reachable, check if any keys exist at all
+    const hasAnyKey =
+      (await keychain.hasKey('anthropic')) ||
+      (await keychain.hasKey('openai')) ||
+      (await keychain.hasKey('openrouter'))
+
+    // Look up a friendly model name from the provider's model list
+    let modelName = activeModel
+    if (connected && activeModel) {
+      let modelList: { id: string; name: string }[] = []
+      if (activeProvider === 'anthropic') {
+        modelList = new AnthropicProvider('').getModels()
+      } else if (activeProvider === 'openai') {
+        modelList = new OpenAIProvider('').getModels()
+      } else if (activeProvider === 'openrouter') {
+        modelList = new OpenRouterProvider('').getModels()
+      }
+      const found = modelList.find((m) => m.id === activeModel)
+      if (found) modelName = found.name
+    }
+
+    return {
+      status: connected ? 'connected' : hasAnyKey ? 'unavailable' : 'no-key',
+      provider: activeProvider,
+      model: activeModel,
+      modelName
+    }
+  })
+
+  ipcMain.handle(
+    IPC.PROJECT_UPDATE_SETTINGS,
+    async (
+      _event,
+      args: { title?: string; author?: string; totalWords?: number }
+    ) => {
+      if (!projectManager.project) throw new Error('No project open')
+      const manifest = projectManager.project.manifest
+      if (args.title !== undefined) manifest.title = args.title
+      if (args.author !== undefined) manifest.author = args.author
+      if (args.totalWords !== undefined) manifest.targets.totalWords = args.totalWords
+      await projectManager.project.saveManifest()
+      return manifest
     }
   )
 

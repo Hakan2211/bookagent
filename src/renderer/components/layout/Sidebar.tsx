@@ -1,10 +1,12 @@
 import React from 'react'
 import { ProjectTree } from '../sidebar/ProjectTree'
 import { useProjectStore } from '../../stores/projectStore'
-import { BookOpen } from 'lucide-react'
+import { useUIStore } from '../../stores/uiStore'
+import { BookOpen, Settings } from 'lucide-react'
 
 export function Sidebar() {
   const isOpen = useProjectStore((s) => s.isOpen)
+  const openModal = useUIStore((s) => s.openModal)
 
   return (
     <div className="h-full bg-[var(--bg-sidebar)] flex flex-col overflow-hidden border-r border-[var(--border-subtle)]">
@@ -27,6 +29,17 @@ export function Sidebar() {
             No project open
           </div>
         )}
+      </div>
+
+      {/* Footer — Settings button */}
+      <div className="shrink-0 border-t border-[var(--border-subtle)] px-4 py-3">
+        <button
+          onClick={() => openModal('settings')}
+          className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-[13px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-all duration-150"
+        >
+          <Settings size={15} />
+          <span>Settings</span>
+        </button>
       </div>
     </div>
   )

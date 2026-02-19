@@ -8,12 +8,16 @@ import { CheckCircle2, AlertCircle } from 'lucide-react'
 export function AIProviderConfig() {
   const [anthropicKey, setAnthropicKey] = useState('')
   const [openaiKey, setOpenaiKey] = useState('')
+  const [openrouterKey, setOpenrouterKey] = useState('')
   const [anthropicHasKey, setAnthropicHasKey] = useState(false)
   const [openaiHasKey, setOpenaiHasKey] = useState(false)
+  const [openrouterHasKey, setOpenrouterHasKey] = useState(false)
   const [anthropicModel, setAnthropicModel] = useState('claude-sonnet-4-5-20250929')
   const [openaiModel, setOpenaiModel] = useState('gpt-4o')
+  const [openrouterModel, setOpenrouterModel] = useState('anthropic/claude-sonnet-4.6')
   const [anthropicModels, setAnthropicModels] = useState<ModelInfo[]>([])
   const [openaiModels, setOpenaiModels] = useState<ModelInfo[]>([])
+  const [openrouterModels, setOpenrouterModels] = useState<ModelInfo[]>([])
   const [isValidating, setIsValidating] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
 
@@ -26,13 +30,16 @@ export function AIProviderConfig() {
     const keyStatus = (await window.api.invoke(IPC.SETTINGS_GET_API_KEY_STATUS)) as {
       anthropic: boolean
       openai: boolean
+      openrouter: boolean
     }
     setAnthropicHasKey(keyStatus.anthropic)
     setOpenaiHasKey(keyStatus.openai)
+    setOpenrouterHasKey(keyStatus.openrouter)
 
     const settings = (await window.api.invoke(IPC.SETTINGS_GET)) as Record<string, any>
     if (settings.anthropicModel) setAnthropicModel(settings.anthropicModel)
     if (settings.openaiModel) setOpenaiModel(settings.openaiModel)
+    if (settings.openrouterModel) setOpenrouterModel(settings.openrouterModel)
   }
 
   const loadModels = async () => {
@@ -45,6 +52,11 @@ export function AIProviderConfig() {
       provider: 'openai'
     })) as ModelInfo[]
     setOpenaiModels(oModels)
+
+    const orModels = (await window.api.invoke(IPC.SETTINGS_GET_MODELS, {
+      provider: 'openrouter'
+    })) as ModelInfo[]
+    setOpenrouterModels(orModels)
   }
 
   const handleSaveKey = async (provider: string, key: string) => {
@@ -63,9 +75,12 @@ export function AIProviderConfig() {
         if (provider === 'anthropic') {
           setAnthropicHasKey(true)
           setAnthropicKey('')
-        } else {
+        } else if (provider === 'openai') {
           setOpenaiHasKey(true)
           setOpenaiKey('')
+        } else if (provider === 'openrouter') {
+          setOpenrouterHasKey(true)
+          setOpenrouterKey('')
         }
       } else {
         setStatus(`Invalid ${provider} API key`)
@@ -81,9 +96,12 @@ export function AIProviderConfig() {
     if (provider === 'anthropic') {
       setAnthropicModel(model)
       await window.api.invoke(IPC.SETTINGS_SET, { anthropicModel: model })
-    } else {
+    } else if (provider === 'openai') {
       setOpenaiModel(model)
       await window.api.invoke(IPC.SETTINGS_SET, { openaiModel: model })
+    } else if (provider === 'openrouter') {
+      setOpenrouterModel(model)
+      await window.api.invoke(IPC.SETTINGS_SET, { openrouterModel: model })
     }
   }
 
@@ -177,6 +195,49 @@ export function AIProviderConfig() {
           options={openaiModels.map((m) => ({ value: m.id, label: m.name }))}
           value={openaiModel}
           onChange={(v) => handleModelChange('openai', v)}
+          placeholder="Select model"
+        />
+      </div>
+
+      <div className="border-t border-[var(--border)]" />
+
+      {/* OpenRouter */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2.5">
+          <h3 className="text-sm font-semibold text-[var(--text-primary)]">OpenRouter</h3>
+          {openrouterHasKey && (
+            <span className="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 font-medium">
+              Connected
+            </span>
+          )}
+        </div>
+
+        <p className="text-[12px] text-[var(--text-tertiary)] leading-relaxed">
+          Access 200+ models from all major providers through a single API key.
+        </p>
+
+        <div className="flex gap-3">
+          <input
+            type="password"
+            value={openrouterKey}
+            onChange={(e) => setOpenrouterKey(e.target.value)}
+            placeholder={openrouterHasKey ? 'Key saved (enter new to replace)' : 'sk-or-...'}
+            className="flex-1 px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+          />
+          <Button
+            size="md"
+            onClick={() => handleSaveKey('openrouter', openrouterKey)}
+            isLoading={isValidating}
+            disabled={!openrouterKey.trim()}
+          >
+            Save
+          </Button>
+        </div>
+
+        <Dropdown
+          options={openrouterModels.map((m) => ({ value: m.id, label: m.name }))}
+          value={openrouterModel}
+          onChange={(v) => handleModelChange('openrouter', v)}
           placeholder="Select model"
         />
       </div>

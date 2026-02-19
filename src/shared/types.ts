@@ -59,7 +59,7 @@ export interface AIConfig {
   keyRef: string
 }
 
-export type AIProviderName = 'anthropic' | 'openai'
+export type AIProviderName = 'anthropic' | 'openai' | 'openrouter'
 
 export interface ImportRecord {
   date: string
@@ -289,6 +289,7 @@ export interface RecentProject {
 export interface AppSettings {
   anthropicModel: string
   openaiModel: string
+  openrouterModel: string
   theme: 'dark' | 'light'
   sidebarWidth: number
   chatPanelWidth: number

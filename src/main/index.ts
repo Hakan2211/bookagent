@@ -8,6 +8,7 @@ import { AIRegistry } from './ai/registry'
 import { keychain } from './ai/keychain'
 import { AnthropicProvider } from './ai/providers/AnthropicProvider'
 import { OpenAIProvider } from './ai/providers/OpenAIProvider'
+import { OpenRouterProvider } from './ai/providers/OpenRouterProvider'
 import { SnapshotManager } from './history/SnapshotManager'
 import { SearchEngine } from './search/SearchEngine'
 import Store from 'electron-store'
@@ -15,7 +16,8 @@ import Store from 'electron-store'
 const settingsStore = new Store({
   defaults: {
     anthropicModel: 'claude-sonnet-4-5-20250929',
-    openaiModel: 'gpt-4o'
+    openaiModel: 'gpt-4o',
+    openrouterModel: 'anthropic/claude-sonnet-4.6'
   }
 })
 
@@ -56,6 +58,20 @@ app.whenReady().then(async () => {
     }
   } catch {
     console.warn('Failed to load OpenAI API key')
+  }
+
+  try {
+    const openrouterKey = await keychain.getKey('openrouter')
+    if (openrouterKey) {
+      aiRegistry.register(
+        new OpenRouterProvider(
+          openrouterKey,
+          settingsStore.get('openrouterModel') as string
+        )
+      )
+    }
+  } catch {
+    console.warn('Failed to load OpenRouter API key')
   }
 
   // Register IPC handlers

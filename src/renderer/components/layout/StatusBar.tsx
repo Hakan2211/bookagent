@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useProjectStore } from '../../stores/projectStore'
 import { useEditorStore } from '../../stores/editorStore'
 import { useChatStore } from '../../stores/chatStore'
+import { useUIStore } from '../../stores/uiStore'
+import type { ApiStatusState } from '../../stores/uiStore'
+
+const STATUS_CHECK_INTERVAL = 30_000
 
 export function StatusBar() {
   const manifest = useProjectStore((s) => s.manifest)
@@ -9,12 +13,58 @@ export function StatusBar() {
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
   const isAgentWorking = useChatStore((s) => s.isAgentWorking)
 
+  const apiStatus = useUIStore((s) => s.apiStatus)
+  const apiModelName = useUIStore((s) => s.apiModelName)
+  const apiProvider = useUIStore((s) => s.apiProvider)
+  const checkApiStatus = useUIStore((s) => s.checkApiStatus)
+
   const totalWords = manifest?.chapters.reduce((sum, ch) => sum + ch.wordCount, 0) || 0
   const targetWords = manifest?.targets.totalWords || 80000
   const percentage = Math.round((totalWords / targetWords) * 100)
 
   const activeChapter = manifest?.chapters.find((ch) => ch.id === activeChapterId)
-  const provider = manifest?.ai.provider || 'none'
+
+  // Poll API status on mount and every 30s
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  useEffect(() => {
+    checkApiStatus()
+    intervalRef.current = setInterval(checkApiStatus, STATUS_CHECK_INTERVAL)
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [checkApiStatus])
+
+  // Derive the dot color and label
+  let dotColor: string
+  let dotPulse = false
+  let statusLabel: string
+
+  if (isAgentWorking) {
+    dotColor = 'var(--color-warning)'
+    dotPulse = true
+    statusLabel = 'Working...'
+  } else {
+    switch (apiStatus as ApiStatusState) {
+      case 'connected':
+        dotColor = 'var(--color-success)'
+        statusLabel = apiModelName || apiProvider || 'Connected'
+        break
+      case 'checking':
+        dotColor = 'var(--color-warning)'
+        dotPulse = true
+        statusLabel = 'Checking...'
+        break
+      case 'unavailable':
+        dotColor = 'var(--color-error, #ef4444)'
+        statusLabel = 'API Unavailable'
+        break
+      case 'no-key':
+      default:
+        dotColor = 'var(--text-tertiary)'
+        statusLabel = 'No API Key'
+        break
+    }
+  }
 
   return (
     <div className="h-9 flex items-center px-5 gap-5 bg-[var(--bg-sidebar)] border-t border-[var(--border)] text-sm text-[var(--text-secondary)] shrink-0 select-none">
@@ -72,14 +122,13 @@ export function StatusBar() {
         </div>
       )}
 
-      {/* AI Provider */}
+      {/* API Status */}
       <div className="flex items-center gap-1.5">
         <div
-          className={`w-1.5 h-1.5 rounded-full ${
-            isAgentWorking ? 'bg-[var(--color-warning)] animate-pulse' : 'bg-[var(--color-success)]'
-          }`}
+          className={`w-1.5 h-1.5 rounded-full ${dotPulse ? 'animate-pulse' : ''}`}
+          style={{ backgroundColor: dotColor }}
         />
-        <span className="capitalize">{provider}</span>
+        <span className="max-w-[160px] truncate">{statusLabel}</span>
       </div>
     </div>
   )

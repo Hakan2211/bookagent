@@ -43,6 +43,10 @@ export const IPC = {
   SETTINGS_SET_API_KEY: 'settings:set-api-key',
   SETTINGS_GET_API_KEY_STATUS: 'settings:get-api-key-status',
   SETTINGS_GET_MODELS: 'settings:get-models',
+  SETTINGS_CHECK_API_STATUS: 'settings:check-api-status',
+
+  // ── Project Settings ───────────────────────
+  PROJECT_UPDATE_SETTINGS: 'project:update-settings',
 
   // ── History ─────────────────────────────────
   HISTORY_LIST: 'history:list',

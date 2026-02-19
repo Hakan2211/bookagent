@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import { useProjectStore } from '../../stores/projectStore'
 import { Button } from '../common/Button'
+import { IPC } from '@shared/ipc-channels'
+import type { BookManifest } from '@shared/types'
 
 export function ProjectSettings() {
   const manifest = useProjectStore((s) => s.manifest)
-  const refreshManifest = useProjectStore((s) => s.refreshManifest)
+  const updateManifest = useProjectStore((s) => s.updateManifest)
 
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [totalWords, setTotalWords] = useState(80000)
-  const [chapterWords, setChapterWords] = useState(3000)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     if (manifest) {
       setTitle(manifest.title)
       setAuthor(manifest.author)
       setTotalWords(manifest.targets.totalWords)
-      setChapterWords(manifest.targets.chapterWords)
     }
   }, [manifest])
 
@@ -28,21 +30,41 @@ export function ProjectSettings() {
     )
   }
 
-  const inputClasses = "w-full px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+  const handleSave = async () => {
+    setIsSaving(true)
+    setSaved(false)
+    try {
+      const updated = (await window.api.invoke(IPC.PROJECT_UPDATE_SETTINGS, {
+        title: title.trim(),
+        author: author.trim(),
+        totalWords
+      })) as BookManifest
+      updateManifest(updated)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch (err) {
+      console.error('Failed to save project settings:', err)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const inputClasses =
+    'w-full px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all'
 
   return (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Book Title</label>
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className={inputClasses}
-        />
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+          Book Title
+        </label>
+        <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputClasses} />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Author</label>
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+          Author
+        </label>
         <input
           value={author}
           onChange={(e) => setAuthor(e.target.value)}
@@ -50,33 +72,24 @@ export function ProjectSettings() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-5">
-        <div>
-          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-            Total Word Target
-          </label>
-          <input
-            type="number"
-            value={totalWords}
-            onChange={(e) => setTotalWords(Number(e.target.value))}
-            className={inputClasses}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-            Chapter Word Target
-          </label>
-          <input
-            type="number"
-            value={chapterWords}
-            onChange={(e) => setChapterWords(Number(e.target.value))}
-            className={inputClasses}
-          />
-        </div>
+      <div>
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+          Total Word Target
+        </label>
+        <input
+          type="number"
+          value={totalWords}
+          onChange={(e) => setTotalWords(Number(e.target.value))}
+          className={inputClasses}
+        />
+        <p className="mt-1.5 text-[12px] text-[var(--text-tertiary)]">
+          The overall word count goal for the book. Chapter lengths are managed organically by the
+          agent based on narrative structure.
+        </p>
       </div>
 
-      <Button variant="primary" size="md">
-        Save Project Settings
+      <Button variant="primary" size="md" onClick={handleSave} isLoading={isSaving}>
+        {saved ? 'Saved' : 'Save Project Settings'}
       </Button>
     </div>
   )
