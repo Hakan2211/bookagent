@@ -3,10 +3,12 @@ import { AppLayout } from './components/layout/AppLayout'
 import { WelcomeScreen } from './components/layout/WelcomeScreen'
 import { ImportWizard } from './components/import/ImportWizard'
 import { SettingsModal } from './components/settings/SettingsModal'
+import { ExportModal } from './components/export/ExportModal'
 import { useProjectStore } from './stores/projectStore'
 import { useUIStore } from './stores/uiStore'
 import { useEditorStore } from './stores/editorStore'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
+import type { ExportFormat } from '@shared/types'
 
 export function App() {
   const isOpen = useProjectStore((s) => s.isOpen)
@@ -16,6 +18,8 @@ export function App() {
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
   const toggleChatPanel = useUIStore((s) => s.toggleChatPanel)
   const openImportWizard = useUIStore((s) => s.openImportWizard)
+  const openExportModal = useUIStore((s) => s.openExportModal)
+  const togglePreviewMode = useUIStore((s) => s.togglePreviewMode)
   const saveChapter = useEditorStore((s) => s.saveChapter)
 
   // Keyboard shortcuts
@@ -49,6 +53,12 @@ export function App() {
       handleMenuEvent('menu:toggle-chat', () => toggleChatPanel()),
       handleMenuEvent('menu:search', () => {
         useUIStore.getState().openSearch()
+      }),
+      handleMenuEvent('menu:export', (format: string) => {
+        openExportModal(format as ExportFormat)
+      }),
+      handleMenuEvent('menu:preview', () => {
+        togglePreviewMode()
       })
     ]
 
@@ -60,6 +70,8 @@ export function App() {
     openModal,
     openProject,
     openImportWizard,
+    openExportModal,
+    togglePreviewMode,
     saveChapter,
     toggleSidebar,
     toggleChatPanel
@@ -70,6 +82,7 @@ export function App() {
       {isOpen ? <AppLayout /> : <WelcomeScreen />}
       <ImportWizard />
       <SettingsModal />
+      <ExportModal />
     </>
   )
 }

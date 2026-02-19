@@ -71,6 +71,13 @@ export const IPC = {
   DIALOG_SAVE_FOLDER: 'dialog:save-folder',
   DIALOG_CONFIRM: 'dialog:confirm',
 
+  // ── Export ─────────────────────────────────
+  EXPORT_PDF: 'export:pdf',
+  EXPORT_EPUB: 'export:epub',
+  EXPORT_PROGRESS: 'export:progress',
+  EXPORT_PREVIEW_HTML: 'export:preview-html',
+  DIALOG_SAVE_FILE: 'dialog:save-file',
+
   // ── App ────────────────────────────────────
   APP_GET_DOCUMENTS_PATH: 'app:get-documents-path',
 } as const

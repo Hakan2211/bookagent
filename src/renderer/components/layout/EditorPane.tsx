@@ -3,6 +3,7 @@ import { TiptapEditor } from '../editor/TiptapEditor'
 import { ChapterHeader } from '../editor/ChapterHeader'
 import { ChangeReviewBar } from '../editor/ChangeReviewBar'
 import { DiffOverlay } from '../editor/DiffOverlay'
+import { BookPreview } from '../export/BookPreview'
 import { useEditorStore } from '../../stores/editorStore'
 import { useProjectStore } from '../../stores/projectStore'
 import { useUIStore } from '../../stores/uiStore'
@@ -22,6 +23,7 @@ export function EditorPane() {
   const isOpen = useProjectStore((s) => s.isOpen)
   const manifest = useProjectStore((s) => s.manifest)
   const openImportWizard = useUIStore((s) => s.openImportWizard)
+  const isPreviewMode = useUIStore((s) => s.isPreviewMode)
   const sendPrompt = useChatStore((s) => s.sendPrompt)
 
   const [creatingChapter, setCreatingChapter] = useState(false)
@@ -165,6 +167,11 @@ export function EditorPane() {
         </div>
       </div>
     )
+  }
+
+  // State: Preview mode active
+  if (isPreviewMode) {
+    return <BookPreview />
   }
 
   // State: Chapter (or section) is open -- normal editor

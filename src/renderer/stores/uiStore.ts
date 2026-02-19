@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { IPC } from '@shared/ipc-channels'
-import type { ModelInfo } from '@shared/types'
+import type { ModelInfo, ExportConfig, ExportFormat, ExportProgress } from '@shared/types'
 
 export type ApiStatusState = 'connected' | 'unavailable' | 'checking' | 'no-key'
 
@@ -11,6 +11,16 @@ interface UIState {
   searchQuery: string
   isSearchOpen: boolean
   isImportWizardOpen: boolean
+
+  // Export state
+  isExportModalOpen: boolean
+  exportFormat: ExportFormat | null
+  exportProgress: ExportProgress | null
+
+  // Preview state
+  isPreviewMode: boolean
+  previewHtml: string | null
+  isPreviewLoading: boolean
 
   apiStatus: ApiStatusState
   apiProvider: string
@@ -29,6 +39,19 @@ interface UIState {
   setSearchQuery: (query: string) => void
   openImportWizard: () => void
   closeImportWizard: () => void
+
+  // Export actions
+  openExportModal: (format?: ExportFormat) => void
+  closeExportModal: () => void
+  setExportProgress: (progress: ExportProgress | null) => void
+
+  // Preview actions
+  togglePreviewMode: () => void
+  closePreview: () => void
+  setPreviewHtml: (html: string | null) => void
+  setPreviewLoading: (loading: boolean) => void
+  loadPreview: (config: ExportConfig) => Promise<void>
+
   checkApiStatus: () => Promise<void>
   /** Instantly update the displayed model name from manifest config (no network) */
   refreshModelName: (provider: string, modelId: string) => Promise<void>
@@ -41,6 +64,16 @@ export const useUIStore = create<UIState>((set, get) => ({
   searchQuery: '',
   isSearchOpen: false,
   isImportWizardOpen: false,
+
+  // Export state
+  isExportModalOpen: false,
+  exportFormat: null,
+  exportProgress: null,
+
+  // Preview state
+  isPreviewMode: false,
+  previewHtml: null,
+  isPreviewLoading: false,
 
   apiStatus: 'checking',
   apiProvider: '',
@@ -68,6 +101,43 @@ export const useUIStore = create<UIState>((set, get) => ({
   openImportWizard: () => set({ isImportWizardOpen: true }),
 
   closeImportWizard: () => set({ isImportWizardOpen: false }),
+
+  // Export actions
+  openExportModal: (format?: ExportFormat) =>
+    set({ isExportModalOpen: true, exportFormat: format || null, exportProgress: null }),
+
+  closeExportModal: () =>
+    set({ isExportModalOpen: false, exportFormat: null, exportProgress: null }),
+
+  setExportProgress: (progress: ExportProgress | null) =>
+    set({ exportProgress: progress }),
+
+  // Preview actions
+  togglePreviewMode: () =>
+    set((state) => ({
+      isPreviewMode: !state.isPreviewMode,
+      previewHtml: state.isPreviewMode ? null : state.previewHtml
+    })),
+
+  closePreview: () =>
+    set({ isPreviewMode: false, previewHtml: null, isPreviewLoading: false }),
+
+  setPreviewHtml: (html: string | null) =>
+    set({ previewHtml: html }),
+
+  setPreviewLoading: (loading: boolean) =>
+    set({ isPreviewLoading: loading }),
+
+  loadPreview: async (config: ExportConfig) => {
+    set({ isPreviewLoading: true, previewHtml: null })
+    try {
+      const html = (await window.api.invoke(IPC.EXPORT_PREVIEW_HTML, { config })) as string
+      set({ previewHtml: html, isPreviewLoading: false })
+    } catch (err) {
+      console.error('Failed to load preview:', err)
+      set({ isPreviewLoading: false })
+    }
+  },
 
   refreshModelName: async (provider: string, modelId: string) => {
     if (!provider || !modelId) return

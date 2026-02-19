@@ -1,5 +1,6 @@
 import React from 'react'
 import type { Editor } from '@tiptap/react'
+import { useUIStore } from '../../stores/uiStore'
 import {
   Bold,
   Italic,
@@ -10,7 +11,9 @@ import {
   Minus,
   List,
   Undo2,
-  Redo2
+  Redo2,
+  Eye,
+  FileDown
 } from 'lucide-react'
 
 interface EditorToolbarProps {
@@ -18,6 +21,9 @@ interface EditorToolbarProps {
 }
 
 export function EditorToolbar({ editor }: EditorToolbarProps) {
+  const togglePreviewMode = useUIStore((s) => s.togglePreviewMode)
+  const openExportModal = useUIStore((s) => s.openExportModal)
+
   if (!editor) return null
 
   const ToolbarButton = ({
@@ -45,7 +51,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   )
 
   return (
-    <div className="flex items-center gap-0.5 px-6 py-2.5 border-b border-[var(--border)] bg-[var(--bg-editor)] shrink-0">
+    <div className="flex items-center gap-0.5 px-6 py-2.5 border-b border-[var(--border)] bg-[var(--bg-editor)] shrink-0 w-full">
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBold().run()}
         isActive={editor.isActive('bold')}
@@ -127,6 +133,24 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         title="Redo (Ctrl+Shift+Z)"
       >
         <Redo2 size={16} />
+      </ToolbarButton>
+
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* Preview & Export */}
+      <ToolbarButton
+        onClick={togglePreviewMode}
+        title="Preview (Ctrl+Shift+P)"
+      >
+        <Eye size={16} />
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={() => openExportModal()}
+        title="Export (Ctrl+Shift+E)"
+      >
+        <FileDown size={16} />
       </ToolbarButton>
     </div>
   )

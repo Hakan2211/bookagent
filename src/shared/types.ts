@@ -354,6 +354,40 @@ export interface ChatMessage {
   pendingActions?: PendingAction[]
 }
 
+// ─── Export Types ────────────────────────────
+
+export type ExportFormat = 'pdf' | 'epub'
+export type ExportScope = 'book' | 'chapter'
+export type PageSize = 'a4' | 'letter' | 'a5' | '6x9'
+
+export interface ExportConfig {
+  format: ExportFormat
+  scope: ExportScope
+  chapterId?: string
+  pageSize: PageSize
+  fontFamily: 'serif' | 'sans-serif' | 'monospace'
+  fontSize: number
+  lineSpacing: number
+  margins: { top: number; bottom: number; left: number; right: number }
+  includeTableOfContents: boolean
+  includeTitlePage: boolean
+  headerText: string
+  footerText: string
+  showPageNumbers: boolean
+}
+
+export interface ExportProgress {
+  stage: 'preparing' | 'rendering' | 'generating' | 'saving' | 'done' | 'error'
+  percent: number
+  message: string
+}
+
+export interface PreviewRequest {
+  scope: ExportScope
+  chapterId?: string
+  config: ExportConfig
+}
+
 // ─── Error Types ─────────────────────────────
 
 export class AIError extends Error {

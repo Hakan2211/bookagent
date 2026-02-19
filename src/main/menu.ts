@@ -60,6 +60,21 @@ export function createMenu(mainWindow: BrowserWindow): void {
           click: () => mainWindow.webContents.send('menu:save')
         },
         { type: 'separator' },
+        {
+          label: 'Export as PDF...',
+          accelerator: 'CmdOrCtrl+Shift+E',
+          click: () => mainWindow.webContents.send('menu:export', 'pdf')
+        },
+        {
+          label: 'Export as EPUB...',
+          click: () => mainWindow.webContents.send('menu:export', 'epub')
+        },
+        {
+          label: 'Preview',
+          accelerator: 'CmdOrCtrl+Shift+P',
+          click: () => mainWindow.webContents.send('menu:preview')
+        },
+        { type: 'separator' },
         ...(isMac ? [] : [{ role: 'quit' as const }])
       ]
     },

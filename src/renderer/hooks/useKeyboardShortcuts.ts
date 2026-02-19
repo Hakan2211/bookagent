@@ -7,6 +7,10 @@ export function useKeyboardShortcuts(): void {
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
   const toggleChatPanel = useUIStore((s) => s.toggleChatPanel)
   const openSearch = useUIStore((s) => s.openSearch)
+  const openExportModal = useUIStore((s) => s.openExportModal)
+  const togglePreviewMode = useUIStore((s) => s.togglePreviewMode)
+  const isPreviewMode = useUIStore((s) => s.isPreviewMode)
+  const closePreview = useUIStore((s) => s.closePreview)
   const saveChapter = useEditorStore((s) => s.saveChapter)
   const exitDiffMode = useEditorStore((s) => s.exitDiffMode)
   const isInDiffMode = useEditorStore((s) => s.isInDiffMode)
@@ -42,8 +46,23 @@ export function useKeyboardShortcuts(): void {
         openSearch()
       }
 
-      // Escape: Exit diff mode
-      if (e.key === 'Escape' && isInDiffMode) {
+      // Cmd/Ctrl + Shift + E: Export
+      if (isMod && e.shiftKey && e.key === 'E') {
+        e.preventDefault()
+        openExportModal()
+      }
+
+      // Cmd/Ctrl + Shift + P: Toggle preview
+      if (isMod && e.shiftKey && e.key === 'P') {
+        e.preventDefault()
+        togglePreviewMode()
+      }
+
+      // Escape: Exit diff mode or preview
+      if (e.key === 'Escape' && isPreviewMode) {
+        e.preventDefault()
+        closePreview()
+      } else if (e.key === 'Escape' && isInDiffMode) {
         e.preventDefault()
         exitDiffMode()
       }
@@ -69,6 +88,10 @@ export function useKeyboardShortcuts(): void {
     toggleChatPanel,
     saveChapter,
     openSearch,
+    openExportModal,
+    togglePreviewMode,
+    isPreviewMode,
+    closePreview,
     exitDiffMode,
     isInDiffMode,
     manifest,

@@ -6,7 +6,8 @@ import type {
   ChapterStatus,
   ImportConfig,
   ConfirmedChapter,
-  AppSettings
+  AppSettings,
+  ExportConfig
 } from '@shared/types'
 import { ProjectManager } from './project/ProjectManager'
 import { FileWatcher } from './project/FileWatcher'
@@ -20,6 +21,7 @@ import { Agent } from './agent/Agent'
 import { SnapshotManager } from './history/SnapshotManager'
 import { SearchEngine } from './search/SearchEngine'
 import { ParserFactory } from './import/parsers'
+import { ExportEngine, PdfExporter, EpubExporter } from './export'
 import Store from 'electron-store'
 
 const settingsStore = new Store<AppSettings>({
@@ -624,6 +626,80 @@ export function registerIPC(
         cancelId: 1
       })
       return result.response === 0
+    }
+  )
+
+  // ── Export Handlers ────────────────────────
+
+  ipcMain.handle(
+    IPC.EXPORT_PDF,
+    async (_event, args: { config: ExportConfig; outputPath: string }) => {
+      if (!projectManager.project) throw new Error('No project open')
+
+      const win = BrowserWindow.getFocusedWindow()
+      const sendProgress = (progress: unknown) => {
+        if (win) win.webContents.send(IPC.EXPORT_PROGRESS, progress)
+      }
+
+      await PdfExporter.export(
+        projectManager.project,
+        args.config,
+        args.outputPath,
+        sendProgress
+      )
+    }
+  )
+
+  ipcMain.handle(
+    IPC.EXPORT_EPUB,
+    async (_event, args: { config: ExportConfig; outputPath: string }) => {
+      if (!projectManager.project) throw new Error('No project open')
+
+      const win = BrowserWindow.getFocusedWindow()
+      const sendProgress = (progress: unknown) => {
+        if (win) win.webContents.send(IPC.EXPORT_PROGRESS, progress)
+      }
+
+      await EpubExporter.export(
+        projectManager.project,
+        args.config,
+        args.outputPath,
+        sendProgress
+      )
+    }
+  )
+
+  ipcMain.handle(
+    IPC.EXPORT_PREVIEW_HTML,
+    async (_event, args: { config: ExportConfig }) => {
+      if (!projectManager.project) throw new Error('No project open')
+
+      if (args.config.scope === 'chapter' && args.config.chapterId) {
+        return ExportEngine.assembleChapterHtml(
+          projectManager.project,
+          args.config.chapterId,
+          args.config,
+          true
+        )
+      }
+      return ExportEngine.assembleBookHtml(projectManager.project, args.config, true)
+    }
+  )
+
+  ipcMain.handle(
+    IPC.DIALOG_SAVE_FILE,
+    async (
+      _event,
+      args: { defaultName: string; filters: Electron.FileFilter[] }
+    ) => {
+      const win = BrowserWindow.getFocusedWindow()
+      if (!win) return null
+      const result = await dialog.showSaveDialog(win, {
+        title: 'Export Book',
+        defaultPath: args.defaultName,
+        filters: args.filters
+      })
+      return result.canceled ? null : result.filePath
     }
   )
 

@@ -5,7 +5,7 @@ import { resolve } from 'path'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin({ exclude: ['electron-store'] })],
+    plugins: [externalizeDepsPlugin({ exclude: ['electron-store', 'marked', 'epub-gen-memory'] })],
     build: {
       rollupOptions: {
         input: {
