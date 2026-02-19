@@ -76,6 +76,9 @@ export function ChatInput() {
     setSelectedModel(modelId)
     setIsModelOpen(false)
     await window.api.invoke(IPC.SETTINGS_SET, { openrouterModel: modelId })
+    // Update the status bar model name instantly
+    const { refreshModelName } = await import('../../stores/uiStore').then((m) => m.useUIStore.getState())
+    refreshModelName('openrouter', modelId)
   }
 
   // Auto-resize textarea

@@ -17,14 +17,26 @@ export function StatusBar() {
   const apiModelName = useUIStore((s) => s.apiModelName)
   const apiProvider = useUIStore((s) => s.apiProvider)
   const checkApiStatus = useUIStore((s) => s.checkApiStatus)
+  const refreshModelName = useUIStore((s) => s.refreshModelName)
 
   const totalWords = manifest?.chapters.reduce((sum, ch) => sum + ch.wordCount, 0) || 0
-  const targetWords = manifest?.targets.totalWords || 80000
-  const percentage = Math.round((totalWords / targetWords) * 100)
+  const targetWords = manifest?.targets.totalWords || 0
+  const hasTarget = targetWords > 0
+  const percentage = hasTarget ? Math.round((totalWords / targetWords) * 100) : 0
 
   const activeChapter = manifest?.chapters.find((ch) => ch.id === activeChapterId)
 
-  // Poll API status on mount and every 30s
+  // On mount: immediately show model name from manifest (no network),
+  // then start background connectivity check
+  const manifestProvider = manifest?.ai?.provider
+  const manifestModel = manifest?.ai?.model
+  useEffect(() => {
+    if (manifestProvider && manifestModel) {
+      refreshModelName(manifestProvider, manifestModel)
+    }
+  }, [manifestProvider, manifestModel, refreshModelName])
+
+  // Poll API connectivity in the background on mount and every 30s
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   useEffect(() => {
     checkApiStatus()
@@ -39,24 +51,28 @@ export function StatusBar() {
   let dotPulse = false
   let statusLabel: string
 
+  // Model name is always shown (set instantly from manifest or from API check)
+  const displayName = apiModelName || apiProvider || ''
+
   if (isAgentWorking) {
     dotColor = 'var(--color-warning)'
     dotPulse = true
-    statusLabel = 'Working...'
+    statusLabel = displayName || 'Working...'
   } else {
     switch (apiStatus as ApiStatusState) {
       case 'connected':
         dotColor = 'var(--color-success)'
-        statusLabel = apiModelName || apiProvider || 'Connected'
+        statusLabel = displayName || 'Connected'
         break
       case 'checking':
         dotColor = 'var(--color-warning)'
         dotPulse = true
-        statusLabel = 'Checking...'
+        // Show existing model name while checking, not "Checking..."
+        statusLabel = displayName || 'Checking...'
         break
       case 'unavailable':
         dotColor = 'var(--color-error, #ef4444)'
-        statusLabel = 'API Unavailable'
+        statusLabel = displayName ? `${displayName} (unavailable)` : 'API Unavailable'
         break
       case 'no-key':
       default:
@@ -109,16 +125,24 @@ export function StatusBar() {
       {/* Word count progress */}
       {manifest && (
         <div className="flex items-center gap-2.5">
-          <span className="tabular-nums">
-            {totalWords.toLocaleString()} / {targetWords.toLocaleString()} words
-          </span>
-          <div className="w-24 h-1.5 bg-[var(--bg-active)] rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-full transition-all duration-500"
-              style={{ width: `${Math.min(100, percentage)}%` }}
-            />
-          </div>
-          <span className="tabular-nums text-[var(--text-tertiary)]">{percentage}%</span>
+          {hasTarget ? (
+            <>
+              <span className="tabular-nums">
+                {totalWords.toLocaleString()} / {targetWords.toLocaleString()} words
+              </span>
+              <div className="w-24 h-1.5 bg-[var(--bg-active)] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(100, percentage)}%` }}
+                />
+              </div>
+              <span className="tabular-nums text-[var(--text-tertiary)]">{percentage}%</span>
+            </>
+          ) : (
+            <span className="tabular-nums">
+              {totalWords.toLocaleString()} words
+            </span>
+          )}
         </div>
       )}
 

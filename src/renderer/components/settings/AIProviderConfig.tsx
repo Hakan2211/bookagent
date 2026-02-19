@@ -82,6 +82,9 @@ export function AIProviderConfig() {
           setOpenrouterHasKey(true)
           setOpenrouterKey('')
         }
+        // Refresh status bar connectivity immediately
+        const { useUIStore } = await import('../../stores/uiStore')
+        useUIStore.getState().checkApiStatus()
       } else {
         setStatus(`Invalid ${provider} API key`)
       }
@@ -103,6 +106,9 @@ export function AIProviderConfig() {
       setOpenrouterModel(model)
       await window.api.invoke(IPC.SETTINGS_SET, { openrouterModel: model })
     }
+    // Instantly update the status bar model name
+    const { useUIStore } = await import('../../stores/uiStore')
+    useUIStore.getState().refreshModelName(provider, model)
   }
 
   const isStatusError = status?.includes('Error') || status?.includes('Invalid')

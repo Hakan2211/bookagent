@@ -10,7 +10,7 @@ export function ProjectSettings() {
 
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
-  const [totalWords, setTotalWords] = useState(80000)
+  const [totalWords, setTotalWords] = useState(0)
   const [isSaving, setIsSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
