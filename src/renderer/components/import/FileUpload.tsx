@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { IPC } from '@shared/ipc-channels'
 import { Upload } from 'lucide-react'
 
@@ -7,6 +8,7 @@ interface FileUploadProps {
 }
 
 export function FileUpload({ onFileSelected }: FileUploadProps) {
+  const { t } = useTranslation('import')
   const [isDragOver, setIsDragOver] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -48,10 +50,10 @@ export function FileUpload({ onFileSelected }: FileUploadProps) {
           <Upload size={24} className="text-[var(--text-accent)]" />
         </div>
         <p className="text-sm text-[var(--text-primary)] mb-1 font-medium">
-          Drop your file here
+          {t('import:dropFileHere')}
         </p>
         <p className="text-xs text-[var(--text-tertiary)]">
-          PDF, DOCX, TXT, or MD
+          {t('import:fileTypes')}
         </p>
       </div>
 
@@ -60,7 +62,7 @@ export function FileUpload({ onFileSelected }: FileUploadProps) {
           onClick={handleBrowse}
           className="text-sm text-[var(--text-accent)] hover:text-[var(--text-accent-hover)] font-medium transition-colors"
         >
-          Browse files
+          {t('import:browseFiles')}
         </button>
       </div>
     </div>

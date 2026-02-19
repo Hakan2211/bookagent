@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '../common/Button'
 import { Dropdown } from '../common/Dropdown'
 import { IPC } from '@shared/ipc-channels'
@@ -6,6 +7,7 @@ import type { ModelInfo } from '@shared/types'
 import { CheckCircle2, AlertCircle } from 'lucide-react'
 
 export function AIProviderConfig() {
+  const { t } = useTranslation(['settings', 'common'])
   const [anthropicKey, setAnthropicKey] = useState('')
   const [openaiKey, setOpenaiKey] = useState('')
   const [openrouterKey, setOpenrouterKey] = useState('')
@@ -71,7 +73,7 @@ export function AIProviderConfig() {
       })) as { valid: boolean }
 
       if (result.valid) {
-        setStatus(`${provider} key saved successfully`)
+        setStatus(t('settings:ai.keySaved', { provider }))
         if (provider === 'anthropic') {
           setAnthropicHasKey(true)
           setAnthropicKey('')
@@ -86,7 +88,7 @@ export function AIProviderConfig() {
         const { useUIStore } = await import('../../stores/uiStore')
         useUIStore.getState().checkApiStatus()
       } else {
-        setStatus(`Invalid ${provider} API key`)
+        setStatus(t('settings:ai.invalidKey', { provider }))
       }
     } catch (err) {
       setStatus(`Error: ${(err as Error).message}`)
@@ -132,10 +134,10 @@ export function AIProviderConfig() {
       {/* Anthropic */}
       <div className="space-y-4">
         <div className="flex items-center gap-2.5">
-          <h3 className="text-sm font-semibold text-[var(--text-primary)]">Anthropic (Claude)</h3>
+          <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('settings:ai.anthropicClaude')}</h3>
           {anthropicHasKey && (
             <span className="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 font-medium">
-              Connected
+              {t('settings:ai.connected')}
             </span>
           )}
         </div>
@@ -145,7 +147,7 @@ export function AIProviderConfig() {
             type="password"
             value={anthropicKey}
             onChange={(e) => setAnthropicKey(e.target.value)}
-            placeholder={anthropicHasKey ? 'Key saved (enter new to replace)' : 'sk-ant-...'}
+            placeholder={anthropicHasKey ? t('settings:ai.keySavedPlaceholder') : 'sk-ant-...'}
             className="flex-1 px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
           />
           <Button
@@ -154,7 +156,7 @@ export function AIProviderConfig() {
             isLoading={isValidating}
             disabled={!anthropicKey.trim()}
           >
-            Save
+            {t('common:save')}
           </Button>
         </div>
 
@@ -162,7 +164,7 @@ export function AIProviderConfig() {
           options={anthropicModels.map((m) => ({ value: m.id, label: m.name }))}
           value={anthropicModel}
           onChange={(v) => handleModelChange('anthropic', v)}
-          placeholder="Select model"
+          placeholder={t('settings:ai.selectModel')}
         />
       </div>
 
@@ -171,10 +173,10 @@ export function AIProviderConfig() {
       {/* OpenAI */}
       <div className="space-y-4">
         <div className="flex items-center gap-2.5">
-          <h3 className="text-sm font-semibold text-[var(--text-primary)]">OpenAI</h3>
+          <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('settings:ai.openai')}</h3>
           {openaiHasKey && (
             <span className="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 font-medium">
-              Connected
+              {t('settings:ai.connected')}
             </span>
           )}
         </div>
@@ -184,7 +186,7 @@ export function AIProviderConfig() {
             type="password"
             value={openaiKey}
             onChange={(e) => setOpenaiKey(e.target.value)}
-            placeholder={openaiHasKey ? 'Key saved (enter new to replace)' : 'sk-...'}
+            placeholder={openaiHasKey ? t('settings:ai.keySavedPlaceholder') : 'sk-...'}
             className="flex-1 px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
           />
           <Button
@@ -193,7 +195,7 @@ export function AIProviderConfig() {
             isLoading={isValidating}
             disabled={!openaiKey.trim()}
           >
-            Save
+            {t('common:save')}
           </Button>
         </div>
 
@@ -201,7 +203,7 @@ export function AIProviderConfig() {
           options={openaiModels.map((m) => ({ value: m.id, label: m.name }))}
           value={openaiModel}
           onChange={(v) => handleModelChange('openai', v)}
-          placeholder="Select model"
+          placeholder={t('settings:ai.selectModel')}
         />
       </div>
 
@@ -210,16 +212,16 @@ export function AIProviderConfig() {
       {/* OpenRouter */}
       <div className="space-y-4">
         <div className="flex items-center gap-2.5">
-          <h3 className="text-sm font-semibold text-[var(--text-primary)]">OpenRouter</h3>
+          <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('settings:ai.openrouter')}</h3>
           {openrouterHasKey && (
             <span className="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 font-medium">
-              Connected
+              {t('settings:ai.connected')}
             </span>
           )}
         </div>
 
         <p className="text-[12px] text-[var(--text-tertiary)] leading-relaxed">
-          Access 200+ models from all major providers through a single API key.
+          {t('settings:ai.openrouterDesc')}
         </p>
 
         <div className="flex gap-3">
@@ -227,7 +229,7 @@ export function AIProviderConfig() {
             type="password"
             value={openrouterKey}
             onChange={(e) => setOpenrouterKey(e.target.value)}
-            placeholder={openrouterHasKey ? 'Key saved (enter new to replace)' : 'sk-or-...'}
+            placeholder={openrouterHasKey ? t('settings:ai.keySavedPlaceholder') : 'sk-or-...'}
             className="flex-1 px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
           />
           <Button
@@ -236,7 +238,7 @@ export function AIProviderConfig() {
             isLoading={isValidating}
             disabled={!openrouterKey.trim()}
           >
-            Save
+            {t('common:save')}
           </Button>
         </div>
 
@@ -244,7 +246,7 @@ export function AIProviderConfig() {
           options={openrouterModels.map((m) => ({ value: m.id, label: m.name }))}
           value={openrouterModel}
           onChange={(v) => handleModelChange('openrouter', v)}
-          placeholder="Select model"
+          placeholder={t('settings:ai.selectModel')}
         />
       </div>
     </div>

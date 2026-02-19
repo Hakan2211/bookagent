@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useProjectStore } from '../../stores/projectStore'
 import { useEditorStore } from '../../stores/editorStore'
 import { ChapterItem } from './ChapterItem'
@@ -8,6 +9,7 @@ import { IPC } from '@shared/ipc-channels'
 import { Plus } from 'lucide-react'
 
 export function ProjectTree() {
+  const { t } = useTranslation(['sidebar', 'common'])
   const manifest = useProjectStore((s) => s.manifest)
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
   const activeSectionId = useEditorStore((s) => s.activeSectionId)
@@ -19,7 +21,7 @@ export function ProjectTree() {
     const nextNum = (manifest.chapters.length || 0) + 1
     try {
       const result = (await window.api.invoke(IPC.CHAPTER_CREATE, {
-        title: `Chapter ${nextNum}`,
+        title: t('common:chapterNum', { num: nextNum }),
         content: ''
       })) as { id: string }
       await useProjectStore.getState().refreshManifest()
@@ -38,12 +40,12 @@ export function ProjectTree() {
       <div className="mt-4">
         <div className="px-6 py-3.5 flex items-center justify-between">
           <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)]">
-            Chapters
+            {t('sidebar:chapters')}
           </span>
           <button
             onClick={handleAddChapter}
             className="text-[var(--text-secondary)]/80 hover:text-[var(--text-accent)] transition-all p-2 rounded-lg hover:bg-[var(--bg-hover)] hover:shadow-[var(--shadow-xs)]"
-            title="New chapter"
+            title={t('sidebar:newChapter')}
           >
             <Plus size={15} />
           </button>
@@ -61,7 +63,7 @@ export function ProjectTree() {
         </div>
         {manifest.chapters.length === 0 && (
           <div className="px-6 py-4 text-[14px] text-[var(--text-secondary)]/75 italic">
-            No chapters yet
+            {t('sidebar:noChaptersYet')}
           </div>
         )}
       </div>

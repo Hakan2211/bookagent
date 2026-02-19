@@ -1,0 +1,61 @@
+{
+  "exportBook": "Buch exportieren",
+  "format": "Format",
+  "scope": "Umfang",
+  "fullBook": "Ganzes Buch",
+  "chapter": "Kapitel",
+  "exporting": "Exportiere: {{title}}",
+  "quickPresets": "Schnellvorlagen",
+  "pageSize": "Seitengröße",
+  "font": "Schriftart",
+  "fontSize": "Schriftgröße ({{size}}pt)",
+  "lineSpacing": "Zeilenabstand ({{spacing}})",
+  "margins": "Ränder (mm)",
+  "contentOptions": "Inhaltsoptionen",
+  "titlePage": "Titelseite",
+  "tableOfContents": "Inhaltsverzeichnis",
+  "pageNumbers": "Seitenzahlen",
+  "headerText": "Kopfzeilentext",
+  "footerText": "Fußzeilentext",
+  "headerPlaceholder": "z.B. Buchtitel",
+  "footerPlaceholder": "z.B. Autorenname",
+  "startingExport": "Export wird gestartet...",
+  "exported": "Exportiert!",
+  "exportAs": "Als {{format}} exportieren",
+  "single": "Einfach",
+  "top": "Oben",
+  "right": "Rechts",
+  "bottom": "Unten",
+  "left": "Links",
+  "presets": {
+    "standardPaperback": "Standard-Taschenbuch",
+    "standardPaperbackDesc": "6x9 Trim, Serifenschrift, klassisches Buchlayout",
+    "manuscript": "Manuskript",
+    "manuscriptDesc": "Letter-Format, doppelter Zeilenabstand, Monospace — druckfertig",
+    "eReader": "eReader",
+    "eReaderDesc": "A5-Format, klares Serifen-Layout für digitales Lesen",
+    "compact": "Kompakt",
+    "compactDesc": "A5-Format, kleinere Schrift, maximaler Inhaltsbereich"
+  },
+  "pageSizes": {
+    "a4": "A4 (210 x 297mm)",
+    "letter": "US Letter (8,5 x 11\")",
+    "a5": "A5 (148 x 210mm)",
+    "trade": "Trade (6 x 9\")"
+  },
+  "fonts": {
+    "serif": "Serif (Georgia)",
+    "sansSerif": "Sans-Serif (Inter)",
+    "monospace": "Monospace (Courier)"
+  },
+  "preview": {
+    "title": "Vorschau",
+    "renderingPreview": "Vorschau wird gerendert...",
+    "noPreviewAvailable": "Keine Vorschau verfügbar",
+    "generatePreview": "Vorschau erzeugen",
+    "zoomOut": "Verkleinern",
+    "zoomIn": "Vergrößern",
+    "refreshPreview": "Vorschau aktualisieren",
+    "closePreview": "Vorschau schließen"
+  }
+}

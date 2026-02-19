@@ -1,0 +1,19 @@
+{
+  "newBook": "New Book",
+  "newBookDesc": "Start a new project from scratch",
+  "openExisting": "Open Existing",
+  "openExistingDesc": "Open an existing project folder",
+  "importFile": "Import File",
+  "importFileDesc": "Import from PDF, DOCX, or TXT",
+  "settingsDesc": "Configure API keys and preferences",
+  "recentProjects": "Recent Projects",
+  "createNewBook": "Create New Book",
+  "bookTitle": "Book Title",
+  "authorName": "Author Name",
+  "saveLocation": "Save Location",
+  "createBook": "Create Book",
+  "myNovel": "My Novel",
+  "janeDoe": "Jane Doe",
+  "failedToCreate": "Failed to create project: {{message}}",
+  "failedToOpen": "Failed to open project: {{message}}"
+}

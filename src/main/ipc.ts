@@ -1,6 +1,8 @@
 import { ipcMain, dialog, BrowserWindow, app } from 'electron'
 import path from 'path'
 import { IPC } from '@shared/ipc-channels'
+import { setMainProcessLanguage } from './i18n'
+import { createMenu } from './menu'
 import type {
   BookMetadata,
   ChapterStatus,
@@ -718,5 +720,16 @@ export function registerIPC(
 
   ipcMain.handle(IPC.APP_GET_DOCUMENTS_PATH, async () => {
     return path.join(app.getPath('documents'), 'ChapterForge')
+  })
+
+  // ── Language Handler ──────────────────────
+
+  ipcMain.handle(IPC.LANGUAGE_CHANGED, async (_event, args: { language: string }) => {
+    setMainProcessLanguage(args.language)
+    // Rebuild native menu in the new language
+    const win = BrowserWindow.getFocusedWindow() || BrowserWindow.getAllWindows()[0]
+    if (win) {
+      createMenu(win)
+    }
   })
 }

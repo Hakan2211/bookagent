@@ -1,10 +1,12 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { ProjectTree } from '../sidebar/ProjectTree'
 import { useProjectStore } from '../../stores/projectStore'
 import { useUIStore } from '../../stores/uiStore'
 import { BookOpen, Settings } from 'lucide-react'
 
 export function Sidebar() {
+  const { t } = useTranslation('common')
   const isOpen = useProjectStore((s) => s.isOpen)
   const openModal = useUIStore((s) => s.openModal)
 
@@ -15,7 +17,7 @@ export function Sidebar() {
         <div className="flex items-center gap-3">
           <BookOpen size={16} className="text-[var(--text-accent)]" />
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            Project
+            {t('common:project')}
           </h2>
         </div>
       </div>
@@ -26,7 +28,7 @@ export function Sidebar() {
           <ProjectTree />
         ) : (
           <div className="p-6 text-[15px] text-[var(--text-secondary)]/80">
-            No project open
+            {t('common:noProjectOpen')}
           </div>
         )}
       </div>
@@ -38,7 +40,7 @@ export function Sidebar() {
           className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-[13px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-all duration-150"
         >
           <Settings size={15} />
-          <span>Settings</span>
+          <span>{t('common:settings')}</span>
         </button>
       </div>
     </div>

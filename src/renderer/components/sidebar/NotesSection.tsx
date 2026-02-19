@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useProjectStore } from '../../stores/projectStore'
 import { IPC } from '@shared/ipc-channels'
 import { ChevronRight, FileText } from 'lucide-react'
 
 export function NotesSection() {
+  const { t } = useTranslation('sidebar')
   const manifest = useProjectStore((s) => s.manifest)
   const [expanded, setExpanded] = useState(true)
 
@@ -19,7 +21,7 @@ export function NotesSection() {
           size={13}
           className={`transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
         />
-        Notes
+        {t('sidebar:notes')}
       </button>
 
       {expanded && (
@@ -34,6 +36,7 @@ export function NotesSection() {
 }
 
 function NoteItem({ noteId, title }: { noteId: string; title: string }) {
+  const { t } = useTranslation('sidebar')
   const [isOpen, setIsOpen] = useState(false)
   const [content, setContent] = useState('')
   const [isDirty, setIsDirty] = useState(false)
@@ -71,7 +74,7 @@ function NoteItem({ noteId, title }: { noteId: string; title: string }) {
             }}
             onBlur={() => isDirty && handleSave()}
             className="w-full h-40 text-[14px] bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-xl px-4 py-3.5 resize-y outline-none focus:border-[var(--border-active)] focus:shadow-[0_0_0_2px_var(--focus-ring-soft),var(--shadow-glow-sm)] placeholder:text-[var(--text-tertiary)]/85 transition-all leading-relaxed"
-            placeholder={`Write ${title.toLowerCase()} here...`}
+            placeholder={t('sidebar:writeNotePlaceholder', { title: title.toLowerCase() })}
           />
         </div>
       )}

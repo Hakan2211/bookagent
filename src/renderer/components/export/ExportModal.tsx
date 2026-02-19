@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Modal } from '../common/Modal'
 import { Button } from '../common/Button'
 import { Dropdown } from '../common/Dropdown'
@@ -26,7 +27,10 @@ import {
   Zap
 } from 'lucide-react'
 
+const presetKeys = ['standardPaperback', 'manuscript', 'eReader', 'compact']
+
 export function ExportModal() {
+  const { t } = useTranslation(['export', 'common'])
   const isOpen = useUIStore((s) => s.isExportModalOpen)
   const initialFormat = useUIStore((s) => s.exportFormat)
   const exportProgress = useUIStore((s) => s.exportProgress)
@@ -135,7 +139,7 @@ export function ExportModal() {
     if (!outputPath) return
 
     setIsExporting(true)
-    setExportProgress({ stage: 'preparing', percent: 0, message: 'Starting export...' })
+    setExportProgress({ stage: 'preparing', percent: 0, message: t('export:startingExport') })
 
     try {
       const ipcChannel = config.format === 'pdf' ? IPC.EXPORT_PDF : IPC.EXPORT_EPUB
@@ -158,14 +162,14 @@ export function ExportModal() {
   const isEpub = config.format === 'epub'
 
   return (
-    <Modal isOpen={isOpen} onClose={closeExportModal} title="Export Book" size="xl">
+    <Modal isOpen={isOpen} onClose={closeExportModal} title={t('export:exportBook')} size="xl">
       <div className="px-8 py-6">
         {/* Format & Scope row */}
         <div className="flex gap-4 mb-6">
           {/* Format selection */}
           <div className="flex-1">
             <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
-              Format
+              {t('export:format')}
             </label>
             <div className="flex gap-2">
               <button
@@ -196,7 +200,7 @@ export function ExportModal() {
           {/* Scope selection */}
           <div className="flex-1">
             <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
-              Scope
+              {t('export:scope')}
             </label>
             <div className="flex gap-2">
               <button
@@ -208,7 +212,7 @@ export function ExportModal() {
                 }`}
               >
                 <BookOpen size={16} />
-                Full Book
+                {t('export:fullBook')}
               </button>
               <button
                 onClick={() => {
@@ -223,12 +227,12 @@ export function ExportModal() {
                 }`}
               >
                 <FileText size={16} />
-                Chapter
+                {t('export:chapter')}
               </button>
             </div>
             {config.scope === 'chapter' && activeChapterTitle && (
               <p className="text-xs text-[var(--text-tertiary)] mt-1.5 truncate">
-                Exporting: {activeChapterTitle}
+                {t('export:exporting', { title: activeChapterTitle })}
               </p>
             )}
           </div>
@@ -237,7 +241,7 @@ export function ExportModal() {
         {/* Presets */}
         <div className="mb-6">
           <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
-            Quick Presets
+            {t('export:quickPresets')}
           </label>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {EXPORT_PRESETS.map((preset, i) => (
@@ -247,7 +251,7 @@ export function ExportModal() {
                 className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:border-[var(--border-active)] hover:text-[var(--text-primary)] transition-all text-sm group"
               >
                 <Zap size={13} className="text-[var(--text-tertiary)] group-hover:text-[var(--accent-secondary)]" />
-                {preset.name}
+                {t(`export:presets.${presetKeys[i]}`)}
               </button>
             ))}
           </div>
@@ -260,7 +264,7 @@ export function ExportModal() {
             <div>
               <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
                 <Layout size={12} />
-                Page Size
+                {t('export:pageSize')}
               </label>
               <Dropdown
                 options={PAGE_SIZE_OPTIONS}
@@ -274,7 +278,7 @@ export function ExportModal() {
           <div>
             <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
               <Type size={12} />
-              Font
+              {t('export:font')}
             </label>
             <Dropdown
               options={FONT_OPTIONS}
@@ -288,7 +292,7 @@ export function ExportModal() {
           {/* Font Size */}
           <div>
             <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
-              Font Size ({config.fontSize}pt)
+              {t('export:fontSize', { size: config.fontSize })}
             </label>
             <input
               type="range"
@@ -308,7 +312,7 @@ export function ExportModal() {
           {/* Line Spacing */}
           <div>
             <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
-              Line Spacing ({config.lineSpacing.toFixed(1)})
+              {t('export:lineSpacing', { spacing: config.lineSpacing.toFixed(1) })}
             </label>
             <input
               type="range"
@@ -320,7 +324,7 @@ export function ExportModal() {
               className="w-full h-2 rounded-full appearance-none cursor-pointer accent-[var(--accent-primary)] bg-[var(--bg-active)]"
             />
             <div className="flex justify-between text-[10px] text-[var(--text-tertiary)] mt-1">
-              <span>Single</span>
+              <span>{t('export:single')}</span>
               <span>2.5x</span>
             </div>
           </div>
@@ -329,13 +333,13 @@ export function ExportModal() {
           {!isEpub && (
             <div className="col-span-2">
               <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
-                Margins (mm)
+                {t('export:margins')}
               </label>
               <div className="grid grid-cols-4 gap-3">
                 {(['top', 'right', 'bottom', 'left'] as const).map((side) => (
                   <div key={side}>
                     <label className="block text-[10px] text-[var(--text-tertiary)] mb-1 capitalize">
-                      {side}
+                      {t(`export:${side}`)}
                     </label>
                     <input
                       type="number"
@@ -355,7 +359,7 @@ export function ExportModal() {
           <div className="col-span-2">
             <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] mb-3 uppercase tracking-wider">
               <Bookmark size={12} />
-              Content Options
+              {t('export:contentOptions')}
             </label>
             <div className="flex flex-wrap gap-4">
               <label className="flex items-center gap-2 text-sm text-[var(--text-primary)] cursor-pointer">
@@ -365,7 +369,7 @@ export function ExportModal() {
                   onChange={(e) => updateConfig('includeTitlePage', e.target.checked)}
                   className="w-4 h-4 rounded border-[var(--border)] accent-[var(--accent-primary)]"
                 />
-                Title page
+                {t('export:titlePage')}
               </label>
               <label className="flex items-center gap-2 text-sm text-[var(--text-primary)] cursor-pointer">
                 <input
@@ -376,7 +380,7 @@ export function ExportModal() {
                   }
                   className="w-4 h-4 rounded border-[var(--border)] accent-[var(--accent-primary)]"
                 />
-                Table of contents
+                {t('export:tableOfContents')}
               </label>
               {!isEpub && (
                 <label className="flex items-center gap-2 text-sm text-[var(--text-primary)] cursor-pointer">
@@ -388,7 +392,7 @@ export function ExportModal() {
                     }
                     className="w-4 h-4 rounded border-[var(--border)] accent-[var(--accent-primary)]"
                   />
-                  Page numbers
+                  {t('export:pageNumbers')}
                 </label>
               )}
             </div>
@@ -400,25 +404,25 @@ export function ExportModal() {
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
                   <Hash size={12} />
-                  Header Text
+                  {t('export:headerText')}
                 </label>
                 <input
                   type="text"
                   value={config.headerText}
                   onChange={(e) => updateConfig('headerText', e.target.value)}
-                  placeholder="e.g. Book title"
+                  placeholder={t('export:headerPlaceholder')}
                   className="w-full px-4 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:border-[var(--border-active)] focus:outline-none"
                 />
               </div>
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
-                  Footer Text
+                  {t('export:footerText')}
                 </label>
                 <input
                   type="text"
                   value={config.footerText}
                   onChange={(e) => updateConfig('footerText', e.target.value)}
-                  placeholder="e.g. Author name"
+                  placeholder={t('export:footerPlaceholder')}
                   className="w-full px-4 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:border-[var(--border-active)] focus:outline-none"
                 />
               </div>
@@ -447,7 +451,7 @@ export function ExportModal() {
         {/* Actions */}
         <div className="flex items-center justify-between mt-8 pt-6 border-t border-[var(--border)]">
           <Button variant="ghost" onClick={closeExportModal}>
-            Cancel
+            {t('common:cancel')}
           </Button>
           <Button
             variant="primary"
@@ -457,11 +461,11 @@ export function ExportModal() {
             disabled={isExporting || exportProgress?.stage === 'done'}
           >
             {exportProgress?.stage === 'done' ? (
-              'Exported!'
+              t('export:exported')
             ) : (
               <>
                 <FileDown size={16} />
-                Export as {config.format.toUpperCase()}
+                {t('export:exportAs', { format: config.format.toUpperCase() })}
               </>
             )}
           </Button>

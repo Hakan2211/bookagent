@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useUIStore } from '../../stores/uiStore'
 import { useProjectStore } from '../../stores/projectStore'
 import { useEditorStore } from '../../stores/editorStore'
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react'
 
 export function BookPreview() {
+  const { t } = useTranslation(['export', 'common'])
   const previewHtml = useUIStore((s) => s.previewHtml)
   const isPreviewLoading = useUIStore((s) => s.isPreviewLoading)
   const loadPreview = useUIStore((s) => s.loadPreview)
@@ -73,7 +75,7 @@ export function BookPreview() {
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--border)] bg-[var(--bg-editor)] shrink-0">
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium text-[var(--text-primary)]">
-            Preview
+            {t('export:preview.title')}
           </span>
 
           {/* Scope toggle */}
@@ -87,7 +89,7 @@ export function BookPreview() {
               }`}
             >
               <BookOpen size={12} />
-              Full Book
+              {t('export:fullBook')}
             </button>
             <button
               onClick={() =>
@@ -109,7 +111,7 @@ export function BookPreview() {
                 ? activeChapterTitle.length > 18
                   ? activeChapterTitle.slice(0, 18) + '...'
                   : activeChapterTitle
-                : 'Chapter'}
+                : t('export:chapter')}
             </button>
           </div>
 
@@ -143,7 +145,7 @@ export function BookPreview() {
             <button
               onClick={handleZoomOut}
               className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-all"
-              title="Zoom out"
+              title={t('export:preview.zoomOut')}
             >
               <ZoomOut size={15} />
             </button>
@@ -153,7 +155,7 @@ export function BookPreview() {
             <button
               onClick={handleZoomIn}
               className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-all"
-              title="Zoom in"
+              title={t('export:preview.zoomIn')}
             >
               <ZoomIn size={15} />
             </button>
@@ -165,7 +167,7 @@ export function BookPreview() {
           <button
             onClick={loadCurrentPreview}
             className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-all"
-            title="Refresh preview"
+            title={t('export:preview.refreshPreview')}
           >
             <RefreshCw size={15} />
           </button>
@@ -177,14 +179,14 @@ export function BookPreview() {
             onClick={() => openExportModal('pdf')}
           >
             <FileDown size={14} />
-            Export
+            {t('common:export')}
           </Button>
 
           {/* Close */}
           <button
             onClick={closePreview}
             className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-all"
-            title="Close preview"
+            title={t('export:preview.closePreview')}
           >
             <X size={16} />
           </button>
@@ -198,7 +200,7 @@ export function BookPreview() {
             <div className="text-center">
               <LoadingSpinner />
               <p className="text-sm text-[var(--text-secondary)] mt-3">
-                Rendering preview...
+                {t('export:preview.renderingPreview')}
               </p>
             </div>
           </div>
@@ -228,7 +230,7 @@ export function BookPreview() {
             <div className="text-center">
               <BookOpen size={40} className="mx-auto mb-3 text-[var(--text-tertiary)] opacity-40" />
               <p className="text-sm text-[var(--text-secondary)]">
-                No preview available
+                {t('export:preview.noPreviewAvailable')}
               </p>
               <Button
                 variant="secondary"
@@ -237,7 +239,7 @@ export function BookPreview() {
                 onClick={loadCurrentPreview}
               >
                 <RefreshCw size={14} />
-                Generate Preview
+                {t('export:preview.generatePreview')}
               </Button>
             </div>
           </div>

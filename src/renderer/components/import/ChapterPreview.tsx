@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { ProposedChapter } from '@shared/types'
 import { formatWordCount } from '../../lib/formatters'
 import { ChevronRight } from 'lucide-react'
@@ -9,6 +10,7 @@ interface ChapterPreviewProps {
 }
 
 export function ChapterPreview({ chapters, onUpdateChapter }: ChapterPreviewProps) {
+  const { t } = useTranslation('common')
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
   return (
@@ -46,7 +48,7 @@ export function ChapterPreview({ chapters, onUpdateChapter }: ChapterPreviewProp
               />
             </div>
             <span className="text-xs text-[var(--text-tertiary)] tabular-nums font-medium">
-              {formatWordCount(chapter.wordCount)} words
+              {formatWordCount(chapter.wordCount)} {t('common:words')}
             </span>
           </div>
 

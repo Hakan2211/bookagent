@@ -1,0 +1,61 @@
+{
+  "exportBook": "Export Book",
+  "format": "Format",
+  "scope": "Scope",
+  "fullBook": "Full Book",
+  "chapter": "Chapter",
+  "exporting": "Exporting: {{title}}",
+  "quickPresets": "Quick Presets",
+  "pageSize": "Page Size",
+  "font": "Font",
+  "fontSize": "Font Size ({{size}}pt)",
+  "lineSpacing": "Line Spacing ({{spacing}})",
+  "margins": "Margins (mm)",
+  "contentOptions": "Content Options",
+  "titlePage": "Title page",
+  "tableOfContents": "Table of contents",
+  "pageNumbers": "Page numbers",
+  "headerText": "Header Text",
+  "footerText": "Footer Text",
+  "headerPlaceholder": "e.g. Book title",
+  "footerPlaceholder": "e.g. Author name",
+  "startingExport": "Starting export...",
+  "exported": "Exported!",
+  "exportAs": "Export as {{format}}",
+  "single": "Single",
+  "top": "top",
+  "right": "right",
+  "bottom": "bottom",
+  "left": "left",
+  "presets": {
+    "standardPaperback": "Standard Paperback",
+    "standardPaperbackDesc": "6x9 trim, serif font, classic book layout",
+    "manuscript": "Manuscript",
+    "manuscriptDesc": "Letter size, double-spaced, mono font — submission-ready",
+    "eReader": "eReader",
+    "eReaderDesc": "A5 size, clean serif layout for digital reading",
+    "compact": "Compact",
+    "compactDesc": "A5 size, smaller text, maximized content area"
+  },
+  "pageSizes": {
+    "a4": "A4 (210 x 297mm)",
+    "letter": "US Letter (8.5 x 11\")",
+    "a5": "A5 (148 x 210mm)",
+    "trade": "Trade (6 x 9\")"
+  },
+  "fonts": {
+    "serif": "Serif (Georgia)",
+    "sansSerif": "Sans-serif (Inter)",
+    "monospace": "Monospace (Courier)"
+  },
+  "preview": {
+    "title": "Preview",
+    "renderingPreview": "Rendering preview...",
+    "noPreviewAvailable": "No preview available",
+    "generatePreview": "Generate Preview",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in",
+    "refreshPreview": "Refresh preview",
+    "closePreview": "Close preview"
+  }
+}

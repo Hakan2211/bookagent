@@ -1,0 +1,22 @@
+{
+  "file": "Datei",
+  "newBook": "Neues Buch...",
+  "openBook": "Buch öffnen...",
+  "openBookDialog": "Buchprojekt öffnen",
+  "importFile": "Datei importieren...",
+  "save": "Speichern",
+  "exportPdf": "Als PDF exportieren...",
+  "exportEpub": "Als EPUB exportieren...",
+  "preview": "Vorschau",
+  "edit": "Bearbeiten",
+  "view": "Ansicht",
+  "toggleSidebar": "Seitenleiste umschalten",
+  "toggleAgentPanel": "Agent-Panel umschalten",
+  "searchBook": "Buch durchsuchen",
+  "quickSwitchChapter": "Kapitel schnell wechseln",
+  "help": "Hilfe",
+  "aboutChapterForge": "Über ChapterForge",
+  "aboutVersion": "ChapterForge v0.1.0",
+  "aboutDetail": "KI-gestützte Schreib-IDE für Bücher.\nCursor für Bücher.",
+  "settings": "Einstellungen..."
+}

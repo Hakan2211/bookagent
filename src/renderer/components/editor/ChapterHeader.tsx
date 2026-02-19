@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useEditorStore } from '../../stores/editorStore'
 import { useProjectStore } from '../../stores/projectStore'
 import { IPC } from '@shared/ipc-channels'
@@ -7,6 +8,7 @@ import type { ChapterStatus } from '@shared/types'
 import { ChevronRight } from 'lucide-react'
 
 export function ChapterHeader() {
+  const { t } = useTranslation(['common', 'editor'])
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
   const activeSectionId = useEditorStore((s) => s.activeSectionId)
   const openChapter = useEditorStore((s) => s.openChapter)
@@ -111,16 +113,16 @@ export function ChapterHeader() {
           </div>
 
           <span className="text-[13px] text-[var(--text-tertiary)] tabular-nums font-medium">
-            {activeWordCount.toLocaleString()} words
+            {activeWordCount.toLocaleString()} {t('common:words')}
           </span>
         </div>
 
         <Dropdown
           options={[
-            { value: 'outline', label: 'Outline' },
-            { value: 'draft', label: 'Draft' },
-            { value: 'revised', label: 'Revised' },
-            { value: 'final', label: 'Final' }
+            { value: 'outline', label: t('editor:statusOutline') },
+            { value: 'draft', label: t('editor:statusDraft') },
+            { value: 'revised', label: t('editor:statusRevised') },
+            { value: 'final', label: t('editor:statusFinal') }
           ]}
           value={activeStatus}
           onChange={handleStatusChange}

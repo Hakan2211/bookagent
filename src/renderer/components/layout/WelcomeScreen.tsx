@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useProjectStore } from '../../stores/projectStore'
 import { useUIStore } from '../../stores/uiStore'
 import { IPC } from '@shared/ipc-channels'
@@ -8,6 +9,7 @@ import { Button } from '../common/Button'
 import { Plus, FolderOpen, FileUp, Settings, BookOpen, Clock } from 'lucide-react'
 
 export function WelcomeScreen() {
+  const { t } = useTranslation(['welcome', 'common'])
   const recentProjects = useProjectStore((s) => s.recentProjects)
   const openProject = useProjectStore((s) => s.openProject)
   const openModal = useUIStore((s) => s.openModal)
@@ -16,7 +18,7 @@ export function WelcomeScreen() {
   const [showNewBookModal, setShowNewBookModal] = useState(false)
   const [defaultBasePath, setDefaultBasePath] = useState('')
   const [newBookPath, setNewBookPath] = useState<string | null>(null)
-  const [newBookTitle, setNewBookTitle] = useState('My Novel')
+  const [newBookTitle, setNewBookTitle] = useState(t('welcome:myNovel'))
   const [newBookAuthor, setNewBookAuthor] = useState('')
   const [manualPath, setManualPath] = useState(false)
   const [creating, setCreating] = useState(false)
@@ -25,8 +27,8 @@ export function WelcomeScreen() {
   const handleNewBook = async () => {
     const basePath = (await window.api.invoke(IPC.APP_GET_DOCUMENTS_PATH)) as string
     setDefaultBasePath(basePath)
-    setNewBookPath(basePath + '\\My Novel')
-    setNewBookTitle('My Novel')
+    setNewBookPath(basePath + '\\' + t('welcome:myNovel'))
+    setNewBookTitle(t('welcome:myNovel'))
     setNewBookAuthor('')
     setManualPath(false)
     setError(null)
@@ -36,7 +38,7 @@ export function WelcomeScreen() {
   const handleTitleChange = (title: string) => {
     setNewBookTitle(title)
     if (defaultBasePath && !manualPath) {
-      const safeName = title.trim() || 'My Novel'
+      const safeName = title.trim() || t('welcome:myNovel')
       setNewBookPath(defaultBasePath + '\\' + safeName)
     }
   }
@@ -67,7 +69,7 @@ export function WelcomeScreen() {
       })
       setShowNewBookModal(false)
     } catch (err) {
-      setError(`Failed to create project: ${(err as Error).message}`)
+      setError(t('welcome:failedToCreate', { message: (err as Error).message }))
     } finally {
       setCreating(false)
     }
@@ -79,7 +81,7 @@ export function WelcomeScreen() {
       try {
         await openProject(path)
       } catch (err) {
-        setError(`Failed to open project: ${(err as Error).message}`)
+        setError(t('welcome:failedToOpen', { message: (err as Error).message }))
       }
     }
   }
@@ -96,10 +98,10 @@ export function WelcomeScreen() {
         {/* Brand */}
         <div className="mb-16">
           <h1 className="text-5xl font-bold tracking-tight mb-3">
-            <span className="text-gradient">ChapterForge</span>
+            <span className="text-gradient">{t('common:appName')}</span>
           </h1>
           <p className="text-base text-[var(--text-secondary)] font-medium">
-            AI-powered book writing IDE
+            {t('common:appTagline')}
           </p>
         </div>
 
@@ -113,10 +115,10 @@ export function WelcomeScreen() {
               <Plus size={22} className="text-[var(--text-accent)]" />
             </div>
             <div className="text-base font-medium text-[var(--text-primary)]">
-              New Book
+              {t('welcome:newBook')}
             </div>
             <div className="text-sm text-[var(--text-secondary)] mt-1">
-              Start a new project from scratch
+              {t('welcome:newBookDesc')}
             </div>
           </button>
 
@@ -128,10 +130,10 @@ export function WelcomeScreen() {
               <FolderOpen size={22} className="text-[var(--color-success)]" />
             </div>
             <div className="text-base font-medium text-[var(--text-primary)]">
-              Open Existing
+              {t('welcome:openExisting')}
             </div>
             <div className="text-sm text-[var(--text-secondary)] mt-1">
-              Open an existing project folder
+              {t('welcome:openExistingDesc')}
             </div>
           </button>
 
@@ -143,10 +145,10 @@ export function WelcomeScreen() {
               <FileUp size={22} className="text-[var(--color-warning)]" />
             </div>
             <div className="text-base font-medium text-[var(--text-primary)]">
-              Import File
+              {t('welcome:importFile')}
             </div>
             <div className="text-sm text-[var(--text-secondary)] mt-1">
-              Import from PDF, DOCX, or TXT
+              {t('welcome:importFileDesc')}
             </div>
           </button>
 
@@ -158,10 +160,10 @@ export function WelcomeScreen() {
               <Settings size={22} className="text-[var(--text-secondary)]" />
             </div>
             <div className="text-base font-medium text-[var(--text-primary)]">
-              Settings
+              {t('common:settings')}
             </div>
             <div className="text-sm text-[var(--text-secondary)] mt-1">
-              Configure API keys and preferences
+              {t('welcome:settingsDesc')}
             </div>
           </button>
         </div>
@@ -172,7 +174,7 @@ export function WelcomeScreen() {
             <div className="flex items-center gap-2.5 mb-4">
               <Clock size={14} className="text-[var(--text-tertiary)]" />
               <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)]">
-                Recent Projects
+                {t('welcome:recentProjects')}
               </h3>
             </div>
             <div className="space-y-1">
@@ -202,39 +204,39 @@ export function WelcomeScreen() {
       <Modal
         isOpen={showNewBookModal}
         onClose={() => setShowNewBookModal(false)}
-        title="Create New Book"
+        title={t('welcome:createNewBook')}
       >
         <div className="space-y-6 p-8">
           <div>
             <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-              Book Title
+              {t('welcome:bookTitle')}
             </label>
             <input
               type="text"
               value={newBookTitle}
               onChange={(e) => handleTitleChange(e.target.value)}
               className="w-full bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-xl px-4 py-3 text-[15px] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
-              placeholder="My Novel"
+              placeholder={t('welcome:myNovel')}
               autoFocus
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-              Author Name
+              {t('welcome:authorName')}
             </label>
             <input
               type="text"
               value={newBookAuthor}
               onChange={(e) => setNewBookAuthor(e.target.value)}
               className="w-full bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-xl px-4 py-3 text-[15px] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
-              placeholder="Jane Doe"
+              placeholder={t('welcome:janeDoe')}
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-              Save Location
+              {t('welcome:saveLocation')}
             </label>
             <div className="flex gap-3">
               <div
@@ -244,7 +246,7 @@ export function WelcomeScreen() {
                 {newBookPath}
               </div>
               <Button variant="secondary" onClick={handleBrowseLocation}>
-                Browse
+                {t('common:browse')}
               </Button>
             </div>
           </div>
@@ -260,14 +262,14 @@ export function WelcomeScreen() {
               variant="secondary"
               onClick={() => setShowNewBookModal(false)}
             >
-              Cancel
+              {t('common:cancel')}
             </Button>
             <Button
               variant="primary"
               onClick={handleCreateProject}
               disabled={creating || !newBookTitle.trim()}
             >
-              {creating ? 'Creating...' : 'Create Book'}
+              {creating ? t('common:creating') : t('welcome:createBook')}
             </Button>
           </div>
         </div>

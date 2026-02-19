@@ -1,0 +1,16 @@
+{
+  "importManuscript": "Manuskript importieren",
+  "bookTitle": "Buchtitel",
+  "author": "Autor",
+  "chaptersDetected": "{{count}} Kapitel erkannt ({{words}} Wörter)",
+  "createProject": "Projekt erstellen",
+  "creatingProject": "Projekt wird erstellt...",
+  "myNovel": "Mein Roman",
+  "janeDoe": "Max Mustermann",
+  "untitledBook": "Unbenanntes Buch",
+  "unknownAuthor": "Unbekannter Autor",
+  "dropFileHere": "Datei hier ablegen",
+  "fileTypes": "PDF, DOCX, TXT oder MD",
+  "browseFiles": "Dateien durchsuchen",
+  "splitAdjusterNote": "Visuelle Aufteilungsanpassung kommt in einem zukünftigen Update."
+}

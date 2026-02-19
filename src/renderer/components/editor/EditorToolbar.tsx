@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Editor } from '@tiptap/react'
 import { useUIStore } from '../../stores/uiStore'
 import {
@@ -25,6 +26,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   const openExportModal = useUIStore((s) => s.openExportModal)
 
   if (!editor) return null
+
+  const { t } = useTranslation('editor')
 
   const ToolbarButton = ({
     onClick,
@@ -55,7 +58,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBold().run()}
         isActive={editor.isActive('bold')}
-        title="Bold (Ctrl+B)"
+        title={t('editor:bold')}
       >
         <Bold size={16} />
       </ToolbarButton>
@@ -63,7 +66,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleItalic().run()}
         isActive={editor.isActive('italic')}
-        title="Italic (Ctrl+I)"
+        title={t('editor:italic')}
       >
         <Italic size={16} />
       </ToolbarButton>
@@ -73,7 +76,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         isActive={editor.isActive('heading', { level: 1 })}
-        title="Heading 1"
+        title={t('editor:heading1')}
       >
         <Heading1 size={16} />
       </ToolbarButton>
@@ -81,7 +84,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         isActive={editor.isActive('heading', { level: 2 })}
-        title="Heading 2"
+        title={t('editor:heading2')}
       >
         <Heading2 size={16} />
       </ToolbarButton>
@@ -89,7 +92,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         isActive={editor.isActive('heading', { level: 3 })}
-        title="Heading 3"
+        title={t('editor:heading3')}
       >
         <Heading3 size={16} />
       </ToolbarButton>
@@ -99,14 +102,14 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         isActive={editor.isActive('blockquote')}
-        title="Blockquote"
+        title={t('editor:blockquote')}
       >
         <Quote size={16} />
       </ToolbarButton>
 
       <ToolbarButton
         onClick={() => editor.chain().focus().setHorizontalRule().run()}
-        title="Scene Break"
+        title={t('editor:sceneBreak')}
       >
         <Minus size={16} />
       </ToolbarButton>
@@ -114,7 +117,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         isActive={editor.isActive('bulletList')}
-        title="Bullet List"
+        title={t('editor:bulletList')}
       >
         <List size={16} />
       </ToolbarButton>
@@ -123,14 +126,14 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       <ToolbarButton
         onClick={() => editor.chain().focus().undo().run()}
-        title="Undo (Ctrl+Z)"
+        title={t('editor:undo')}
       >
         <Undo2 size={16} />
       </ToolbarButton>
 
       <ToolbarButton
         onClick={() => editor.chain().focus().redo().run()}
-        title="Redo (Ctrl+Shift+Z)"
+        title={t('editor:redo')}
       >
         <Redo2 size={16} />
       </ToolbarButton>
@@ -141,14 +144,14 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       {/* Preview & Export */}
       <ToolbarButton
         onClick={togglePreviewMode}
-        title="Preview (Ctrl+Shift+P)"
+        title={t('editor:previewShortcut')}
       >
         <Eye size={16} />
       </ToolbarButton>
 
       <ToolbarButton
         onClick={() => openExportModal()}
-        title="Export (Ctrl+Shift+E)"
+        title={t('editor:exportShortcut')}
       >
         <FileDown size={16} />
       </ToolbarButton>

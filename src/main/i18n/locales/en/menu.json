@@ -1,0 +1,22 @@
+{
+  "file": "File",
+  "newBook": "New Book...",
+  "openBook": "Open Book...",
+  "openBookDialog": "Open Book Project",
+  "importFile": "Import File...",
+  "save": "Save",
+  "exportPdf": "Export as PDF...",
+  "exportEpub": "Export as EPUB...",
+  "preview": "Preview",
+  "edit": "Edit",
+  "view": "View",
+  "toggleSidebar": "Toggle Sidebar",
+  "toggleAgentPanel": "Toggle Agent Panel",
+  "searchBook": "Search Book",
+  "quickSwitchChapter": "Quick Switch Chapter",
+  "help": "Help",
+  "aboutChapterForge": "About ChapterForge",
+  "aboutVersion": "ChapterForge v0.1.0",
+  "aboutDetail": "AI-powered book writing IDE.\nCursor for books.",
+  "settings": "Settings..."
+}

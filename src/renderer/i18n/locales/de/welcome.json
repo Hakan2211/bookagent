@@ -1,0 +1,19 @@
+{
+  "newBook": "Neues Buch",
+  "newBookDesc": "Ein neues Projekt von Grund auf beginnen",
+  "openExisting": "Vorhandenes öffnen",
+  "openExistingDesc": "Einen bestehenden Projektordner öffnen",
+  "importFile": "Datei importieren",
+  "importFileDesc": "Aus PDF, DOCX oder TXT importieren",
+  "settingsDesc": "API-Schlüssel und Einstellungen konfigurieren",
+  "recentProjects": "Letzte Projekte",
+  "createNewBook": "Neues Buch erstellen",
+  "bookTitle": "Buchtitel",
+  "authorName": "Autorenname",
+  "saveLocation": "Speicherort",
+  "createBook": "Buch erstellen",
+  "myNovel": "Mein Roman",
+  "janeDoe": "Max Mustermann",
+  "failedToCreate": "Projekt konnte nicht erstellt werden: {{message}}",
+  "failedToOpen": "Projekt konnte nicht geöffnet werden: {{message}}"
+}

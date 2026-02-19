@@ -1,0 +1,17 @@
+{
+  "chapters": "Chapters",
+  "noChaptersYet": "No chapters yet",
+  "newChapter": "New chapter",
+  "addSection": "Add section",
+  "deleteChapter": "Delete chapter",
+  "deleteSection": "Delete section",
+  "newSection": "New Section",
+  "deleteChapterConfirm": "Delete \"{{title}}\"? This cannot be undone.",
+  "deleteChapterTitle": "Delete Chapter",
+  "deleteSectionConfirm": "Delete section \"{{title}}\"? This cannot be undone.",
+  "deleteSectionTitle": "Delete Section",
+  "outline": "Outline",
+  "noOutlineYet": "No outline generated yet",
+  "notes": "Notes",
+  "writeNotePlaceholder": "Write {{title}} here..."
+}

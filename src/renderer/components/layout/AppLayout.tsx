@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import { Sidebar } from './Sidebar'
 import { EditorPane } from './EditorPane'
@@ -7,6 +8,7 @@ import { StatusBar } from './StatusBar'
 import { useUIStore } from '../../stores/uiStore'
 
 export function AppLayout() {
+  const { t } = useTranslation('common')
   const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed)
   const chatPanelCollapsed = useUIStore((s) => s.chatPanelCollapsed)
 
@@ -17,7 +19,7 @@ export function AppLayout() {
         className="h-10 flex items-center justify-center text-xs font-semibold text-[var(--text-secondary)]/85 select-none shrink-0 border-b border-[var(--border-subtle)]"
         style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
       >
-        <span className="pl-20 tracking-[0.12em] uppercase">ChapterForge</span>
+        <span className="pl-20 tracking-[0.12em] uppercase">{t('common:appName')}</span>
       </div>
 
       {/* Main content area */}

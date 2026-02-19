@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { TiptapEditor } from '../editor/TiptapEditor'
 import { ChapterHeader } from '../editor/ChapterHeader'
 import { ChangeReviewBar } from '../editor/ChangeReviewBar'
@@ -12,6 +13,7 @@ import { IPC } from '@shared/ipc-channels'
 import { PenLine, Upload, Sparkles, BookOpen } from 'lucide-react'
 
 export function EditorPane() {
+  const { t } = useTranslation(['editor', 'common', 'chat'])
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
   const activeSectionId = useEditorStore((s) => s.activeSectionId)
   const openChapter = useEditorStore((s) => s.openChapter)
@@ -34,7 +36,7 @@ export function EditorPane() {
     setCreatingChapter(true)
     try {
       const result = (await window.api.invoke(IPC.CHAPTER_CREATE, {
-        title: 'Chapter 1',
+        title: t('common:chapterNum', { num: 1 }),
         content: ''
       })) as { id: string }
       await useProjectStore.getState().refreshManifest()
@@ -48,7 +50,7 @@ export function EditorPane() {
 
   const handleAIStart = () => {
     sendPrompt(
-      'Help me start writing my book. Ask me about the genre, setting, main characters, and the opening scene before creating the first chapter.'
+      t('chat:aiStartPrompt')
     )
   }
 
@@ -59,7 +61,7 @@ export function EditorPane() {
         <div className="text-center" style={{ animation: 'fade-in 400ms ease-out' }}>
           <PenLine size={48} className="mx-auto mb-5 text-[var(--text-tertiary)] opacity-30" strokeWidth={1.5} />
           <p className="text-[var(--text-tertiary)] text-base">
-            Open or create a project to start writing
+            {t('editor:openOrCreate')}
           </p>
         </div>
       </div>
@@ -79,10 +81,10 @@ export function EditorPane() {
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl font-semibold text-[var(--text-primary)] mb-3 tracking-tight">
-              Welcome to &ldquo;{manifest?.title || 'Your Book'}&rdquo;
+              {t('editor:welcomeTo', { title: manifest?.title || t('editor:yourBook') })}
             </h2>
             <p className="text-base text-[var(--text-secondary)]">
-              Choose how you'd like to begin
+              {t('editor:chooseHowToBegin')}
             </p>
           </div>
 
@@ -99,10 +101,10 @@ export function EditorPane() {
               </div>
               <div>
                 <div className="text-[15px] font-medium text-[var(--text-primary)]">
-                  {creatingChapter ? 'Creating...' : 'Create First Chapter'}
+                  {creatingChapter ? t('common:creating') : t('editor:createFirstChapter')}
                 </div>
                 <div className="text-sm text-[var(--text-secondary)] mt-1">
-                  Start writing with a blank chapter
+                  {t('editor:startBlankChapter')}
                 </div>
               </div>
             </button>
@@ -118,10 +120,10 @@ export function EditorPane() {
               </div>
               <div>
                 <div className="text-[15px] font-medium text-[var(--text-primary)]">
-                  Import a Manuscript
+                  {t('editor:importManuscript')}
                 </div>
                 <div className="text-sm text-[var(--text-secondary)] mt-1">
-                  Bring in a PDF, DOCX, or text file
+                  {t('editor:bringInFile')}
                 </div>
               </div>
             </button>
@@ -137,17 +139,17 @@ export function EditorPane() {
               </div>
               <div>
                 <div className="text-[15px] font-medium text-[var(--text-primary)]">
-                  Let AI Help You Start
+                  {t('editor:letAIHelp')}
                 </div>
                 <div className="text-sm text-[var(--text-secondary)] mt-1">
-                  Describe your book idea and get AI-guided writing
+                  {t('editor:describeBookIdea')}
                 </div>
               </div>
             </button>
           </div>
 
           <p className="text-sm text-[var(--text-tertiary)] text-center mt-10">
-            Tip: Use the Agent panel on the right to collaborate with AI at any time.
+            {t('editor:tipUseAgent')}
           </p>
         </div>
       </div>
@@ -162,7 +164,7 @@ export function EditorPane() {
         <div className="text-center" style={{ animation: 'fade-in 400ms ease-out' }}>
           <BookOpen size={48} className="mx-auto mb-5 text-[var(--text-tertiary)] opacity-30" strokeWidth={1.5} />
           <p className="text-[var(--text-secondary)] text-base">
-            Select a chapter from the sidebar to begin editing
+            {t('editor:selectChapter')}
           </p>
         </div>
       </div>

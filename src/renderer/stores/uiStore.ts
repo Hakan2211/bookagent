@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import i18n from '../i18n'
 import { IPC } from '@shared/ipc-channels'
 import type { ModelInfo, ExportConfig, ExportFormat, ExportProgress } from '@shared/types'
 
@@ -53,6 +54,10 @@ interface UIState {
   loadPreview: (config: ExportConfig) => Promise<void>
 
   checkApiStatus: () => Promise<void>
+  // Language
+  language: string
+  setLanguage: (lang: string) => void
+
   /** Instantly update the displayed model name from manifest config (no network) */
   refreshModelName: (provider: string, modelId: string) => Promise<void>
 }
@@ -80,6 +85,8 @@ export const useUIStore = create<UIState>((set, get) => ({
   apiModel: '',
   apiModelName: '',
 
+  language: i18n.language?.startsWith('de') ? 'de' : 'en',
+
   _modelCache: {},
 
   toggleSidebar: () =>
@@ -101,6 +108,15 @@ export const useUIStore = create<UIState>((set, get) => ({
   openImportWizard: () => set({ isImportWizardOpen: true }),
 
   closeImportWizard: () => set({ isImportWizardOpen: false }),
+
+  // Language
+  setLanguage: (lang: string) => {
+    i18n.changeLanguage(lang)
+    localStorage.setItem('chapterforge-language', lang)
+    set({ language: lang })
+    // Notify main process to rebuild menus
+    window.api.invoke(IPC.LANGUAGE_CHANGED, { language: lang }).catch(() => {})
+  },
 
   // Export actions
   openExportModal: (format?: ExportFormat) =>

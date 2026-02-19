@@ -80,6 +80,9 @@ export const IPC = {
   EXPORT_PREVIEW_HTML: 'export:preview-html',
   DIALOG_SAVE_FILE: 'dialog:save-file',
 
+  // ── Language ────────────────────────────────
+  LANGUAGE_CHANGED: 'language:changed',
+
   // ── App ────────────────────────────────────
   APP_GET_DOCUMENTS_PATH: 'app:get-documents-path',
 } as const

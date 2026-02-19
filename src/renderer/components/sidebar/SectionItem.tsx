@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { SectionMeta } from '@shared/types'
 import { StatusBadge } from './StatusBadge'
 import { formatWordCount } from '../../lib/formatters'
@@ -16,6 +17,7 @@ interface SectionItemProps {
 }
 
 export function SectionItem({ chapterId, section, index, isActive, onClick }: SectionItemProps) {
+  const { t } = useTranslation(['sidebar', 'common'])
   const [showContextMenu, setShowContextMenu] = useState(false)
   const [isRenaming, setIsRenaming] = useState(false)
   const [renameValue, setRenameValue] = useState('')
@@ -30,8 +32,8 @@ export function SectionItem({ chapterId, section, index, isActive, onClick }: Se
   const handleDelete = async () => {
     setShowContextMenu(false)
     const confirmed = await window.api.invoke(IPC.DIALOG_CONFIRM, {
-      message: `Delete section "${section.title}"? This cannot be undone.`,
-      title: 'Delete Section',
+      message: t('sidebar:deleteSectionConfirm', { title: section.title }),
+      title: t('sidebar:deleteSectionTitle'),
       confirmLabel: 'Delete'
     })
     if (!confirmed) return
@@ -130,7 +132,7 @@ export function SectionItem({ chapterId, section, index, isActive, onClick }: Se
         <button
           onClick={handleDelete}
           className="shrink-0 mr-3 p-1 rounded-lg opacity-0 group-hover:opacity-100 text-[var(--text-tertiary)] hover:text-[var(--color-error)] hover:bg-[var(--bg-hover)] transition-all"
-          title="Delete section"
+          title={t('sidebar:deleteSection')}
         >
           <Trash2 size={12} />
         </button>
@@ -152,14 +154,14 @@ export function SectionItem({ chapterId, section, index, isActive, onClick }: Se
               className="w-full text-left px-4 py-2.5 text-[14px] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
             >
               <Pencil size={14} />
-              Rename
+              {t('common:rename')}
             </button>
             <button
               onClick={handleDelete}
               className="w-full text-left px-4 py-2.5 text-[14px] text-[var(--color-error)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
             >
               <Trash2 size={14} />
-              Delete
+              {t('common:delete')}
             </button>
           </div>
         </>

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { IPC } from '@shared/ipc-channels'
 import { useProjectStore } from '../../stores/projectStore'
 import { ChevronRight } from 'lucide-react'
 
 export function OutlineView() {
+  const { t } = useTranslation('sidebar')
   const isOpen = useProjectStore((s) => s.isOpen)
   const [expanded, setExpanded] = useState(false)
   const [content, setContent] = useState('')
@@ -34,13 +36,13 @@ export function OutlineView() {
           size={13}
           className={`transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
         />
-        Outline
+        {t('sidebar:outline')}
       </button>
 
       {expanded && (
         <div className="px-6 py-4 text-[14px] text-[var(--text-secondary)] whitespace-pre-wrap max-h-48 overflow-y-auto leading-relaxed">
           {content || (
-            <span className="text-[var(--text-secondary)]/80 italic">No outline generated yet</span>
+            <span className="text-[var(--text-secondary)]/80 italic">{t('sidebar:noOutlineYet')}</span>
           )}
         </div>
       )}

@@ -1,0 +1,16 @@
+{
+  "importManuscript": "Import Manuscript",
+  "bookTitle": "Book Title",
+  "author": "Author",
+  "chaptersDetected": "{{count}} chapters detected ({{words}} words)",
+  "createProject": "Create Project",
+  "creatingProject": "Creating project...",
+  "myNovel": "My Novel",
+  "janeDoe": "Jane Doe",
+  "untitledBook": "Untitled Book",
+  "unknownAuthor": "Unknown Author",
+  "dropFileHere": "Drop your file here",
+  "fileTypes": "PDF, DOCX, TXT, or MD",
+  "browseFiles": "Browse files",
+  "splitAdjusterNote": "Visual split adjustment coming in a future update."
+}

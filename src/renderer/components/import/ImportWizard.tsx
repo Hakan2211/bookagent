@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Modal } from '../common/Modal'
 import { FileUpload } from './FileUpload'
 import { ChapterPreview } from './ChapterPreview'
@@ -14,6 +15,7 @@ import { ArrowLeft } from 'lucide-react'
 type WizardStep = 'upload' | 'parsing' | 'review' | 'confirm'
 
 export function ImportWizard() {
+  const { t } = useTranslation(['import', 'common'])
   const isOpen = useUIStore((s) => s.isImportWizardOpen)
   const closeWizard = useUIStore((s) => s.closeImportWizard)
   const openProject = useProjectStore((s) => s.openProject)
@@ -71,8 +73,8 @@ export function ImportWizard() {
       }
 
       const metadata: BookMetadata = {
-        title: title || 'Untitled Book',
-        author: author || 'Unknown Author',
+        title: title || t('import:untitledBook'),
+        author: author || t('import:unknownAuthor'),
         aiProvider: 'anthropic',
         aiModel: 'claude-sonnet-4-5-20250929',
         sourceFile: filePath,
@@ -115,7 +117,7 @@ export function ImportWizard() {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Import Manuscript" size="xl">
+    <Modal isOpen={isOpen} onClose={handleClose} title={t('import:importManuscript')} size="xl">
       <div className="p-6">
         {error && (
           <div className="mb-5 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-300">
@@ -141,23 +143,23 @@ export function ImportWizard() {
             <div className="grid grid-cols-2 gap-4 mb-5">
               <div>
                 <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-                  Book Title
+                  {t('import:bookTitle')}
                 </label>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="My Novel"
+                  placeholder={t('import:myNovel')}
                   className="w-full px-3.5 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
                 />
               </div>
               <div>
                 <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-                  Author
+                  {t('import:author')}
                 </label>
                 <input
                   value={author}
                   onChange={(e) => setAuthor(e.target.value)}
-                  placeholder="Jane Doe"
+                  placeholder={t('import:janeDoe')}
                   className="w-full px-3.5 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
                 />
               </div>
@@ -165,7 +167,7 @@ export function ImportWizard() {
 
             <div className="mb-3 flex items-center justify-between">
               <span className="text-sm text-[var(--text-primary)] font-medium">
-                {chapters.length} chapters detected ({proposedSplit.totalWords.toLocaleString()} words)
+                {t('import:chaptersDetected', { count: chapters.length, words: proposedSplit.totalWords.toLocaleString() })}
               </span>
               {proposedSplit.detectedGenre && (
                 <span className="text-xs text-[var(--text-tertiary)]">
@@ -186,10 +188,10 @@ export function ImportWizard() {
             <div className="flex justify-end gap-2 mt-5">
               <Button variant="ghost" onClick={() => setStep('upload')}>
                 <ArrowLeft size={14} />
-                Back
+                {t('common:back')}
               </Button>
               <Button variant="primary" onClick={handleConfirm} isLoading={isProcessing}>
-                Create Project
+                {t('import:createProject')}
               </Button>
             </div>
           </div>
@@ -199,7 +201,7 @@ export function ImportWizard() {
         {step === 'confirm' && (
           <div className="text-center py-16">
             <LoadingSpinner size="lg" className="mx-auto mb-5" />
-            <p className="text-sm text-[var(--text-primary)] font-medium">Creating project...</p>
+            <p className="text-sm text-[var(--text-primary)] font-medium">{t('import:creatingProject')}</p>
           </div>
         )}
       </div>

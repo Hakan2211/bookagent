@@ -1,0 +1,17 @@
+{
+  "chapters": "Kapitel",
+  "noChaptersYet": "Noch keine Kapitel",
+  "newChapter": "Neues Kapitel",
+  "addSection": "Abschnitt hinzufügen",
+  "deleteChapter": "Kapitel löschen",
+  "deleteSection": "Abschnitt löschen",
+  "newSection": "Neuer Abschnitt",
+  "deleteChapterConfirm": "\"{{title}}\" löschen? Dies kann nicht rückgängig gemacht werden.",
+  "deleteChapterTitle": "Kapitel löschen",
+  "deleteSectionConfirm": "Abschnitt \"{{title}}\" löschen? Dies kann nicht rückgängig gemacht werden.",
+  "deleteSectionTitle": "Abschnitt löschen",
+  "outline": "Gliederung",
+  "noOutlineYet": "Noch keine Gliederung erstellt",
+  "notes": "Notizen",
+  "writeNotePlaceholder": "{{title}} hier schreiben..."
+}

@@ -1,0 +1,56 @@
+{
+  "title": "Settings",
+  "tabs": {
+    "ai": "AI Providers",
+    "style": "Style Guide",
+    "project": "Project",
+    "language": "Language"
+  },
+  "ai": {
+    "anthropicClaude": "Anthropic (Claude)",
+    "openai": "OpenAI",
+    "openrouter": "OpenRouter",
+    "openrouterDesc": "Access 200+ models from all major providers through a single API key.",
+    "connected": "Connected",
+    "keySaved": "{{provider}} key saved successfully",
+    "invalidKey": "Invalid {{provider}} API key",
+    "keySavedPlaceholder": "Key saved (enter new to replace)",
+    "selectModel": "Select model"
+  },
+  "style": {
+    "genre": "Genre",
+    "genrePlaceholder": "e.g., literary fiction, sci-fi, thriller",
+    "pov": "Point of View",
+    "tense": "Tense",
+    "tone": "Tone",
+    "tonePlaceholder": "e.g., introspective, lyrical, fast-paced",
+    "avoidWords": "Words to Avoid (comma-separated)",
+    "avoidWordsPlaceholder": "e.g., suddenly, very, really, literally",
+    "customInstructions": "Custom AI Instructions",
+    "customInstructionsPlaceholder": "e.g., Short paragraphs. Show don't tell. Hemingway-esque clarity.",
+    "saveStyleGuide": "Save Style Guide",
+    "openProjectToEdit": "Open a project to edit its style guide.",
+    "notSpecified": "Not specified",
+    "firstPerson": "First Person",
+    "thirdLimited": "Third Limited",
+    "thirdOmniscient": "Third Omniscient",
+    "secondPerson": "Second Person",
+    "pastTense": "Past Tense",
+    "presentTense": "Present Tense"
+  },
+  "project": {
+    "bookTitle": "Book Title",
+    "author": "Author",
+    "totalWordTarget": "Total Word Target",
+    "wordTargetDesc": "The overall word count goal for the book. Chapter lengths are managed organically by the agent based on narrative structure.",
+    "saveProjectSettings": "Save Project Settings",
+    "saved": "Saved",
+    "openProjectToEdit": "Open a project to edit its settings."
+  },
+  "language": {
+    "title": "Language",
+    "description": "Choose the display language for the application interface.",
+    "current": "Current language",
+    "switchNote": "The interface will update immediately when you change the language."
+  }
+}

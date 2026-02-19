@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useProjectStore } from '../../stores/projectStore'
 import { useEditorStore } from '../../stores/editorStore'
 import { useChatStore } from '../../stores/chatStore'
@@ -8,6 +9,7 @@ import type { ApiStatusState } from '../../stores/uiStore'
 const STATUS_CHECK_INTERVAL = 30_000
 
 export function StatusBar() {
+  const { t } = useTranslation(['common', 'editor'])
   const manifest = useProjectStore((s) => s.manifest)
   const isDirty = useEditorStore((s) => s.isDirty)
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
@@ -18,6 +20,8 @@ export function StatusBar() {
   const apiProvider = useUIStore((s) => s.apiProvider)
   const checkApiStatus = useUIStore((s) => s.checkApiStatus)
   const refreshModelName = useUIStore((s) => s.refreshModelName)
+  const language = useUIStore((s) => s.language)
+  const setLanguage = useUIStore((s) => s.setLanguage)
 
   const totalWords = manifest?.chapters.reduce((sum, ch) => sum + ch.wordCount, 0) || 0
   const targetWords = manifest?.targets.totalWords || 0
@@ -57,27 +61,27 @@ export function StatusBar() {
   if (isAgentWorking) {
     dotColor = 'var(--color-warning)'
     dotPulse = true
-    statusLabel = displayName || 'Working...'
+    statusLabel = displayName || t('common:working')
   } else {
     switch (apiStatus as ApiStatusState) {
       case 'connected':
         dotColor = 'var(--color-success)'
-        statusLabel = displayName || 'Connected'
+        statusLabel = displayName || t('common:connected')
         break
       case 'checking':
         dotColor = 'var(--color-warning)'
         dotPulse = true
         // Show existing model name while checking, not "Checking..."
-        statusLabel = displayName || 'Checking...'
+        statusLabel = displayName || t('common:checking')
         break
       case 'unavailable':
         dotColor = 'var(--color-error, #ef4444)'
-        statusLabel = displayName ? `${displayName} (unavailable)` : 'API Unavailable'
+        statusLabel = displayName ? `${displayName} (${t('common:unavailable')})` : t('common:apiUnavailable')
         break
       case 'no-key':
       default:
         dotColor = 'var(--text-tertiary)'
-        statusLabel = 'No API Key'
+        statusLabel = t('common:noApiKey')
         break
     }
   }
@@ -107,7 +111,7 @@ export function StatusBar() {
                 : 'rgba(148, 163, 184, 0.1)'
           }}
         >
-          {activeChapter.status}
+          {t(('editor:status' + activeChapter.status.charAt(0).toUpperCase() + activeChapter.status.slice(1)) as any)}
         </span>
       )}
 
@@ -115,7 +119,7 @@ export function StatusBar() {
       {isDirty && (
         <span className="text-[var(--color-warning)]/95 flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-warning)] animate-pulse" />
-          Unsaved
+          {t('common:unsaved')}
         </span>
       )}
 
@@ -128,7 +132,7 @@ export function StatusBar() {
           {hasTarget ? (
             <>
               <span className="tabular-nums">
-                {totalWords.toLocaleString()} / {targetWords.toLocaleString()} words
+                {totalWords.toLocaleString()} / {targetWords.toLocaleString()} {t('common:words')}
               </span>
               <div className="w-24 h-1.5 bg-[var(--bg-active)] rounded-full overflow-hidden">
                 <div
@@ -140,11 +144,20 @@ export function StatusBar() {
             </>
           ) : (
             <span className="tabular-nums">
-              {totalWords.toLocaleString()} words
+              {totalWords.toLocaleString()} {t('common:words')}
             </span>
           )}
         </div>
       )}
+
+      {/* Language toggle */}
+      <button
+        onClick={() => setLanguage(language === 'en' ? 'de' : 'en')}
+        className="px-2 py-0.5 rounded-md text-xs font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-all uppercase tracking-wide"
+        title={t('common:language')}
+      >
+        {language === 'en' ? 'EN' : 'DE'}
+      </button>
 
       {/* API Status */}
       <div className="flex items-center gap-1.5">

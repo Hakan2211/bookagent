@@ -1,5 +1,6 @@
 import { Menu, app, dialog, type BrowserWindow } from 'electron'
 import { IPC } from '@shared/ipc-channels'
+import { t } from './i18n'
 
 export function createMenu(mainWindow: BrowserWindow): void {
   const isMac = process.platform === 'darwin'
@@ -13,7 +14,7 @@ export function createMenu(mainWindow: BrowserWindow): void {
               { role: 'about' as const },
               { type: 'separator' as const },
               {
-                label: 'Settings...',
+                label: t('settings'),
                 accelerator: 'Cmd+,',
                 click: () => mainWindow.webContents.send('menu:settings')
               },
@@ -28,20 +29,20 @@ export function createMenu(mainWindow: BrowserWindow): void {
         ]
       : []),
     {
-      label: 'File',
+      label: t('file'),
       submenu: [
         {
-          label: 'New Book...',
+          label: t('newBook'),
           accelerator: 'CmdOrCtrl+N',
           click: () => mainWindow.webContents.send('menu:new-project')
         },
         {
-          label: 'Open Book...',
+          label: t('openBook'),
           accelerator: 'CmdOrCtrl+O',
           click: async () => {
             const result = await dialog.showOpenDialog(mainWindow, {
               properties: ['openDirectory'],
-              title: 'Open Book Project'
+              title: t('openBookDialog')
             })
             if (!result.canceled && result.filePaths[0]) {
               mainWindow.webContents.send('menu:open-project', result.filePaths[0])
@@ -49,28 +50,28 @@ export function createMenu(mainWindow: BrowserWindow): void {
           }
         },
         {
-          label: 'Import File...',
+          label: t('importFile'),
           accelerator: 'CmdOrCtrl+Shift+I',
           click: () => mainWindow.webContents.send('menu:import')
         },
         { type: 'separator' },
         {
-          label: 'Save',
+          label: t('save'),
           accelerator: 'CmdOrCtrl+S',
           click: () => mainWindow.webContents.send('menu:save')
         },
         { type: 'separator' },
         {
-          label: 'Export as PDF...',
+          label: t('exportPdf'),
           accelerator: 'CmdOrCtrl+Shift+E',
           click: () => mainWindow.webContents.send('menu:export', 'pdf')
         },
         {
-          label: 'Export as EPUB...',
+          label: t('exportEpub'),
           click: () => mainWindow.webContents.send('menu:export', 'epub')
         },
         {
-          label: 'Preview',
+          label: t('preview'),
           accelerator: 'CmdOrCtrl+Shift+P',
           click: () => mainWindow.webContents.send('menu:preview')
         },
@@ -79,7 +80,7 @@ export function createMenu(mainWindow: BrowserWindow): void {
       ]
     },
     {
-      label: 'Edit',
+      label: t('edit'),
       submenu: [
         { role: 'undo' },
         { role: 'redo' },
@@ -91,26 +92,26 @@ export function createMenu(mainWindow: BrowserWindow): void {
       ]
     },
     {
-      label: 'View',
+      label: t('view'),
       submenu: [
         {
-          label: 'Toggle Sidebar',
+          label: t('toggleSidebar'),
           accelerator: 'CmdOrCtrl+B',
           click: () => mainWindow.webContents.send('menu:toggle-sidebar')
         },
         {
-          label: 'Toggle Agent Panel',
+          label: t('toggleAgentPanel'),
           accelerator: 'CmdOrCtrl+J',
           click: () => mainWindow.webContents.send('menu:toggle-chat')
         },
         { type: 'separator' },
         {
-          label: 'Search Book',
+          label: t('searchBook'),
           accelerator: 'CmdOrCtrl+Shift+F',
           click: () => mainWindow.webContents.send('menu:search')
         },
         {
-          label: 'Quick Switch Chapter',
+          label: t('quickSwitchChapter'),
           accelerator: 'CmdOrCtrl+P',
           click: () => mainWindow.webContents.send('menu:quick-switch')
         },
@@ -120,16 +121,16 @@ export function createMenu(mainWindow: BrowserWindow): void {
       ]
     },
     {
-      label: 'Help',
+      label: t('help'),
       submenu: [
         {
-          label: 'About ChapterForge',
+          label: t('aboutChapterForge'),
           click: () => {
             dialog.showMessageBox(mainWindow, {
               type: 'info',
-              title: 'About ChapterForge',
-              message: 'ChapterForge v0.1.0',
-              detail: 'AI-powered book writing IDE.\nCursor for books.'
+              title: t('aboutChapterForge'),
+              message: t('aboutVersion'),
+              detail: t('aboutDetail')
             })
           }
         }

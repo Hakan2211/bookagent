@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useProjectStore } from '../../stores/projectStore'
 import { Button } from '../common/Button'
 import { IPC } from '@shared/ipc-channels'
 import type { BookManifest } from '@shared/types'
 
 export function ProjectSettings() {
+  const { t } = useTranslation('settings')
   const manifest = useProjectStore((s) => s.manifest)
   const updateManifest = useProjectStore((s) => s.updateManifest)
 
@@ -25,7 +27,7 @@ export function ProjectSettings() {
   if (!manifest) {
     return (
       <p className="text-sm text-[var(--text-tertiary)]">
-        Open a project to edit its settings.
+        {t('settings:project.openProjectToEdit')}
       </p>
     )
   }
@@ -56,14 +58,14 @@ export function ProjectSettings() {
     <div className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-          Book Title
+          {t('settings:project.bookTitle')}
         </label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputClasses} />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-          Author
+          {t('settings:project.author')}
         </label>
         <input
           value={author}
@@ -74,7 +76,7 @@ export function ProjectSettings() {
 
       <div>
         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-          Total Word Target
+          {t('settings:project.totalWordTarget')}
         </label>
         <input
           type="number"
@@ -83,13 +85,12 @@ export function ProjectSettings() {
           className={inputClasses}
         />
         <p className="mt-1.5 text-[12px] text-[var(--text-tertiary)]">
-          The overall word count goal for the book. Chapter lengths are managed organically by the
-          agent based on narrative structure.
+          {t('settings:project.wordTargetDesc')}
         </p>
       </div>
 
       <Button variant="primary" size="md" onClick={handleSave} isLoading={isSaving}>
-        {saved ? 'Saved' : 'Save Project Settings'}
+        {saved ? t('settings:project.saved') : t('settings:project.saveProjectSettings')}
       </Button>
     </div>
   )

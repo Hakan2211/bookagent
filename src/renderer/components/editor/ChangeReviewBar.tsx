@@ -1,9 +1,11 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useEditorStore } from '../../stores/editorStore'
 import { Button } from '../common/Button'
 import { GitCompare } from 'lucide-react'
 
 export function ChangeReviewBar() {
+  const { t } = useTranslation('editor')
   const pendingDiff = useEditorStore((s) => s.pendingDiff)
   const acceptAllChanges = useEditorStore((s) => s.acceptAllChanges)
   const rejectAllChanges = useEditorStore((s) => s.rejectAllChanges)
@@ -20,10 +22,10 @@ export function ChangeReviewBar() {
       <div className="flex items-center gap-3">
         <GitCompare size={14} className="text-[var(--text-accent)]" />
         <span className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">
-          Review Mode
+          {t('editor:reviewMode')}
         </span>
         <span className="text-xs text-[var(--text-secondary)] font-medium">
-          {changeCount} change{changeCount !== 1 ? 's' : ''} proposed
+          {t('editor:changesProposed', { count: changeCount })}
         </span>
         {pendingDiff.description && (
           <span className="text-xs text-[var(--text-tertiary)] italic">
@@ -34,10 +36,10 @@ export function ChangeReviewBar() {
 
       <div className="flex items-center gap-2">
         <Button variant="primary" size="sm" onClick={acceptAllChanges}>
-          Accept All
+          {t('editor:acceptAll')}
         </Button>
         <Button variant="danger" size="sm" onClick={rejectAllChanges}>
-          Reject All
+          {t('editor:rejectAll')}
         </Button>
       </div>
     </div>

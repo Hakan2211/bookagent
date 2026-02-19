@@ -1,0 +1,56 @@
+{
+  "title": "Einstellungen",
+  "tabs": {
+    "ai": "KI-Anbieter",
+    "style": "Stilvorlage",
+    "project": "Projekt",
+    "language": "Sprache"
+  },
+  "ai": {
+    "anthropicClaude": "Anthropic (Claude)",
+    "openai": "OpenAI",
+    "openrouter": "OpenRouter",
+    "openrouterDesc": "Zugriff auf über 200 Modelle von allen großen Anbietern mit einem einzigen API-Schlüssel.",
+    "connected": "Verbunden",
+    "keySaved": "{{provider}}-Schlüssel erfolgreich gespeichert",
+    "invalidKey": "Ungültiger {{provider}} API-Schlüssel",
+    "keySavedPlaceholder": "Schlüssel gespeichert (neuen eingeben zum Ersetzen)",
+    "selectModel": "Modell auswählen"
+  },
+  "style": {
+    "genre": "Genre",
+    "genrePlaceholder": "z.B. Belletristik, Science-Fiction, Thriller",
+    "pov": "Erzählperspektive",
+    "tense": "Zeitform",
+    "tone": "Tonfall",
+    "tonePlaceholder": "z.B. introspektiv, lyrisch, temporeich",
+    "avoidWords": "Zu vermeidende Wörter (kommagetrennt)",
+    "avoidWordsPlaceholder": "z.B. plötzlich, sehr, wirklich, buchstäblich",
+    "customInstructions": "Benutzerdefinierte KI-Anweisungen",
+    "customInstructionsPlaceholder": "z.B. Kurze Absätze. Zeigen statt erzählen. Hemingway-artige Klarheit.",
+    "saveStyleGuide": "Stilvorlage speichern",
+    "openProjectToEdit": "Öffne ein Projekt, um die Stilvorlage zu bearbeiten.",
+    "notSpecified": "Nicht angegeben",
+    "firstPerson": "Ich-Erzähler",
+    "thirdLimited": "Dritte Person (begrenzt)",
+    "thirdOmniscient": "Dritte Person (allwissend)",
+    "secondPerson": "Zweite Person",
+    "pastTense": "Vergangenheit",
+    "presentTense": "Gegenwart"
+  },
+  "project": {
+    "bookTitle": "Buchtitel",
+    "author": "Autor",
+    "totalWordTarget": "Gesamtwortanzahl-Ziel",
+    "wordTargetDesc": "Das Gesamtwortziel für das Buch. Kapitellängen werden vom Agenten organisch basierend auf der narrativen Struktur verwaltet.",
+    "saveProjectSettings": "Projekteinstellungen speichern",
+    "saved": "Gespeichert",
+    "openProjectToEdit": "Öffne ein Projekt, um die Einstellungen zu bearbeiten."
+  },
+  "language": {
+    "title": "Sprache",
+    "description": "Wähle die Anzeigesprache für die Anwendungsoberfläche.",
+    "current": "Aktuelle Sprache",
+    "switchNote": "Die Oberfläche wird sofort aktualisiert, wenn du die Sprache änderst."
+  }
+}

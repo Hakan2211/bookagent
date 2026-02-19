@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { ListChecks } from 'lucide-react'
 
 interface AgentPlanCardProps {
@@ -8,6 +9,7 @@ interface AgentPlanCardProps {
 }
 
 export function AgentPlanCard({ plan, onProceed, onAdjust }: AgentPlanCardProps) {
+  const { t } = useTranslation(['editor', 'common'])
   return (
     <div
       className="mx-5 my-4 p-5 bg-[var(--bg-input)] border border-[var(--border-active)] rounded-xl"
@@ -19,7 +21,7 @@ export function AgentPlanCard({ plan, onProceed, onAdjust }: AgentPlanCardProps)
       <div className="flex items-center gap-2.5 mb-3">
         <ListChecks size={15} className="text-[var(--text-accent)]" />
         <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-accent)]">
-          Agent Plan
+          {t('editor:agentPlan')}
         </div>
       </div>
       <p className="text-[15px] text-[var(--text-primary)] whitespace-pre-wrap leading-relaxed">
@@ -32,7 +34,7 @@ export function AgentPlanCard({ plan, onProceed, onAdjust }: AgentPlanCardProps)
               onClick={onProceed}
               className="text-[13px] px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:brightness-110 transition-all font-medium shadow-[var(--shadow-xs)]"
             >
-              Proceed
+              {t('common:proceed')}
             </button>
           )}
           {onAdjust && (
@@ -40,7 +42,7 @@ export function AgentPlanCard({ plan, onProceed, onAdjust }: AgentPlanCardProps)
               onClick={onAdjust}
               className="text-[13px] px-4 py-2 rounded-lg bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all font-medium"
             >
-              Adjust
+              {t('common:adjust')}
             </button>
           )}
         </div>

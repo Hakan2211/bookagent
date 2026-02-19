@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useProjectStore } from '../../stores/projectStore'
 import { Dropdown } from '../common/Dropdown'
 import { Button } from '../common/Button'
 import { IPC } from '@shared/ipc-channels'
 
 export function StyleGuideEditor() {
+  const { t } = useTranslation('settings')
   const manifest = useProjectStore((s) => s.manifest)
   const refreshManifest = useProjectStore((s) => s.refreshManifest)
 
@@ -58,7 +60,7 @@ export function StyleGuideEditor() {
   if (!manifest) {
     return (
       <p className="text-sm text-[var(--text-tertiary)]">
-        Open a project to edit its style guide.
+        {t('settings:style.openProjectToEdit')}
       </p>
     )
   }
@@ -68,37 +70,37 @@ export function StyleGuideEditor() {
   return (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Genre</label>
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">{t('settings:style.genre')}</label>
         <input
           value={genre}
           onChange={(e) => setGenre(e.target.value)}
-          placeholder="e.g., literary fiction, sci-fi, thriller"
+          placeholder={t('settings:style.genrePlaceholder')}
           className={inputClasses}
         />
       </div>
 
       <div className="grid grid-cols-2 gap-5">
         <div>
-          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Point of View</label>
+          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">{t('settings:style.pov')}</label>
           <Dropdown
             options={[
-              { value: '', label: 'Not specified' },
-              { value: 'first-person', label: 'First Person' },
-              { value: 'third-limited', label: 'Third Limited' },
-              { value: 'third-omniscient', label: 'Third Omniscient' },
-              { value: 'second-person', label: 'Second Person' }
+              { value: '', label: t('settings:style.notSpecified') },
+              { value: 'first-person', label: t('settings:style.firstPerson') },
+              { value: 'third-limited', label: t('settings:style.thirdLimited') },
+              { value: 'third-omniscient', label: t('settings:style.thirdOmniscient') },
+              { value: 'second-person', label: t('settings:style.secondPerson') }
             ]}
             value={pov}
             onChange={setPov}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Tense</label>
+          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">{t('settings:style.tense')}</label>
           <Dropdown
             options={[
-              { value: '', label: 'Not specified' },
-              { value: 'past', label: 'Past Tense' },
-              { value: 'present', label: 'Present Tense' }
+              { value: '', label: t('settings:style.notSpecified') },
+              { value: 'past', label: t('settings:style.pastTense') },
+              { value: 'present', label: t('settings:style.presentTense') }
             ]}
             value={tense}
             onChange={setTense}
@@ -107,42 +109,42 @@ export function StyleGuideEditor() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Tone</label>
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">{t('settings:style.tone')}</label>
         <input
           value={tone}
           onChange={(e) => setTone(e.target.value)}
-          placeholder="e.g., introspective, lyrical, fast-paced"
+          placeholder={t('settings:style.tonePlaceholder')}
           className={inputClasses}
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-          Words to Avoid (comma-separated)
+          {t('settings:style.avoidWords')}
         </label>
         <input
           value={avoidWords}
           onChange={(e) => setAvoidWords(e.target.value)}
-          placeholder="e.g., suddenly, very, really, literally"
+          placeholder={t('settings:style.avoidWordsPlaceholder')}
           className={inputClasses}
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-          Custom AI Instructions
+          {t('settings:style.customInstructions')}
         </label>
         <textarea
           value={customInstructions}
           onChange={(e) => setCustomInstructions(e.target.value)}
-          placeholder="e.g., Short paragraphs. Show don't tell. Hemingway-esque clarity."
+          placeholder={t('settings:style.customInstructionsPlaceholder')}
           rows={4}
           className={`${inputClasses} resize-y leading-relaxed`}
         />
       </div>
 
       <Button variant="primary" onClick={handleSave} size="md">
-        Save Style Guide
+        {t('settings:style.saveStyleGuide')}
       </Button>
     </div>
   )

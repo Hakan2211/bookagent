@@ -1,0 +1,38 @@
+{
+  "agentWorking": "Agent arbeitet...",
+  "askAnything": "Frage den Agenten etwas...",
+  "getStarted": "Erste Schritte",
+  "quickActions": "Schnellaktionen",
+  "importManuscript": "Manuskript importieren",
+  "newBook": {
+    "createFirst": "Mein erstes Kapitel erstellen",
+    "createFirstPrompt": "Hilf mir, mein erstes Kapitel zu erstellen. Frage mich nach dem Genre meines Buches, den Hauptfiguren und der Eröffnungsszene, bevor du schreibst.",
+    "outlineBook": "Hilf mir bei der Gliederung meines Buches",
+    "outlineBookPrompt": "Hilf mir, eine detaillierte Gliederung für mein Buch zu erstellen. Frage mich nach dem Genre, den Themen, den Hauptfiguren und dem allgemeinen Handlungsbogen, den ich mir vorstelle.",
+    "developCharacters": "Meine Charaktere entwickeln",
+    "developCharactersPrompt": "Hilf mir, die Hauptfiguren für mein Buch zu entwickeln. Frage mich nach dem Genre und allen ersten Charakterideen, die ich habe."
+  },
+  "noChapter": {
+    "reviewFull": "Das gesamte Buch überprüfen",
+    "reviewFullPrompt": "Überprüfe mein bisheriges Buch — prüfe auf Tempoprobleme, Handlungslücken und Konsistenz über alle Kapitel hinweg.",
+    "planNext": "Das nächste Kapitel planen",
+    "planNextPrompt": "Hilf mir basierend auf dem Bisherigen, das nächste Kapitel zu planen. Berücksichtige den Handlungsbogen, ungelöste Handlungsstränge und die Charakterentwicklung.",
+    "generateSummaries": "Kapitelzusammenfassungen erstellen",
+    "generateSummariesPrompt": "Erstelle eine kurze Zusammenfassung für jedes bisherige Kapitel des Buches."
+  },
+  "chapter": {
+    "summarize": "Dieses Kapitel zusammenfassen",
+    "summarizePrompt": "Bitte fasse dieses Kapitel zusammen und hebe wichtige Ereignisse und die Charakterentwicklung hervor.",
+    "checkInconsistencies": "Auf Inkonsistenzen prüfen",
+    "checkInconsistenciesPrompt": "Überprüfe dieses Kapitel auf Inkonsistenzen mit dem Rest des Buches — Zeitlinienprobleme, Charakterverhalten, sachliche Widersprüche.",
+    "expand": "Diesen Abschnitt erweitern",
+    "expandPrompt": "Erweitere das aktuelle Kapitel mit mehr beschreibenden Details, tieferer Charakterintrospektion und sinnlichen Details. Behalte die bestehende Stimme und den Stil bei.",
+    "makeConcise": "Kürzer fassen",
+    "makeConcisePrompt": "Bearbeite dieses Kapitel, um es prägnanter zu machen. Entferne redundante Formulierungen, straffe Dialoge und streiche Passagen, die die Handlung oder Charakterentwicklung nicht vorantreiben.",
+    "improveDialogue": "Dialog verbessern",
+    "improveDialoguePrompt": "Überprüfe und verbessere die Dialoge in diesem Kapitel. Mache die Stimme jeder Figur unverwechselbarer und stelle sicher, dass Gespräche natürlich und zielgerichtet wirken.",
+    "addForeshadowing": "Vorausdeutungen hinzufügen",
+    "addForeshadowingPrompt": "Füge diesem Kapitel subtile Vorausdeutungen hinzu, die auf Ereignisse in späteren Kapiteln hinweisen. Die Hinweise sollten natürlich und nicht aufdringlich sein."
+  },
+  "aiStartPrompt": "Hilf mir, mit dem Schreiben meines Buches zu beginnen. Frage mich nach dem Genre, dem Setting, den Hauptfiguren und der Eröffnungsszene, bevor du das erste Kapitel erstellst."
+}

@@ -1,9 +1,11 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChatContainer } from '../chat/ChatContainer'
 import { useProjectStore } from '../../stores/projectStore'
 import { Sparkles } from 'lucide-react'
 
 export function ChatPanel() {
+  const { t } = useTranslation('common')
   const isOpen = useProjectStore((s) => s.isOpen)
 
   return (
@@ -13,7 +15,7 @@ export function ChatPanel() {
         <div className="flex items-center gap-3">
           <Sparkles size={16} className="text-[var(--text-accent)]" />
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            Agent
+            {t('common:agent')}
           </h2>
         </div>
       </div>
@@ -24,7 +26,7 @@ export function ChatPanel() {
           <ChatContainer />
         ) : (
           <div className="p-6 text-[15px] text-[var(--text-secondary)]/80">
-            Open a project to use the AI agent
+            {t('common:openProjectToUseAgent')}
           </div>
         )}
       </div>

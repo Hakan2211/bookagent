@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { ChapterMeta } from '@shared/types'
 import { StatusBadge } from './StatusBadge'
 import { SectionItem } from './SectionItem'
@@ -16,6 +17,7 @@ interface ChapterItemProps {
 }
 
 export function ChapterItem({ chapter, index, isActive, onClick }: ChapterItemProps) {
+  const { t } = useTranslation(['sidebar', 'common'])
   const [showContextMenu, setShowContextMenu] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [isRenaming, setIsRenaming] = useState(false)
@@ -44,8 +46,8 @@ export function ChapterItem({ chapter, index, isActive, onClick }: ChapterItemPr
   const handleDelete = async () => {
     setShowContextMenu(false)
     const confirmed = await window.api.invoke(IPC.DIALOG_CONFIRM, {
-      message: `Delete "${chapter.title}"? This cannot be undone.`,
-      title: 'Delete Chapter',
+      message: t('sidebar:deleteChapterConfirm', { title: chapter.title }),
+      title: t('sidebar:deleteChapterTitle'),
       confirmLabel: 'Delete'
     })
     if (!confirmed) return
@@ -72,7 +74,7 @@ export function ChapterItem({ chapter, index, isActive, onClick }: ChapterItemPr
       // Then create a new section
       await window.api.invoke(IPC.SECTION_CREATE, {
         chapterId: chapter.id,
-        title: 'New Section',
+        title: t('sidebar:newSection'),
         content: ''
       })
       await refreshManifest()
@@ -192,7 +194,7 @@ export function ChapterItem({ chapter, index, isActive, onClick }: ChapterItemPr
           <button
             onClick={handleAddSection}
             className="shrink-0 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 text-[var(--text-tertiary)] hover:text-[var(--text-accent)] hover:bg-[var(--bg-hover)] transition-all"
-            title="Add section"
+            title={t('sidebar:addSection')}
           >
             <Plus size={14} />
           </button>
@@ -201,7 +203,7 @@ export function ChapterItem({ chapter, index, isActive, onClick }: ChapterItemPr
           <button
             onClick={handleDelete}
             className="shrink-0 mr-3 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 text-[var(--text-tertiary)] hover:text-[var(--color-error)] hover:bg-[var(--bg-hover)] transition-all"
-            title="Delete chapter"
+            title={t('sidebar:deleteChapter')}
           >
             <Trash2 size={14} />
           </button>
@@ -240,21 +242,21 @@ export function ChapterItem({ chapter, index, isActive, onClick }: ChapterItemPr
               className="w-full text-left px-4 py-2.5 text-[14px] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
             >
               <Pencil size={14} />
-              Rename
+              {t('common:rename')}
             </button>
             <button
               onClick={handleAddSection}
               className="w-full text-left px-4 py-2.5 text-[14px] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
             >
               <Plus size={14} />
-              Add Section
+              {t('sidebar:addSection')}
             </button>
             <button
               onClick={handleDelete}
               className="w-full text-left px-4 py-2.5 text-[14px] text-[var(--color-error)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
             >
               <Trash2 size={14} />
-              Delete
+              {t('common:delete')}
             </button>
           </div>
         </>

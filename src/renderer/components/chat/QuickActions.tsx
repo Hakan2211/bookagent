@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useChatStore } from '../../stores/chatStore'
 import { useEditorStore } from '../../stores/editorStore'
 import { useProjectStore } from '../../stores/projectStore'
@@ -10,83 +11,37 @@ interface QuickAction {
   prompt: string
 }
 
-// Actions when NO chapters exist (brand new book)
-const NEW_BOOK_ACTIONS: QuickAction[] = [
-  {
-    label: 'Create my first chapter',
-    prompt:
-      'Help me create my first chapter. Ask me about my book\'s genre, main characters, and the opening scene before writing.'
-  },
-  {
-    label: 'Help me outline my book',
-    prompt:
-      'Help me create a detailed outline for my book. Ask me about the genre, themes, main characters, and the general story arc I have in mind.'
-  },
-  {
-    label: 'Develop my characters',
-    prompt:
-      'Help me develop the main characters for my book. Ask me about the genre and any initial character ideas I have.'
-  }
-]
-
-// Actions when chapters exist but none is selected
-const NO_CHAPTER_SELECTED_ACTIONS: QuickAction[] = [
-  {
-    label: 'Review the full book',
-    prompt:
-      'Review my book so far \u2014 check for pacing issues, plot holes, and consistency across all chapters.'
-  },
-  {
-    label: 'Plan the next chapter',
-    prompt:
-      'Based on what\'s been written so far, help me plan the next chapter. Consider the story arc, unresolved plot threads, and character development.'
-  },
-  {
-    label: 'Generate chapter summaries',
-    prompt: 'Generate a brief summary for each chapter in the book so far.'
-  }
-]
-
-// Actions when a chapter IS open (existing behavior)
-const CHAPTER_ACTIONS: QuickAction[] = [
-  {
-    label: 'Summarize this chapter',
-    prompt:
-      'Please summarize this chapter, highlighting key events and character development.'
-  },
-  {
-    label: 'Check for inconsistencies',
-    prompt:
-      'Check this chapter for any inconsistencies with the rest of the book \u2014 timeline issues, character behavior, factual contradictions.'
-  },
-  {
-    label: 'Expand this section',
-    prompt:
-      'Expand the current chapter with more descriptive detail, deeper character introspection, and sensory details. Maintain the existing voice and style.'
-  },
-  {
-    label: 'Make more concise',
-    prompt:
-      'Edit this chapter to be more concise. Remove redundant phrases, tighten dialogue, and cut any passages that don\'t advance the plot or character development.'
-  },
-  {
-    label: 'Improve dialogue',
-    prompt:
-      'Review and improve the dialogue in this chapter. Make each character\'s voice more distinct and ensure conversations feel natural and purposeful.'
-  },
-  {
-    label: 'Add foreshadowing',
-    prompt:
-      'Add subtle foreshadowing elements to this chapter that hint at events in later chapters. The hints should be natural and not heavy-handed.'
-  }
-]
-
 export function QuickActions() {
+  const { t } = useTranslation('chat')
   const sendPrompt = useChatStore((s) => s.sendPrompt)
   const isAgentWorking = useChatStore((s) => s.isAgentWorking)
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
   const manifest = useProjectStore((s) => s.manifest)
   const openImportWizard = useUIStore((s) => s.openImportWizard)
+
+  // Actions when NO chapters exist (brand new book)
+  const NEW_BOOK_ACTIONS: QuickAction[] = [
+    { label: t('chat:newBook.createFirst'), prompt: t('chat:newBook.createFirstPrompt') },
+    { label: t('chat:newBook.outlineBook'), prompt: t('chat:newBook.outlineBookPrompt') },
+    { label: t('chat:newBook.developCharacters'), prompt: t('chat:newBook.developCharactersPrompt') }
+  ]
+
+  // Actions when chapters exist but none is selected
+  const NO_CHAPTER_SELECTED_ACTIONS: QuickAction[] = [
+    { label: t('chat:noChapter.reviewFull'), prompt: t('chat:noChapter.reviewFullPrompt') },
+    { label: t('chat:noChapter.planNext'), prompt: t('chat:noChapter.planNextPrompt') },
+    { label: t('chat:noChapter.generateSummaries'), prompt: t('chat:noChapter.generateSummariesPrompt') }
+  ]
+
+  // Actions when a chapter IS open (existing behavior)
+  const CHAPTER_ACTIONS: QuickAction[] = [
+    { label: t('chat:chapter.summarize'), prompt: t('chat:chapter.summarizePrompt') },
+    { label: t('chat:chapter.checkInconsistencies'), prompt: t('chat:chapter.checkInconsistenciesPrompt') },
+    { label: t('chat:chapter.expand'), prompt: t('chat:chapter.expandPrompt') },
+    { label: t('chat:chapter.makeConcise'), prompt: t('chat:chapter.makeConcisePrompt') },
+    { label: t('chat:chapter.improveDialogue'), prompt: t('chat:chapter.improveDialoguePrompt') },
+    { label: t('chat:chapter.addForeshadowing'), prompt: t('chat:chapter.addForeshadowingPrompt') }
+  ]
 
   const hasChapters = (manifest?.chapters.length || 0) > 0
 
@@ -95,13 +50,13 @@ export function QuickActions() {
 
   if (!hasChapters) {
     actions = NEW_BOOK_ACTIONS
-    heading = 'Get started'
+    heading = t('chat:getStarted')
   } else if (!activeChapterId) {
     actions = NO_CHAPTER_SELECTED_ACTIONS
-    heading = 'Quick actions'
+    heading = t('chat:quickActions')
   } else {
     actions = CHAPTER_ACTIONS
-    heading = 'Quick actions'
+    heading = t('chat:quickActions')
   }
 
   return (
@@ -127,7 +82,7 @@ export function QuickActions() {
             className="text-[14px] px-4 py-3 rounded-xl bg-[var(--bg-input)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--border-active)] hover:shadow-[var(--shadow-xs)] transition-all disabled:opacity-50 font-medium inline-flex items-center gap-2"
           >
             <FileUp size={14} />
-            Import a manuscript
+            {t('chat:importManuscript')}
           </button>
         )}
       </div>

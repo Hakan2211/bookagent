@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import type { ChangeGroup } from '@shared/types'
 import { Check, X } from 'lucide-react'
 
@@ -15,6 +16,7 @@ export function DiffOverlay({
   onAccept,
   onReject
 }: DiffOverlayProps) {
+  const { t } = useTranslation('common')
   return (
     <div className="p-5 space-y-3 max-w-4xl mx-auto">
       {changeGroups.map((group) => {
@@ -51,14 +53,14 @@ export function DiffOverlay({
                 className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-all font-medium"
               >
                 <Check size={12} />
-                Accept
+                {t('common:accept')}
               </button>
               <button
                 onClick={() => onReject(group.id)}
                 className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-all font-medium"
               >
                 <X size={12} />
-                Reject
+                {t('common:reject')}
               </button>
             </div>
           </div>
