@@ -139,6 +139,85 @@ export function registerIPC(
     }
   )
 
+  // ── Section Handlers ───────────────────────
+
+  ipcMain.handle(
+    IPC.SECTION_READ,
+    async (_event, args: { chapterId: string; sectionId: string }) => {
+      if (!projectManager.project) throw new Error('No project open')
+      return projectManager.project.readSection(args.chapterId, args.sectionId)
+    }
+  )
+
+  ipcMain.handle(
+    IPC.SECTION_SAVE,
+    async (_event, args: { chapterId: string; sectionId: string; content: string }) => {
+      if (!projectManager.project) throw new Error('No project open')
+      const wordCount = await projectManager.project.saveSection(
+        args.chapterId,
+        args.sectionId,
+        args.content
+      )
+      return { wordCount }
+    }
+  )
+
+  ipcMain.handle(
+    IPC.SECTION_CREATE,
+    async (
+      _event,
+      args: { chapterId: string; title: string; content: string; afterSectionId?: string }
+    ) => {
+      if (!projectManager.project) throw new Error('No project open')
+      return projectManager.project.addSection(
+        args.chapterId,
+        args.title,
+        args.content,
+        args.afterSectionId
+      )
+    }
+  )
+
+  ipcMain.handle(
+    IPC.SECTION_DELETE,
+    async (_event, args: { chapterId: string; sectionId: string }) => {
+      if (!projectManager.project) throw new Error('No project open')
+      await projectManager.project.deleteSection(args.chapterId, args.sectionId)
+    }
+  )
+
+  ipcMain.handle(
+    IPC.SECTION_RENAME,
+    async (_event, args: { chapterId: string; sectionId: string; newTitle: string }) => {
+      if (!projectManager.project) throw new Error('No project open')
+      await projectManager.project.renameSection(args.chapterId, args.sectionId, args.newTitle)
+    }
+  )
+
+  ipcMain.handle(
+    IPC.SECTION_REORDER,
+    async (_event, args: { chapterId: string; sectionIds: string[] }) => {
+      if (!projectManager.project) throw new Error('No project open')
+      await projectManager.project.reorderSections(args.chapterId, args.sectionIds)
+    }
+  )
+
+  ipcMain.handle(
+    IPC.SECTION_UPDATE_STATUS,
+    async (_event, args: { chapterId: string; sectionId: string; status: ChapterStatus }) => {
+      if (!projectManager.project) throw new Error('No project open')
+      await projectManager.project.updateSectionStatus(args.chapterId, args.sectionId, args.status)
+    }
+  )
+
+  ipcMain.handle(
+    IPC.CHAPTER_CONVERT_TO_SECTIONED,
+    async (_event, args: { chapterId: string; firstSectionTitle: string }) => {
+      if (!projectManager.project) throw new Error('No project open')
+      return projectManager.project.convertToSectioned(args.chapterId, args.firstSectionTitle)
+    }
+  )
+
   // ── Note Handlers ─────────────────────────
 
   ipcMain.handle(IPC.NOTE_READ, async (_event, args: { noteId: string }) => {

@@ -131,6 +131,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
       // If it's an edit action, enter diff mode in the editor
       if (action.type === 'edit') {
         useEditorStore.getState().enterDiffMode(action)
+      } else if (action.type === 'edit_section') {
+        useEditorStore.getState().enterSectionDiffMode(action)
       }
     })
 

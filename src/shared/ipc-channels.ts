@@ -15,6 +15,16 @@ export const IPC = {
   CHAPTER_REORDER: 'chapter:reorder',
   CHAPTER_UPDATE_STATUS: 'chapter:update-status',
 
+  // ── Sections ─────────────────────────────────
+  SECTION_READ: 'section:read',
+  SECTION_SAVE: 'section:save',
+  SECTION_CREATE: 'section:create',
+  SECTION_DELETE: 'section:delete',
+  SECTION_RENAME: 'section:rename',
+  SECTION_REORDER: 'section:reorder',
+  SECTION_UPDATE_STATUS: 'section:update-status',
+  CHAPTER_CONVERT_TO_SECTIONED: 'chapter:convert-to-sectioned',
+
   // ── Notes ───────────────────────────────────
   NOTE_READ: 'note:read',
   NOTE_SAVE: 'note:save',

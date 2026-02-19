@@ -10,6 +10,7 @@ import { Plus } from 'lucide-react'
 export function ProjectTree() {
   const manifest = useProjectStore((s) => s.manifest)
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
+  const activeSectionId = useEditorStore((s) => s.activeSectionId)
   const openChapter = useEditorStore((s) => s.openChapter)
 
   if (!manifest) return null

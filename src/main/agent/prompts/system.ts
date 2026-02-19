@@ -29,10 +29,19 @@ Total words: ${totalWords} / ${project.manifest.targets.totalWords} target
 
 ## CHAPTER LIST
 ${project.manifest.chapters
-  .map(
-    (ch, i) =>
-      `${i + 1}. [${ch.id}] "${ch.title}" — ${ch.wordCount} words — ${ch.status}`
-  )
+  .map((ch, i) => {
+    const base = `${i + 1}. [${ch.id}] "${ch.title}" — ${ch.wordCount} words — ${ch.status}`
+    if (ch.sections && ch.sections.length > 0) {
+      const sectionLines = ch.sections
+        .map(
+          (s, si) =>
+            `   ${i + 1}.${si + 1}. [${s.id}] "${s.title}" — ${s.wordCount} words — ${s.status}`
+        )
+        .join('\n')
+      return `${base} (sectioned)\n${sectionLines}`
+    }
+    return base
+  })
   .join('\n')}
 
 ## CHAPTER STRUCTURE MANAGEMENT

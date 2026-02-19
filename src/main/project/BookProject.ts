@@ -1,7 +1,8 @@
 import fs from 'fs/promises'
 import path from 'path'
-import type { BookManifest, ChapterMeta, ChapterStatus, SearchResult } from '@shared/types'
+import type { BookManifest, ChapterMeta, ChapterStatus, SectionMeta, SearchResult } from '@shared/types'
 import { ChapterFile } from './ChapterFile'
+import { SectionFile } from './SectionFile'
 
 export class BookProject {
   public manifest: BookManifest
@@ -117,12 +118,22 @@ export class BookProject {
     const chapter = this.getChapterMeta(chapterId)
     if (!chapter) throw new Error(`Chapter "${chapterId}" not found`)
 
-    // Delete file
     const fullPath = path.join(this.projectPath, chapter.file)
-    try {
-      await fs.unlink(fullPath)
-    } catch {
-      // File might already be gone
+
+    if (chapter.sections && chapter.sections.length > 0) {
+      // Sectioned chapter: delete the entire folder
+      try {
+        await fs.rm(fullPath, { recursive: true, force: true })
+      } catch {
+        // Folder might already be gone
+      }
+    } else {
+      // Flat chapter: delete single file
+      try {
+        await fs.unlink(fullPath)
+      } catch {
+        // File might already be gone
+      }
     }
 
     // Remove from manifest
@@ -178,6 +189,225 @@ export class BookProject {
     if (!chapter) throw new Error(`Chapter "${chapterId}" not found`)
     chapter.summary = summary
     await this.saveManifest()
+  }
+
+  // ─── Section Operations ──────────────────
+
+  /** Check if a chapter has sections (is a folder-based chapter) */
+  isSectioned(chapterId: string): boolean {
+    const ch = this.getChapterMeta(chapterId)
+    return !!ch?.sections && ch.sections.length > 0
+  }
+
+  getSectionMeta(chapterId: string, sectionId: string): SectionMeta | undefined {
+    const ch = this.getChapterMeta(chapterId)
+    return ch?.sections?.find((s) => s.id === sectionId)
+  }
+
+  async readSection(chapterId: string, sectionId: string): Promise<string> {
+    const section = this.getSectionMeta(chapterId, sectionId)
+    if (!section) throw new Error(`Section "${sectionId}" not found in chapter "${chapterId}"`)
+
+    const data = await SectionFile.read(this.projectPath, section.file)
+    return data.content
+  }
+
+  async saveSection(chapterId: string, sectionId: string, content: string): Promise<number> {
+    const ch = this.getChapterMeta(chapterId)
+    if (!ch) throw new Error(`Chapter "${chapterId}" not found`)
+    const section = ch.sections?.find((s) => s.id === sectionId)
+    if (!section) throw new Error(`Section "${sectionId}" not found`)
+
+    const wordCount = await SectionFile.write(
+      this.projectPath,
+      section.file,
+      sectionId,
+      section.title,
+      content
+    )
+
+    section.wordCount = wordCount
+    // Recalculate chapter total word count from all sections
+    ch.wordCount = (ch.sections || []).reduce((sum, s) => sum + s.wordCount, 0)
+    await this.saveManifest()
+    return wordCount
+  }
+
+  async addSection(
+    chapterId: string,
+    title: string,
+    content: string,
+    afterSectionId?: string
+  ): Promise<SectionMeta> {
+    const ch = this.getChapterMeta(chapterId)
+    if (!ch) throw new Error(`Chapter "${chapterId}" not found`)
+    if (!ch.sections) ch.sections = []
+
+    // Generate section ID using monotonic counter
+    const maxNum = ch.sections.reduce((max, s) => {
+      const num = parseInt(s.id.replace('sec-', ''), 10)
+      return isNaN(num) ? max : Math.max(max, num)
+    }, ch._nextSectionNum ?? 0)
+    const nextNum = maxNum + 1
+    ch._nextSectionNum = nextNum
+    const sectionId = `sec-${String(nextNum).padStart(2, '0')}`
+
+    // Get the chapter folder path
+    const chapterFolder = ch.file.replace(/\.md$/, '')
+    const fileIndex = afterSectionId
+      ? (ch.sections.findIndex((s) => s.id === afterSectionId) + 2)
+      : ch.sections.length + 1
+    const filename = SectionFile.formatSectionFilename(fileIndex, title)
+    const filePath = `${chapterFolder}/${filename}`
+
+    const wordCount = await SectionFile.write(
+      this.projectPath,
+      filePath,
+      sectionId,
+      title,
+      content
+    )
+
+    const sectionMeta: SectionMeta = {
+      id: sectionId,
+      file: filePath,
+      title,
+      status: 'draft',
+      wordCount,
+      summary: ''
+    }
+
+    if (afterSectionId) {
+      const idx = ch.sections.findIndex((s) => s.id === afterSectionId)
+      if (idx >= 0) {
+        ch.sections.splice(idx + 1, 0, sectionMeta)
+      } else {
+        ch.sections.push(sectionMeta)
+      }
+    } else {
+      ch.sections.push(sectionMeta)
+    }
+
+    // Update chapter word count
+    ch.wordCount = ch.sections.reduce((sum, s) => sum + s.wordCount, 0)
+    await this.saveManifest()
+    return sectionMeta
+  }
+
+  async deleteSection(chapterId: string, sectionId: string): Promise<void> {
+    const ch = this.getChapterMeta(chapterId)
+    if (!ch) throw new Error(`Chapter "${chapterId}" not found`)
+    const section = ch.sections?.find((s) => s.id === sectionId)
+    if (!section) throw new Error(`Section "${sectionId}" not found`)
+
+    const fullPath = path.join(this.projectPath, section.file)
+    try {
+      await fs.unlink(fullPath)
+    } catch {
+      // File might already be gone
+    }
+
+    ch.sections = (ch.sections || []).filter((s) => s.id !== sectionId)
+    ch.wordCount = ch.sections.reduce((sum, s) => sum + s.wordCount, 0)
+    await this.saveManifest()
+  }
+
+  async renameSection(chapterId: string, sectionId: string, newTitle: string): Promise<void> {
+    const section = this.getSectionMeta(chapterId, sectionId)
+    if (!section) throw new Error(`Section "${sectionId}" not found`)
+
+    section.title = newTitle
+    const content = await this.readSection(chapterId, sectionId)
+    await SectionFile.write(this.projectPath, section.file, sectionId, newTitle, content)
+    await this.saveManifest()
+  }
+
+  async reorderSections(chapterId: string, sectionIds: string[]): Promise<void> {
+    const ch = this.getChapterMeta(chapterId)
+    if (!ch || !ch.sections) throw new Error(`Chapter "${chapterId}" not found or has no sections`)
+
+    const existingIds = new Set(ch.sections.map((s) => s.id))
+    const inputIds = new Set(sectionIds)
+    if (existingIds.size !== inputIds.size) {
+      throw new Error('Section ID list must contain exactly the same sections')
+    }
+    for (const id of existingIds) {
+      if (!inputIds.has(id)) throw new Error(`Missing section "${id}" in reorder list`)
+    }
+
+    const reordered: SectionMeta[] = []
+    for (const id of sectionIds) {
+      const s = ch.sections.find((sec) => sec.id === id)
+      if (s) reordered.push(s)
+    }
+    ch.sections = reordered
+    await this.saveManifest()
+  }
+
+  async updateSectionStatus(chapterId: string, sectionId: string, status: ChapterStatus): Promise<void> {
+    const section = this.getSectionMeta(chapterId, sectionId)
+    if (!section) throw new Error(`Section "${sectionId}" not found`)
+    section.status = status
+    await this.saveManifest()
+  }
+
+  /**
+   * Convert a flat chapter (single .md file) into a folder-based sectioned chapter.
+   * The existing content becomes the first section.
+   */
+  async convertToSectioned(chapterId: string, firstSectionTitle: string): Promise<ChapterMeta> {
+    const ch = this.getChapterMeta(chapterId)
+    if (!ch) throw new Error(`Chapter "${chapterId}" not found`)
+    if (ch.sections && ch.sections.length > 0) {
+      throw new Error(`Chapter "${chapterId}" is already sectioned`)
+    }
+
+    // Read existing content
+    const content = await this.readChapter(chapterId)
+
+    // Create chapter folder
+    const oldFilePath = ch.file
+    const folderName = oldFilePath.replace(/\.md$/, '')
+    const folderFullPath = path.join(this.projectPath, folderName)
+    await fs.mkdir(folderFullPath, { recursive: true })
+
+    // Write section file
+    const sectionId = 'sec-01'
+    const sectionFilename = SectionFile.formatSectionFilename(1, firstSectionTitle)
+    const sectionFilePath = `${folderName}/${sectionFilename}`
+
+    const wordCount = await SectionFile.write(
+      this.projectPath,
+      sectionFilePath,
+      sectionId,
+      firstSectionTitle,
+      content
+    )
+
+    // Update manifest: change file to folder path, add sections array
+    ch.file = folderName
+    ch.sections = [
+      {
+        id: sectionId,
+        file: sectionFilePath,
+        title: firstSectionTitle,
+        status: ch.status,
+        wordCount,
+        summary: ch.summary
+      }
+    ]
+    ch._nextSectionNum = 1
+
+    // Delete old flat file
+    try {
+      await fs.unlink(path.join(this.projectPath, oldFilePath))
+    } catch {
+      // Might not exist
+    }
+
+    this.chapterCache.delete(chapterId)
+    await this.saveManifest()
+    return ch
   }
 
   // ─── Notes Operations ────────────────────

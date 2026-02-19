@@ -100,6 +100,98 @@ export const AGENT_TOOLS: ToolDefinition[] = [
     }
   },
   {
+    name: 'read_section',
+    description:
+      'Read the full text of a specific section within a sectioned chapter. Chapters that have been divided into sections store each section as a separate file for granular editing.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        chapterId: {
+          type: 'string',
+          description: 'The chapter ID containing the section, e.g., "ch-03"'
+        },
+        sectionId: {
+          type: 'string',
+          description: 'The section ID, e.g., "sec-01"'
+        }
+      },
+      required: ['chapterId', 'sectionId']
+    }
+  },
+  {
+    name: 'edit_section',
+    description:
+      'Propose an edited version of a section within a sectioned chapter. The edit will be shown to the user as a diff for review. Always provide the COMPLETE new section text.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        chapterId: {
+          type: 'string',
+          description: 'The chapter ID containing the section'
+        },
+        sectionId: {
+          type: 'string',
+          description: 'The section ID to edit'
+        },
+        newContent: {
+          type: 'string',
+          description: 'The complete new section text (in markdown)'
+        },
+        changeDescription: {
+          type: 'string',
+          description: 'A brief description of what was changed and why'
+        }
+      },
+      required: ['chapterId', 'sectionId', 'newContent', 'changeDescription']
+    }
+  },
+  {
+    name: 'create_section',
+    description:
+      'Create a new section within a sectioned chapter. If the chapter is not yet sectioned, the user should first convert it using the sidebar.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        chapterId: {
+          type: 'string',
+          description: 'The chapter ID to add the section to'
+        },
+        title: {
+          type: 'string',
+          description: 'Title for the new section'
+        },
+        content: {
+          type: 'string',
+          description: 'The section text (in markdown)'
+        },
+        afterSectionId: {
+          type: 'string',
+          description:
+            'Insert after this section ID. Omit to append at end of the chapter.'
+        }
+      },
+      required: ['chapterId', 'title', 'content']
+    }
+  },
+  {
+    name: 'delete_section',
+    description: 'Delete a section from a sectioned chapter.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        chapterId: {
+          type: 'string',
+          description: 'The chapter ID containing the section'
+        },
+        sectionId: {
+          type: 'string',
+          description: 'The section ID to delete'
+        }
+      },
+      required: ['chapterId', 'sectionId']
+    }
+  },
+  {
     name: 'update_outline',
     description: 'Regenerate the book outline based on the current state of all chapters.',
     inputSchema: {

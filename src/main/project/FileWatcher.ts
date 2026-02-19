@@ -11,6 +11,7 @@ export class FileWatcher {
     this.watcher = watch(
       [
         path.join(projectPath, 'chapters', '*.md'),
+        path.join(projectPath, 'chapters', '**', '*.md'),
         path.join(projectPath, 'notes', '*.md'),
         path.join(projectPath, 'book.json'),
         path.join(projectPath, 'outline.md')

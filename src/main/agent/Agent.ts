@@ -163,6 +163,58 @@ export class Agent {
           }
         }
 
+        case 'read_section': {
+          const content = await this.project.readSection(
+            toolCall.input.chapterId as string,
+            toolCall.input.sectionId as string
+          )
+          return { success: true, data: content }
+        }
+
+        case 'edit_section': {
+          const chapterId = toolCall.input.chapterId as string
+          const sectionId = toolCall.input.sectionId as string
+          const newContent = toolCall.input.newContent as string
+          const description = toolCall.input.changeDescription as string
+
+          const currentContent = await this.project.readSection(chapterId, sectionId)
+          const diff = computeDiff(currentContent, newContent)
+
+          return {
+            success: true,
+            pendingAction: {
+              type: 'edit_section',
+              chapterId,
+              sectionId,
+              oldContent: currentContent,
+              newContent,
+              diff,
+              description
+            }
+          }
+        }
+
+        case 'create_section': {
+          return {
+            success: true,
+            pendingAction: {
+              type: 'create_section',
+              chapterId: toolCall.input.chapterId as string,
+              title: toolCall.input.title as string,
+              content: toolCall.input.content as string,
+              afterSectionId: toolCall.input.afterSectionId as string | undefined
+            }
+          }
+        }
+
+        case 'delete_section': {
+          await this.project.deleteSection(
+            toolCall.input.chapterId as string,
+            toolCall.input.sectionId as string
+          )
+          return { success: true, data: 'Section deleted' }
+        }
+
         case 'update_outline': {
           // Handled by renderer — emit event
           return { success: true, data: 'Outline update requested' }

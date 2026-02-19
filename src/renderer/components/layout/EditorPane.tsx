@@ -12,6 +12,7 @@ import { PenLine, Upload, Sparkles, BookOpen } from 'lucide-react'
 
 export function EditorPane() {
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
+  const activeSectionId = useEditorStore((s) => s.activeSectionId)
   const openChapter = useEditorStore((s) => s.openChapter)
   const isInDiffMode = useEditorStore((s) => s.isInDiffMode)
   const pendingDiff = useEditorStore((s) => s.pendingDiff)
@@ -166,7 +167,7 @@ export function EditorPane() {
     )
   }
 
-  // State: Chapter is open -- normal editor
+  // State: Chapter (or section) is open -- normal editor
   return (
     <div className="h-full flex flex-col bg-[var(--bg-editor)]">
       {isInDiffMode && <ChangeReviewBar />}

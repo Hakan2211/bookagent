@@ -28,15 +28,28 @@ export class ContextAssembler {
       const chMeta = project.getChapterMeta(id)
       if (!chMeta) continue
 
-      // We need to read the chapter synchronously from cache
-      // The caller should have pre-loaded the chapter
-      const content = `[Chapter: ${chMeta.title}]\nID: ${id}\nStatus: ${chMeta.status}\nWord count: ${chMeta.wordCount}\n\n${chMeta.summary || '(no content loaded - use read_chapter tool)'}`
+      // Build chapter context block
+      const hasSections = chMeta.sections && chMeta.sections.length > 0
+      let chapterContent: string
+
+      if (hasSections) {
+        // For sectioned chapters, list sections with their metadata
+        const sectionsList = chMeta.sections!
+          .map(
+            (s, i) =>
+              `  ${i + 1}. [${s.id}] "${s.title}" — ${s.status}, ${s.wordCount} words${s.summary ? `: ${s.summary}` : ''}`
+          )
+          .join('\n')
+        chapterContent = `[Chapter: ${chMeta.title}]\nID: ${id}\nStatus: ${chMeta.status}\nType: sectioned (${chMeta.sections!.length} sections)\n\nSections:\n${sectionsList}\n\n(Use read_section tool to access individual section content)`
+      } else {
+        chapterContent = `[Chapter: ${chMeta.title}]\nID: ${id}\nStatus: ${chMeta.status}\nWord count: ${chMeta.wordCount}\n\n${chMeta.summary || '(no content loaded - use read_chapter tool)'}`
+      }
 
       blocks.push({
         type: 'chapter-full',
         id,
-        content,
-        tokenEstimate: TokenCounter.estimate(content),
+        content: chapterContent,
+        tokenEstimate: TokenCounter.estimate(chapterContent),
         priority: 90
       })
     }
@@ -144,6 +157,7 @@ export class ContextAssembler {
 
   private getTokenLimit(aiConfig: { provider: string; model: string }): number {
     if (aiConfig.provider === 'anthropic') return 180000
+    if (aiConfig.provider === 'openrouter') return 180000
     if (aiConfig.model === 'gpt-4o') return 120000
     if (aiConfig.model === 'gpt-4o-mini') return 120000
     return 100000

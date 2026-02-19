@@ -34,6 +34,18 @@ export interface ChapterMeta {
   status: ChapterStatus
   wordCount: number
   summary: string
+  sections?: SectionMeta[]
+  /** Internal: monotonic counter to prevent section ID reuse after deletions */
+  _nextSectionNum?: number
+}
+
+export interface SectionMeta {
+  id: string
+  file: string
+  title: string
+  status: ChapterStatus
+  wordCount: number
+  summary: string
 }
 
 export type ChapterStatus = 'outline' | 'draft' | 'revised' | 'final'
@@ -196,6 +208,22 @@ export type PendingAction =
       firstChapterId: string
       secondChapterId: string
       mergedTitle: string
+    }
+  | {
+      type: 'edit_section'
+      chapterId: string
+      sectionId: string
+      oldContent: string
+      newContent: string
+      diff: ChangeGroup[]
+      description: string
+    }
+  | {
+      type: 'create_section'
+      chapterId: string
+      title: string
+      content: string
+      afterSectionId?: string
     }
 
 // ─── Import Types ────────────────────────────

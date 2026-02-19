@@ -6,12 +6,14 @@ import { computeFullDiff, applyAcceptedChanges } from '../lib/diff'
 
 interface EditorState {
   activeChapterId: string | null
+  activeSectionId: string | null
   activeContent: string
   isDirty: boolean
   isLoading: boolean
   isInDiffMode: boolean
   pendingDiff: {
     chapterId: string
+    sectionId?: string
     changeGroups: ChangeGroup[]
     allChanges: TextChange[]
     description: string
@@ -21,9 +23,11 @@ interface EditorState {
   acceptedGroupIds: Set<string>
 
   openChapter: (chapterId: string) => Promise<void>
+  openSection: (chapterId: string, sectionId: string) => Promise<void>
   updateContent: (content: string) => void
   saveChapter: () => Promise<void>
   enterDiffMode: (action: Extract<PendingAction, { type: 'edit' }>) => void
+  enterSectionDiffMode: (action: Extract<PendingAction, { type: 'edit_section' }>) => void
   acceptChange: (groupId: string) => void
   rejectChange: (groupId: string) => void
   acceptAllChanges: () => Promise<void>
@@ -34,6 +38,7 @@ interface EditorState {
 
 export const useEditorStore = create<EditorState>((set, get) => ({
   activeChapterId: null,
+  activeSectionId: null,
   activeContent: '',
   isDirty: false,
   isLoading: false,
@@ -42,8 +47,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   acceptedGroupIds: new Set(),
 
   openChapter: async (chapterId: string) => {
-    // Auto-save current chapter if dirty
-    if (get().isDirty && get().activeChapterId) {
+    // Auto-save current content if dirty
+    if (get().isDirty && (get().activeChapterId || get().activeSectionId)) {
       await get().saveChapter()
     }
 
@@ -54,6 +59,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       })) as string
       set({
         activeChapterId: chapterId,
+        activeSectionId: null,
         activeContent: content,
         isDirty: false,
         isLoading: false,
@@ -66,23 +72,60 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     }
   },
 
+  openSection: async (chapterId: string, sectionId: string) => {
+    // Auto-save current content if dirty
+    if (get().isDirty && (get().activeChapterId || get().activeSectionId)) {
+      await get().saveChapter()
+    }
+
+    set({ isLoading: true })
+    try {
+      const content = (await window.api.invoke(IPC.SECTION_READ, {
+        chapterId,
+        sectionId
+      })) as string
+      set({
+        activeChapterId: chapterId,
+        activeSectionId: sectionId,
+        activeContent: content,
+        isDirty: false,
+        isLoading: false,
+        isInDiffMode: false,
+        pendingDiff: null
+      })
+    } catch (err) {
+      console.error('Failed to open section:', err)
+      set({ isLoading: false })
+    }
+  },
+
   updateContent: (content: string) => {
     set({ activeContent: content, isDirty: true })
   },
 
   saveChapter: async () => {
-    const { activeChapterId, activeContent } = get()
+    const { activeChapterId, activeSectionId, activeContent } = get()
     if (!activeChapterId) return
 
     try {
-      await window.api.invoke(IPC.CHAPTER_SAVE, {
-        chapterId: activeChapterId,
-        content: activeContent
-      })
+      if (activeSectionId) {
+        // Save section content
+        await window.api.invoke(IPC.SECTION_SAVE, {
+          chapterId: activeChapterId,
+          sectionId: activeSectionId,
+          content: activeContent
+        })
+      } else {
+        // Save chapter content
+        await window.api.invoke(IPC.CHAPTER_SAVE, {
+          chapterId: activeChapterId,
+          content: activeContent
+        })
+      }
       set({ isDirty: false })
       useProjectStore.getState().refreshManifest()
     } catch (err) {
-      console.error('Failed to save chapter:', err)
+      console.error('Failed to save:', err)
     }
   },
 
@@ -96,6 +139,25 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       isInDiffMode: true,
       pendingDiff: {
         chapterId: action.chapterId,
+        changeGroups: fullDiff.changeGroups,
+        allChanges: fullDiff.allChanges,
+        description: action.description,
+        oldContent: action.oldContent,
+        newContent: action.newContent
+      },
+      acceptedGroupIds: allGroupIds
+    })
+  },
+
+  enterSectionDiffMode: (action) => {
+    const fullDiff = computeFullDiff(action.oldContent, action.newContent)
+    const allGroupIds = new Set(fullDiff.changeGroups.map((g) => g.id))
+
+    set({
+      isInDiffMode: true,
+      pendingDiff: {
+        chapterId: action.chapterId,
+        sectionId: action.sectionId,
         changeGroups: fullDiff.changeGroups,
         allChanges: fullDiff.allChanges,
         description: action.description,
@@ -136,13 +198,22 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
       await window.api.invoke(IPC.AGENT_ACCEPT_CHANGES, {
         chapterId: pendingDiff.chapterId,
+        sectionId: pendingDiff.sectionId,
         newContent: finalContent
       })
 
-      // Reload chapter
-      const content = (await window.api.invoke(IPC.CHAPTER_READ, {
-        chapterId: pendingDiff.chapterId
-      })) as string
+      // Reload content
+      let content: string
+      if (pendingDiff.sectionId) {
+        content = (await window.api.invoke(IPC.SECTION_READ, {
+          chapterId: pendingDiff.chapterId,
+          sectionId: pendingDiff.sectionId
+        })) as string
+      } else {
+        content = (await window.api.invoke(IPC.CHAPTER_READ, {
+          chapterId: pendingDiff.chapterId
+        })) as string
+      }
 
       set({
         activeContent: content,
@@ -163,7 +234,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!pendingDiff) return
 
     window.api.invoke(IPC.AGENT_REJECT_CHANGES, {
-      chapterId: pendingDiff.chapterId
+      chapterId: pendingDiff.chapterId,
+      sectionId: pendingDiff.sectionId
     }).catch((err: unknown) => {
       console.error('Failed to reject changes:', err)
     })
@@ -182,6 +254,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   reset: () => {
     set({
       activeChapterId: null,
+      activeSectionId: null,
       activeContent: '',
       isDirty: false,
       isLoading: false,
