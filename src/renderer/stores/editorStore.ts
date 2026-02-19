@@ -66,6 +66,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         isInDiffMode: false,
         pendingDiff: null
       })
+
+      // Persist last active chapter (fire-and-forget)
+      window.api.invoke(IPC.PROJECT_SAVE_LAST_CHAPTER, { chapterId }).catch(() => {})
     } catch (err) {
       console.error('Failed to open chapter:', err)
       set({ isLoading: false })
@@ -93,6 +96,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         isInDiffMode: false,
         pendingDiff: null
       })
+
+      // Persist last active chapter+section (fire-and-forget)
+      window.api.invoke(IPC.PROJECT_SAVE_LAST_CHAPTER, { chapterId, sectionId }).catch(() => {})
     } catch (err) {
       console.error('Failed to open section:', err)
       set({ isLoading: false })

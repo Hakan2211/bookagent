@@ -135,18 +135,53 @@ Thumbs.db
     return store.get('recentProjects', [])
   }
 
+  /**
+   * Update the last-active chapter/section for the currently open project.
+   * Called whenever the user switches chapters in the editor.
+   */
+  updateLastChapter(chapterId: string, sectionId?: string): void {
+    if (!this.currentProject) return
+    const projectPath = this.currentProject.path
+
+    const recents = store.get('recentProjects', [])
+    const entry = recents.find((r) => r.path === projectPath)
+    if (entry) {
+      entry.lastChapterId = chapterId
+      entry.lastSectionId = sectionId || undefined
+      store.set('recentProjects', recents)
+    }
+  }
+
+  /**
+   * Get the last-active chapter/section for the currently open project.
+   */
+  getLastChapter(): { chapterId?: string; sectionId?: string } {
+    if (!this.currentProject) return {}
+    const projectPath = this.currentProject.path
+
+    const recents = store.get('recentProjects', [])
+    const entry = recents.find((r) => r.path === projectPath)
+    return {
+      chapterId: entry?.lastChapterId,
+      sectionId: entry?.lastSectionId
+    }
+  }
+
   private addToRecents(projectPath: string, manifest: BookManifest): void {
     const recents = store.get('recentProjects', [])
     
     // Remove existing entry for this path
     const filtered = recents.filter(r => r.path !== projectPath)
     
-    // Add to front
+    // Add to front, preserving lastChapterId/lastSectionId from old entry
+    const oldEntry = recents.find(r => r.path === projectPath)
     filtered.unshift({
       path: projectPath,
       title: manifest.title,
       author: manifest.author,
-      lastOpened: new Date().toISOString()
+      lastOpened: new Date().toISOString(),
+      lastChapterId: oldEntry?.lastChapterId,
+      lastSectionId: oldEntry?.lastSectionId
     })
     
     // Keep only last 10

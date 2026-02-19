@@ -30,6 +30,30 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     try {
       const manifest = (await window.api.invoke(IPC.PROJECT_OPEN, { path })) as BookManifest
       set({ isOpen: true, manifest, isLoading: false })
+
+      // Restore last active chapter/section
+      try {
+        const last = (await window.api.invoke(IPC.PROJECT_GET_LAST_CHAPTER)) as {
+          chapterId?: string
+          sectionId?: string
+        }
+
+        if (last.chapterId) {
+          const chapter = manifest.chapters.find((ch) => ch.id === last.chapterId)
+          if (chapter) {
+            // Dynamically import to avoid circular dependency
+            const { useEditorStore } = await import('./editorStore')
+
+            if (last.sectionId && chapter.sections?.find((s) => s.id === last.sectionId)) {
+              useEditorStore.getState().openSection(last.chapterId, last.sectionId)
+            } else {
+              useEditorStore.getState().openChapter(last.chapterId)
+            }
+          }
+        }
+      } catch {
+        // Non-critical: if restoring fails, user just sees empty editor
+      }
     } catch (err) {
       set({ isLoading: false, error: (err as Error).message })
       throw err

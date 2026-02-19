@@ -81,6 +81,17 @@ export function registerIPC(
     return projectManager.project?.manifest || null
   })
 
+  ipcMain.handle(
+    IPC.PROJECT_SAVE_LAST_CHAPTER,
+    async (_event, args: { chapterId: string; sectionId?: string }) => {
+      projectManager.updateLastChapter(args.chapterId, args.sectionId)
+    }
+  )
+
+  ipcMain.handle(IPC.PROJECT_GET_LAST_CHAPTER, async () => {
+    return projectManager.getLastChapter()
+  })
+
   // ── Chapter Handlers ──────────────────────
 
   ipcMain.handle(IPC.CHAPTER_READ, async (_event, args: { chapterId: string }) => {

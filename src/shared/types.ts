@@ -312,6 +312,8 @@ export interface RecentProject {
   title: string
   author: string
   lastOpened: string
+  lastChapterId?: string
+  lastSectionId?: string
 }
 
 export interface AppSettings {
