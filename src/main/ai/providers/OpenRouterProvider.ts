@@ -29,6 +29,17 @@ export class OpenRouterProvider implements AIProvider {
           if (m.role === 'tool') {
             return { role: 'tool', content: m.content, tool_call_id: m.toolCallId }
           }
+          if (m.role === 'assistant' && m.toolCalls?.length) {
+            return {
+              role: 'assistant',
+              content: m.content || null,
+              tool_calls: m.toolCalls.map((tc) => ({
+                id: tc.id,
+                type: 'function' as const,
+                function: { name: tc.name, arguments: JSON.stringify(tc.input) }
+              }))
+            }
+          }
           return { role: m.role, content: m.content }
         })
       ]
@@ -126,6 +137,17 @@ export class OpenRouterProvider implements AIProvider {
           if (m.role === 'tool') {
             return { role: 'tool', content: m.content, tool_call_id: m.toolCallId }
           }
+          if (m.role === 'assistant' && m.toolCalls?.length) {
+            return {
+              role: 'assistant',
+              content: m.content || null,
+              tool_calls: m.toolCalls.map((tc) => ({
+                id: tc.id,
+                type: 'function' as const,
+                function: { name: tc.name, arguments: JSON.stringify(tc.input) }
+              }))
+            }
+          }
           return { role: m.role, content: m.content }
         })
       ]
@@ -176,6 +198,7 @@ export class OpenRouterProvider implements AIProvider {
     const decoder = new TextDecoder()
     let buffer = ''
     const toolCalls: Map<number, { id: string; name: string; args: string }> = new Map()
+    let finishReason: string | undefined
 
     try {
       while (true) {
@@ -195,6 +218,7 @@ export class OpenRouterProvider implements AIProvider {
           try {
             const data = JSON.parse(jsonStr) as {
               choices: Array<{
+                finish_reason?: string
                 delta: {
                   content?: string
                   tool_calls?: Array<{
@@ -206,7 +230,9 @@ export class OpenRouterProvider implements AIProvider {
               }>
             }
 
-            const delta = data.choices[0]?.delta
+            const choice = data.choices[0]
+            if (choice?.finish_reason) finishReason = choice.finish_reason
+            const delta = choice?.delta
             if (delta?.content) {
               yield { type: 'text_delta', text: delta.content }
             }
@@ -242,12 +268,13 @@ export class OpenRouterProvider implements AIProvider {
             input: JSON.parse(tc.args) as Record<string, unknown>
           }
         }
-      } catch {
-        // Malformed tool arguments
+      } catch (e) {
+        console.warn("[OpenRouterProvider] Malformed tool call JSON (likely truncated by max_tokens):", (e as Error).message)
       }
     }
 
-    yield { type: 'done' }
+    const mapped = finishReason === 'length' ? 'max_tokens' as const : finishReason === 'tool_calls' ? 'tool_use' as const : finishReason === 'stop' ? 'stop' as const : 'end_turn' as const
+    yield { type: 'done', finishReason: mapped }
   }
 
   async validateKey(apiKey: string): Promise<boolean> {

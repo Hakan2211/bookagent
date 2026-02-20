@@ -46,6 +46,9 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
             if (last.sectionId && chapter.sections?.find((s) => s.id === last.sectionId)) {
               useEditorStore.getState().openSection(last.chapterId, last.sectionId)
+            } else if (chapter.sections && chapter.sections.length > 0) {
+              // Chapter is sectioned but sectionId is missing/invalid — open first section
+              useEditorStore.getState().openSection(last.chapterId, chapter.sections[0].id)
             } else {
               useEditorStore.getState().openChapter(last.chapterId)
             }

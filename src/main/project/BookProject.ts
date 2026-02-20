@@ -31,6 +31,16 @@ export class BookProject {
   async readChapter(chapterId: string): Promise<string> {
     const chapter = this.getChapterMeta(chapterId)
     if (!chapter) throw new Error(`Chapter "${chapterId}" not found`)
+
+    // Sectioned chapters are directories, not files — cannot be read directly
+    if (chapter.sections && chapter.sections.length > 0) {
+      const err = new Error(
+        `Chapter "${chapterId}" is sectioned. Use readSection() for individual sections.`
+      )
+      ;(err as Error & { code: string }).code = 'CHAPTER_IS_SECTIONED'
+      ;(err as Error & { firstSectionId: string }).firstSectionId = chapter.sections[0].id
+      throw err
+    }
     
     const data = await ChapterFile.read(this.projectPath, chapter.file)
     this.chapterCache.set(chapterId, data.content)
@@ -40,6 +50,9 @@ export class BookProject {
   async saveChapter(chapterId: string, content: string): Promise<number> {
     const chapter = this.getChapterMeta(chapterId)
     if (!chapter) throw new Error(`Chapter "${chapterId}" not found`)
+    if (chapter.sections && chapter.sections.length > 0) {
+      throw new Error(`Chapter "${chapterId}" is sectioned into multiple files. Use saveSection() to edit individual sections.`)
+    }
 
     const wordCount = await ChapterFile.write(
       this.projectPath,

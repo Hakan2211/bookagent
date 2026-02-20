@@ -22,12 +22,23 @@ export class AnthropicProvider implements AIProvider {
       model: this.model,
       max_tokens: request.maxTokens ?? 4096,
       system: request.systemPrompt,
-      messages: request.messages.map(m => ({
-        role: m.role === 'tool' ? 'user' : m.role,
-        content: m.role === 'tool'
-          ? [{ type: 'tool_result', tool_use_id: m.toolCallId, content: m.content }]
-          : m.content
-      }))
+      messages: request.messages.map(m => {
+        if (m.role === 'tool') {
+          return {
+            role: 'user' as const,
+            content: [{ type: 'tool_result', tool_use_id: m.toolCallId, content: m.content }]
+          }
+        }
+        if (m.role === 'assistant' && m.toolCalls?.length) {
+          const blocks: unknown[] = []
+          if (m.content) blocks.push({ type: 'text', text: m.content })
+          for (const tc of m.toolCalls) {
+            blocks.push({ type: 'tool_use', id: tc.id, name: tc.name, input: tc.input })
+          }
+          return { role: 'assistant' as const, content: blocks }
+        }
+        return { role: m.role as 'user' | 'assistant', content: m.content }
+      })
     }
 
     if (request.temperature !== undefined) {
@@ -95,12 +106,23 @@ export class AnthropicProvider implements AIProvider {
       max_tokens: request.maxTokens ?? 4096,
       system: request.systemPrompt,
       stream: true,
-      messages: request.messages.map(m => ({
-        role: m.role === 'tool' ? 'user' : m.role,
-        content: m.role === 'tool'
-          ? [{ type: 'tool_result', tool_use_id: m.toolCallId, content: m.content }]
-          : m.content
-      }))
+      messages: request.messages.map(m => {
+        if (m.role === 'tool') {
+          return {
+            role: 'user' as const,
+            content: [{ type: 'tool_result', tool_use_id: m.toolCallId, content: m.content }]
+          }
+        }
+        if (m.role === 'assistant' && m.toolCalls?.length) {
+          const blocks: unknown[] = []
+          if (m.content) blocks.push({ type: 'text', text: m.content })
+          for (const tc of m.toolCalls) {
+            blocks.push({ type: 'tool_use', id: tc.id, name: tc.name, input: tc.input })
+          }
+          return { role: 'assistant' as const, content: blocks }
+        }
+        return { role: m.role as 'user' | 'assistant', content: m.content }
+      })
     }
 
     if (request.temperature !== undefined) {
@@ -142,6 +164,7 @@ export class AnthropicProvider implements AIProvider {
     const decoder = new TextDecoder()
     let buffer = ''
     let currentToolCall: { id: string; name: string; inputJson: string } | null = null
+    let stopReason: string | undefined
 
     try {
       while (true) {
@@ -160,8 +183,12 @@ export class AnthropicProvider implements AIProvider {
           try {
             const data = JSON.parse(jsonStr) as {
               type: string
-              delta?: { type?: string; text?: string; partial_json?: string }
+              delta?: { type?: string; text?: string; partial_json?: string; stop_reason?: string }
               content_block?: { type?: string; id?: string; name?: string }
+            }
+
+            if (data.type === 'message_delta' && data.delta?.stop_reason) {
+              stopReason = data.delta.stop_reason
             }
 
             if (data.type === 'content_block_start' && data.content_block?.type === 'tool_use') {
@@ -187,8 +214,8 @@ export class AnthropicProvider implements AIProvider {
                     input
                   }
                 }
-              } catch {
-                // Malformed tool call JSON
+              } catch (e) {
+                console.warn("[AnthropicProvider] Malformed tool call JSON (likely truncated by max_tokens):", (e as Error).message)
               }
               currentToolCall = null
             }
@@ -201,7 +228,8 @@ export class AnthropicProvider implements AIProvider {
       reader.releaseLock()
     }
 
-    yield { type: 'done' }
+    const mappedReason = stopReason === 'end_turn' ? 'end_turn' as const : stopReason === 'tool_use' ? 'tool_use' as const : stopReason === 'max_tokens' ? 'max_tokens' as const : 'stop' as const
+    yield { type: 'done', finishReason: mappedReason }
   }
 
   async validateKey(apiKey: string): Promise<boolean> {

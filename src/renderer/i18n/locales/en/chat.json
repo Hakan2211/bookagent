@@ -1,5 +1,6 @@
 {
   "agentWorking": "Agent is working...",
+  "stopAgent": "Stop agent",
   "askAnything": "Ask the agent anything...",
   "getStarted": "Get started",
   "quickActions": "Quick actions",

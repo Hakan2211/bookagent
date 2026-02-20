@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom'
 import { useChatStore } from '../../stores/chatStore'
 import { IPC } from '@shared/ipc-channels'
 import type { ModelInfo } from '@shared/types'
-import { SendHorizontal, ChevronDown, Check } from 'lucide-react'
+import { SendHorizontal, Square, ChevronDown, Check } from 'lucide-react'
 
 export function ChatInput() {
   const { t } = useTranslation('chat')
@@ -97,6 +97,10 @@ export function ChatInput() {
     setInput('')
   }
 
+  const handleCancel = async () => {
+    await window.api.invoke(IPC.AGENT_CANCEL)
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -171,13 +175,23 @@ export function ChatInput() {
             rows={1}
             className="flex-1 bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-2xl px-5 py-4 text-[15px] resize-none outline-none shadow-[inset_0_1px_2px_rgba(0,0,0,0.2),0_0_8px_rgba(129,140,248,0.06)] focus:border-[var(--border-active)] focus:shadow-[inset_0_1px_2px_rgba(0,0,0,0.15),0_0_0_2px_var(--focus-ring-soft),0_0_20px_rgba(129,140,248,0.12)] placeholder:text-[var(--text-tertiary)]/70 disabled:opacity-50 transition-all duration-200 leading-relaxed"
           />
-          <button
-            onClick={handleSend}
-            disabled={!input.trim() || isAgentWorking}
-            className="shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)] shadow-[var(--shadow-glow-sm)] disabled:opacity-35 disabled:shadow-none hover:shadow-[var(--shadow-glow)] hover:brightness-110 focus-visible:shadow-[0_0_0_2px_var(--bg-chat),0_0_0_4px_var(--focus-ring)] transition-all duration-200 active:scale-95"
-          >
-            <SendHorizontal size={18} />
-          </button>
+          {isAgentWorking ? (
+            <button
+              onClick={handleCancel}
+              className="shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl bg-[var(--color-error)]/80 text-white shadow-[0_0_12px_rgba(239,68,68,0.3)] hover:bg-[var(--color-error)] hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] focus-visible:shadow-[0_0_0_2px_var(--bg-chat),0_0_0_4px_var(--focus-ring)] transition-all duration-200 active:scale-95"
+              title={t('chat:stopAgent')}
+            >
+              <Square size={16} />
+            </button>
+          ) : (
+            <button
+              onClick={handleSend}
+              disabled={!input.trim()}
+              className="shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)] shadow-[var(--shadow-glow-sm)] disabled:opacity-35 disabled:shadow-none hover:shadow-[var(--shadow-glow)] hover:brightness-110 focus-visible:shadow-[0_0_0_2px_var(--bg-chat),0_0_0_4px_var(--focus-ring)] transition-all duration-200 active:scale-95"
+            >
+              <SendHorizontal size={18} />
+            </button>
+          )}
         </div>
       </div>
     </div>

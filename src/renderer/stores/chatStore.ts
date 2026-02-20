@@ -2,17 +2,21 @@ import { create } from 'zustand'
 import type { ChatMessage, PendingAction } from '@shared/types'
 import { IPC } from '@shared/ipc-channels'
 import { useEditorStore } from './editorStore'
+import { useProjectStore } from './projectStore'
 
 interface ChatState {
   messages: ChatMessage[]
   isAgentWorking: boolean
   pendingActions: PendingAction[]
+  toolActivity: string[]
 
   sendPrompt: (prompt: string) => Promise<void>
   appendStreamText: (text: string) => void
+  addToolActivity: (activity: string) => void
   setAgentDone: (fullResponse: string) => void
   setAgentError: (error: string) => void
   addPendingAction: (action: PendingAction) => void
+  removePendingAction: (chapterId: string, sectionId?: string) => void
   clearPendingActions: () => void
   clearHistory: () => void
   initListeners: () => () => void
@@ -22,6 +26,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   messages: [],
   isAgentWorking: false,
   pendingActions: [],
+  toolActivity: [],
 
   sendPrompt: async (prompt: string) => {
     const userMsg: ChatMessage = {
@@ -40,10 +45,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
       status: 'streaming'
     }
 
+    // Clear any stale diff queue from the previous prompt
+    useEditorStore.getState().clearDiffQueue()
+
     set((state) => ({
       messages: [...state.messages, userMsg, assistantMsg],
       isAgentWorking: true,
-      pendingActions: []
+      pendingActions: [],
+      toolActivity: []
     }))
 
     try {
@@ -68,6 +77,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
     })
   },
 
+  addToolActivity: (activity: string) => {
+    set((state) => ({
+      toolActivity: [...state.toolActivity, activity]
+    }))
+  },
+
   setAgentDone: (fullResponse: string) => {
     set((state) => {
       const messages = [...state.messages]
@@ -80,7 +95,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
           status: 'complete'
         }
       }
-      return { messages, isAgentWorking: false }
+      return { messages, isAgentWorking: false, toolActivity: [] }
     })
   },
 
@@ -95,7 +110,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
           status: 'error'
         }
       }
-      return { messages, isAgentWorking: false }
+      return { messages, isAgentWorking: false, toolActivity: [] }
     })
   },
 
@@ -103,6 +118,22 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set((state) => ({
       pendingActions: [...state.pendingActions, action]
     }))
+  },
+
+  removePendingAction: (chapterId: string, sectionId?: string) => {
+    set((state) => {
+      // Find and remove the first matching pending action
+      const idx = state.pendingActions.findIndex((a) => {
+        if (sectionId) {
+          return a.type === 'edit_section' && a.chapterId === chapterId && a.sectionId === sectionId
+        }
+        return a.type === 'edit' && a.chapterId === chapterId
+      })
+      if (idx === -1) return state
+      const updated = [...state.pendingActions]
+      updated.splice(idx, 1)
+      return { pendingActions: updated }
+    })
   },
 
   clearPendingActions: () => {
@@ -120,10 +151,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     const unsubDone = window.api.on(IPC.AGENT_DONE, (data: any) => {
       get().setAgentDone(data.fullResponse)
+      // Refresh project manifest in case the agent created/modified files
+      useProjectStore.getState().refreshManifest()
     })
 
     const unsubError = window.api.on(IPC.AGENT_ERROR, (data: any) => {
       get().setAgentError(data.error)
+    })
+
+    const unsubPlan = window.api.on(IPC.AGENT_PLAN, (data: any) => {
+      get().addToolActivity(data.plan)
     })
 
     const unsubDiff = window.api.on(IPC.AGENT_DIFF, (action: any) => {
@@ -140,6 +177,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       unsubStream()
       unsubDone()
       unsubError()
+      unsubPlan()
       unsubDiff()
     }
   }

@@ -9,7 +9,8 @@ import type {
   ImportConfig,
   ConfirmedChapter,
   AppSettings,
-  ExportConfig
+  ExportConfig,
+  AIProviderName
 } from '@shared/types'
 import { ProjectManager } from './project/ProjectManager'
 import { FileWatcher } from './project/FileWatcher'
@@ -325,6 +326,39 @@ export function registerIPC(
 
       currentAgent = new Agent(ai, projectManager.project)
 
+      const describeToolCall = (toolCall: { name: string; input: Record<string, unknown> }): string => {
+        const chapterId = toolCall.input.chapterId as string | undefined
+        const chapterTitle = chapterId
+          ? projectManager.project?.getChapterTitle(chapterId) || chapterId
+          : ''
+        switch (toolCall.name) {
+          case 'read_chapter':
+            return `Reading chapter: ${chapterTitle}`
+          case 'edit_chapter':
+            return `Editing chapter: ${chapterTitle}`
+          case 'create_chapter':
+            return `Creating chapter: ${toolCall.input.title || 'New chapter'}`
+          case 'read_section':
+            return `Reading section in ${chapterTitle}`
+          case 'edit_section':
+            return `Editing section in ${chapterTitle}`
+          case 'create_section':
+            return `Creating section in ${chapterTitle}`
+          case 'delete_section':
+            return `Deleting section in ${chapterTitle}`
+          case 'update_outline':
+            return 'Updating outline'
+          case 'update_notes':
+            return `Updating notes: ${toolCall.input.noteId || ''}`
+          case 'search_book':
+            return `Searching book for: "${toolCall.input.query || ''}"`
+          case 'get_book_stats':
+            return 'Getting book statistics'
+          default:
+            return `Running: ${toolCall.name}`
+        }
+      }
+
       for await (const event of currentAgent.handlePrompt(
         args.prompt,
         args.openChapterId
@@ -336,7 +370,7 @@ export function registerIPC(
               break
             case 'tool_call':
               win.webContents.send(IPC.AGENT_PLAN, {
-                plan: `Calling tool: ${event.toolCall.name}`
+                plan: describeToolCall(event.toolCall)
               })
               break
             case 'tool_result':
@@ -364,10 +398,14 @@ export function registerIPC(
     IPC.AGENT_ACCEPT_CHANGES,
     async (
       _event,
-      args: { chapterId: string; newContent: string }
+      args: { chapterId: string; sectionId?: string; newContent: string }
     ) => {
       if (!projectManager.project) throw new Error('No project open')
-      await projectManager.project.saveChapter(args.chapterId, args.newContent)
+      if (args.sectionId) {
+        await projectManager.project.saveSection(args.chapterId, args.sectionId, args.newContent)
+      } else {
+        await projectManager.project.saveChapter(args.chapterId, args.newContent)
+      }
     }
   )
 
@@ -551,13 +589,20 @@ export function registerIPC(
     IPC.PROJECT_UPDATE_SETTINGS,
     async (
       _event,
-      args: { title?: string; author?: string; totalWords?: number }
+      args: { title?: string; author?: string; totalWords?: number; aiProvider?: AIProviderName; aiModel?: string }
     ) => {
       if (!projectManager.project) throw new Error('No project open')
       const manifest = projectManager.project.manifest
       if (args.title !== undefined) manifest.title = args.title
       if (args.author !== undefined) manifest.author = args.author
       if (args.totalWords !== undefined) manifest.targets.totalWords = args.totalWords
+      if (args.aiProvider !== undefined) {
+        manifest.ai.provider = args.aiProvider
+        manifest.ai.keyRef = `chapterforge-${args.aiProvider}-key`
+      }
+      if (args.aiModel !== undefined) {
+        manifest.ai.model = args.aiModel
+      }
       await projectManager.project.saveManifest()
       return manifest
     }

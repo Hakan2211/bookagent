@@ -5,6 +5,8 @@ import { Dropdown } from '../common/Dropdown'
 import { IPC } from '@shared/ipc-channels'
 import type { ModelInfo } from '@shared/types'
 import { CheckCircle2, AlertCircle } from 'lucide-react'
+import { useProjectStore } from '../../stores/projectStore'
+import { useUIStore } from '../../stores/uiStore'
 
 export function AIProviderConfig() {
   const { t } = useTranslation(['settings', 'common'])
@@ -85,7 +87,6 @@ export function AIProviderConfig() {
           setOpenrouterKey('')
         }
         // Refresh status bar connectivity immediately
-        const { useUIStore } = await import('../../stores/uiStore')
         useUIStore.getState().checkApiStatus()
       } else {
         setStatus(t('settings:ai.invalidKey', { provider }))
@@ -108,8 +109,20 @@ export function AIProviderConfig() {
       setOpenrouterModel(model)
       await window.api.invoke(IPC.SETTINGS_SET, { openrouterModel: model })
     }
+
+    // Also update the open project's AI config to use this provider and model
+    const projectState = useProjectStore.getState()
+    if (projectState.isOpen && projectState.manifest) {
+      await window.api.invoke(IPC.PROJECT_UPDATE_SETTINGS, {
+        aiProvider: provider,
+        aiModel: model
+      })
+      projectState.updateManifest({
+        ai: { provider: provider as any, model, keyRef: `chapterforge-${provider}-key` }
+      })
+    }
+
     // Instantly update the status bar model name
-    const { useUIStore } = await import('../../stores/uiStore')
     useUIStore.getState().refreshModelName(provider, model)
   }
 

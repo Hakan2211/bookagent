@@ -7,6 +7,7 @@ import { formatWordCount } from '../../lib/formatters'
 import { IPC } from '@shared/ipc-channels'
 import { useProjectStore } from '../../stores/projectStore'
 import { useEditorStore } from '../../stores/editorStore'
+import { useChatStore } from '../../stores/chatStore'
 import { Trash2, ChevronRight, Plus, Pencil } from 'lucide-react'
 
 interface ChapterItemProps {
@@ -27,6 +28,15 @@ export function ChapterItem({ chapter, index, isActive, onClick }: ChapterItemPr
   const activeSectionId = useEditorStore((s) => s.activeSectionId)
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
   const openSection = useEditorStore((s) => s.openSection)
+
+  // Check if this chapter (or any of its sections) has pending agent changes
+  const pendingActions = useChatStore((s) => s.pendingActions)
+  const hasPendingChanges = pendingActions.some(
+    (a) =>
+      ('chapterId' in a && a.chapterId === chapter.id) ||
+      ('firstChapterId' in a && a.firstChapterId === chapter.id) ||
+      ('secondChapterId' in a && a.secondChapterId === chapter.id)
+  )
 
   const hasSections = chapter.sections && chapter.sections.length > 0
   const isChapterContext = activeChapterId === chapter.id
@@ -169,7 +179,16 @@ export function ChapterItem({ chapter, index, isActive, onClick }: ChapterItemPr
             <span className="text-[12px] text-[var(--text-secondary)]/80 w-6 text-right shrink-0 tabular-nums font-medium">
               {String(index + 1).padStart(2, '0')}
             </span>
-            <StatusBadge status={chapter.status} />
+            <div className="relative shrink-0">
+              <StatusBadge status={chapter.status} />
+              {hasPendingChanges && (
+                <span
+                  className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full animate-pulse"
+                  style={{ backgroundColor: 'var(--text-accent)', boxShadow: '0 0 6px var(--text-accent)' }}
+                  title="Pending agent changes"
+                />
+              )}
+            </div>
             {isRenaming ? (
               <input
                 ref={renameInputRef}

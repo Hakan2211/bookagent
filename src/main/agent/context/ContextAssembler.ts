@@ -3,11 +3,11 @@ import type { ContextBlock } from '@shared/types'
 import { TokenCounter } from './TokenCounter'
 
 export class ContextAssembler {
-  assemble(
+  async assemble(
     project: BookProject,
     userPrompt: string,
     targetChapterIds: string[]
-  ): { blocks: ContextBlock[]; totalTokens: number } {
+  ): Promise<{ blocks: ContextBlock[]; totalTokens: number }> {
     const blocks: ContextBlock[] = []
     const tokenLimit = this.getTokenLimit(project.manifest.ai)
     const reservedForResponse = 8000
@@ -40,9 +40,25 @@ export class ContextAssembler {
               `  ${i + 1}. [${s.id}] "${s.title}" — ${s.status}, ${s.wordCount} words${s.summary ? `: ${s.summary}` : ''}`
           )
           .join('\n')
-        chapterContent = `[Chapter: ${chMeta.title}]\nID: ${id}\nStatus: ${chMeta.status}\nType: sectioned (${chMeta.sections!.length} sections)\n\nSections:\n${sectionsList}\n\n(Use read_section tool to access individual section content)`
+        // Pre-load section content to eliminate read_section round-trips
+        const sectionContents: string[] = []
+        for (const sec of chMeta.sections!) {
+          try {
+            const secContent = await project.readSection(id, sec.id)
+            sectionContents.push(`--- Section: ${sec.title} [ID: ${sec.id}] ---\n${secContent}`)
+          } catch {
+            sectionContents.push(`--- Section: ${sec.title} [ID: ${sec.id}] ---\n(failed to load)`)
+          }
+        }
+        chapterContent = `[Chapter: ${chMeta.title}]\nID: ${id}\nStatus: ${chMeta.status}\nType: sectioned (${chMeta.sections!.length} sections)\n\nSections:\n${sectionsList}\n\n${sectionContents.join('\n\n')}`
       } else {
-        chapterContent = `[Chapter: ${chMeta.title}]\nID: ${id}\nStatus: ${chMeta.status}\nWord count: ${chMeta.wordCount}\n\n${chMeta.summary || '(no content loaded - use read_chapter tool)'}`
+        // Pre-load actual chapter content to eliminate read_chapter round-trip
+        try {
+          const fileContent = await project.readChapter(id)
+          chapterContent = `[Chapter: ${chMeta.title}]\nID: ${id}\nStatus: ${chMeta.status}\nWord count: ${chMeta.wordCount}\n\n${fileContent}`
+        } catch {
+          chapterContent = `[Chapter: ${chMeta.title}]\nID: ${id}\nStatus: ${chMeta.status}\nWord count: ${chMeta.wordCount}\n\n${chMeta.summary || '(no content loaded - use read_chapter tool)'}`
+        }
       }
 
       blocks.push({

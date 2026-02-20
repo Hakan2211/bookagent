@@ -134,6 +134,7 @@ export interface ChatMessageData {
   role: 'user' | 'assistant' | 'tool'
   content: string
   toolCallId?: string
+  toolCalls?: ToolCall[]
 }
 
 export interface AIResponse {
@@ -151,6 +152,7 @@ export interface AIStreamChunk {
   type: 'text_delta' | 'tool_use' | 'done'
   text?: string
   toolCall?: ToolCall
+  finishReason?: 'end_turn' | 'tool_use' | 'max_tokens' | 'stop'
 }
 
 export interface ModelInfo {

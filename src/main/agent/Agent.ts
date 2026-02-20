@@ -36,7 +36,7 @@ export class Agent {
       )
 
       // 2. Assemble context
-      const context = this.contextAssembler.assemble(
+      const context = await this.contextAssembler.assemble(
         this.project,
         userPrompt,
         targetChapters
@@ -50,39 +50,100 @@ export class Agent {
 
       const fullUserMessage = `${contextBlock}\n\n---\n\nUser request: ${userPrompt}`
 
-      // 4. Call AI with streaming
+      // 4. Call AI with streaming — agentic loop with multi-turn tool use
+      const MAX_TURNS = 25
       const messages: ChatMessageData[] = [
         { role: 'user', content: fullUserMessage }
       ]
 
       let fullResponse = ''
-      const pendingActions: ToolResult[] = []
 
-      for await (const chunk of this.ai.stream({
-        systemPrompt,
-        messages,
-        tools: AGENT_TOOLS,
-        temperature: 0.7,
-        maxTokens: 8192,
-        signal: this.abortController?.signal
-      })) {
+      for (let turn = 0; turn < MAX_TURNS; turn++) {
         if (this.abortController?.signal.aborted) {
           yield { type: 'error', error: 'Agent cancelled by user' }
           return
         }
 
-        if (chunk.type === 'text_delta' && chunk.text) {
-          fullResponse += chunk.text
-          yield { type: 'stream', text: chunk.text }
+        let turnText = ''
+        const turnToolCalls: ToolCall[] = []
+        let wasTruncated = false
+
+        for await (const chunk of this.ai.stream({
+          systemPrompt,
+          messages,
+          tools: AGENT_TOOLS,
+          temperature: 0.7,
+          maxTokens: 16384,
+          signal: this.abortController?.signal
+        })) {
+          if (this.abortController?.signal.aborted) {
+            yield { type: 'error', error: 'Agent cancelled by user' }
+            return
+          }
+
+          if (chunk.type === 'text_delta' && chunk.text) {
+            turnText += chunk.text
+            fullResponse += chunk.text
+            yield { type: 'stream', text: chunk.text }
+          }
+
+          if (chunk.type === 'tool_use' && chunk.toolCall) {
+            turnToolCalls.push(chunk.toolCall)
+          }
+
+          // Detect if the response was truncated by hitting max_tokens
+          if (chunk.type === 'done' && chunk.finishReason === 'max_tokens') {
+            wasTruncated = true
+          }
         }
 
-        if (chunk.type === 'tool_use' && chunk.toolCall) {
-          yield { type: 'tool_call', toolCall: chunk.toolCall }
+        // If the response was truncated, the AI ran out of output tokens.
+        // Any in-progress tool call JSON was likely malformed and dropped.
+        // Continue the loop so the AI can retry with context of what it already said.
+        if (wasTruncated && turnToolCalls.length === 0) {
+          if (turnText) {
+            messages.push({ role: 'assistant', content: turnText })
+          }
+          messages.push({
+            role: 'user',
+            content: 'Your previous response was truncated due to length limits. Please continue where you left off. If you were in the middle of a tool call, please retry the tool call.'
+          })
+          yield { type: 'stream', text: '\n\n[Continuing...]\n\n' }
+          continue
+        }
 
-          const result = await this.executeTool(chunk.toolCall)
-          pendingActions.push(result)
+        // If no tool calls were made, the AI is done
+        if (turnToolCalls.length === 0) {
+          break
+        }
+
+        // Add the assistant's response (with tool calls) to the conversation
+        messages.push({
+          role: 'assistant',
+          content: turnText,
+          toolCalls: turnToolCalls
+        })
+
+        // Execute each tool call and add results to the conversation
+        for (const toolCall of turnToolCalls) {
+          yield { type: 'tool_call', toolCall }
+
+          const result = await this.executeTool(toolCall)
           yield { type: 'tool_result', result }
+
+          // Serialize tool result for the AI to see
+          const resultContent = result.success
+            ? JSON.stringify(result.data ?? 'Done')
+            : `Error: ${result.error}`
+
+          messages.push({
+            role: 'tool',
+            content: resultContent,
+            toolCallId: toolCall.id
+          })
         }
+
+        // Loop continues — AI will see tool results and decide what to do next
       }
 
       yield { type: 'done', fullResponse }
@@ -100,14 +161,33 @@ export class Agent {
     try {
       switch (toolCall.name) {
         case 'read_chapter': {
-          const content = await this.project.readChapter(
-            toolCall.input.chapterId as string
-          )
+          const chapterId = toolCall.input.chapterId as string
+          const chapterMeta = this.project.getChapterMeta(chapterId)
+          if (chapterMeta?.sections && chapterMeta.sections.length > 0) {
+            const sectionList = chapterMeta.sections
+              .map(s => `  - [${s.id}] "${s.title}" (${s.wordCount} words)`)
+              .join('\n')
+            return {
+              success: false,
+              error: `Chapter "${chapterId}" is sectioned into separate files. Use read_section to read individual sections:\n${sectionList}`
+            }
+          }
+          const content = await this.project.readChapter(chapterId)
           return { success: true, data: content }
         }
 
         case 'edit_chapter': {
           const chapterId = toolCall.input.chapterId as string
+          const chapterMeta = this.project.getChapterMeta(chapterId)
+          if (chapterMeta?.sections && chapterMeta.sections.length > 0) {
+            const sectionList = chapterMeta.sections
+              .map(s => `  - [${s.id}] "${s.title}" (${s.wordCount} words)`)
+              .join('\n')
+            return {
+              success: false,
+              error: `Chapter "${chapterId}" is sectioned into separate files. Use edit_section to edit individual sections:\n${sectionList}`
+            }
+          }
           const newContent = toolCall.input.newContent as string
           const description = toolCall.input.changeDescription as string
 
@@ -116,6 +196,7 @@ export class Agent {
 
           return {
             success: true,
+            data: `Edit proposed for chapter "${this.project.getChapterTitle(chapterId)}" — waiting for user review.`,
             pendingAction: {
               type: 'edit',
               chapterId,
@@ -128,38 +209,14 @@ export class Agent {
         }
 
         case 'create_chapter': {
+          const meta = await this.project.addChapter(
+            toolCall.input.title as string,
+            toolCall.input.content as string,
+            toolCall.input.afterChapterId as string | undefined
+          )
           return {
             success: true,
-            pendingAction: {
-              type: 'create',
-              title: toolCall.input.title as string,
-              content: toolCall.input.content as string,
-              afterChapterId: toolCall.input.afterChapterId as string | undefined
-            }
-          }
-        }
-
-        case 'split_chapter': {
-          return {
-            success: true,
-            pendingAction: {
-              type: 'split',
-              chapterId: toolCall.input.chapterId as string,
-              splitAtParagraph: toolCall.input.splitAtParagraph as number,
-              secondChapterTitle: toolCall.input.secondChapterTitle as string
-            }
-          }
-        }
-
-        case 'merge_chapters': {
-          return {
-            success: true,
-            pendingAction: {
-              type: 'merge',
-              firstChapterId: toolCall.input.firstChapterId as string,
-              secondChapterId: toolCall.input.secondChapterId as string,
-              mergedTitle: toolCall.input.mergedTitle as string
-            }
+            data: `Created chapter "${meta.title}" (${meta.id}, ${meta.wordCount} words)`
           }
         }
 
@@ -182,6 +239,7 @@ export class Agent {
 
           return {
             success: true,
+            data: `Edit proposed for section "${sectionId}" in chapter "${this.project.getChapterTitle(chapterId)}" — waiting for user review.`,
             pendingAction: {
               type: 'edit_section',
               chapterId,
@@ -195,15 +253,15 @@ export class Agent {
         }
 
         case 'create_section': {
+          const meta = await this.project.addSection(
+            toolCall.input.chapterId as string,
+            toolCall.input.title as string,
+            toolCall.input.content as string,
+            toolCall.input.afterSectionId as string | undefined
+          )
           return {
             success: true,
-            pendingAction: {
-              type: 'create_section',
-              chapterId: toolCall.input.chapterId as string,
-              title: toolCall.input.title as string,
-              content: toolCall.input.content as string,
-              afterSectionId: toolCall.input.afterSectionId as string | undefined
-            }
+            data: `Created section "${meta.title}" (${meta.id}, ${meta.wordCount} words)`
           }
         }
 

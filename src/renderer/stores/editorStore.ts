@@ -4,6 +4,16 @@ import { IPC } from '@shared/ipc-channels'
 import { useProjectStore } from './projectStore'
 import { computeFullDiff, applyAcceptedChanges } from '../lib/diff'
 
+interface PendingDiffItem {
+  chapterId: string
+  sectionId?: string
+  changeGroups: ChangeGroup[]
+  allChanges: TextChange[]
+  description: string
+  oldContent: string
+  newContent: string
+}
+
 interface EditorState {
   activeChapterId: string | null
   activeSectionId: string | null
@@ -11,15 +21,8 @@ interface EditorState {
   isDirty: boolean
   isLoading: boolean
   isInDiffMode: boolean
-  pendingDiff: {
-    chapterId: string
-    sectionId?: string
-    changeGroups: ChangeGroup[]
-    allChanges: TextChange[]
-    description: string
-    oldContent: string
-    newContent: string
-  } | null
+  pendingDiff: PendingDiffItem | null
+  pendingDiffQueue: PendingDiffItem[]
   acceptedGroupIds: Set<string>
 
   openChapter: (chapterId: string) => Promise<void>
@@ -31,9 +34,30 @@ interface EditorState {
   acceptChange: (groupId: string) => void
   rejectChange: (groupId: string) => void
   acceptAllChanges: () => Promise<void>
-  rejectAllChanges: () => void
+  rejectAllChanges: () => Promise<void>
   exitDiffMode: () => void
+  clearDiffQueue: () => void
   reset: () => void
+}
+
+/** Build a PendingDiffItem from raw action content */
+function buildDiffItem(
+  chapterId: string,
+  oldContent: string,
+  newContent: string,
+  description: string,
+  sectionId?: string
+): PendingDiffItem {
+  const fullDiff = computeFullDiff(oldContent, newContent)
+  return {
+    chapterId,
+    sectionId,
+    changeGroups: fullDiff.changeGroups,
+    allChanges: fullDiff.allChanges,
+    description,
+    oldContent,
+    newContent
+  }
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
@@ -44,12 +68,20 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   isLoading: false,
   isInDiffMode: false,
   pendingDiff: null,
+  pendingDiffQueue: [],
   acceptedGroupIds: new Set(),
 
   openChapter: async (chapterId: string) => {
     // Auto-save current content if dirty
     if (get().isDirty && (get().activeChapterId || get().activeSectionId)) {
       await get().saveChapter()
+    }
+
+    // If the chapter is sectioned (directory-based), redirect to its first section
+    const manifest = useProjectStore.getState().manifest
+    const chapterMeta = manifest?.chapters.find((ch) => ch.id === chapterId)
+    if (chapterMeta?.sections && chapterMeta.sections.length > 0) {
+      return get().openSection(chapterId, chapterMeta.sections[0].id)
     }
 
     set({ isLoading: true })
@@ -136,42 +168,52 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   enterDiffMode: (action) => {
-    // Compute full diff including equal segments for selective apply
-    const fullDiff = computeFullDiff(action.oldContent, action.newContent)
-    // Pre-accept all groups by default
-    const allGroupIds = new Set(fullDiff.changeGroups.map((g) => g.id))
+    const item = buildDiffItem(
+      action.chapterId,
+      action.oldContent,
+      action.newContent,
+      action.description
+    )
 
-    set({
-      isInDiffMode: true,
-      pendingDiff: {
-        chapterId: action.chapterId,
-        changeGroups: fullDiff.changeGroups,
-        allChanges: fullDiff.allChanges,
-        description: action.description,
-        oldContent: action.oldContent,
-        newContent: action.newContent
-      },
-      acceptedGroupIds: allGroupIds
-    })
+    if (get().isInDiffMode) {
+      // Already reviewing a diff — queue this one for later
+      set((state) => ({
+        pendingDiffQueue: [...state.pendingDiffQueue, item]
+      }))
+    } else {
+      // No diff active — show this one immediately
+      const allGroupIds = new Set(item.changeGroups.map((g) => g.id))
+      set({
+        isInDiffMode: true,
+        pendingDiff: item,
+        acceptedGroupIds: allGroupIds
+      })
+    }
   },
 
   enterSectionDiffMode: (action) => {
-    const fullDiff = computeFullDiff(action.oldContent, action.newContent)
-    const allGroupIds = new Set(fullDiff.changeGroups.map((g) => g.id))
+    const item = buildDiffItem(
+      action.chapterId,
+      action.oldContent,
+      action.newContent,
+      action.description,
+      action.sectionId
+    )
 
-    set({
-      isInDiffMode: true,
-      pendingDiff: {
-        chapterId: action.chapterId,
-        sectionId: action.sectionId,
-        changeGroups: fullDiff.changeGroups,
-        allChanges: fullDiff.allChanges,
-        description: action.description,
-        oldContent: action.oldContent,
-        newContent: action.newContent
-      },
-      acceptedGroupIds: allGroupIds
-    })
+    if (get().isInDiffMode) {
+      // Already reviewing a diff — queue this one for later
+      set((state) => ({
+        pendingDiffQueue: [...state.pendingDiffQueue, item]
+      }))
+    } else {
+      // No diff active — show this one immediately
+      const allGroupIds = new Set(item.changeGroups.map((g) => g.id))
+      set({
+        isInDiffMode: true,
+        pendingDiff: item,
+        acceptedGroupIds: allGroupIds
+      })
+    }
   },
 
   acceptChange: (groupId: string) => {
@@ -208,7 +250,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         newContent: finalContent
       })
 
-      // Reload content
+      // Reload content for the current diff's chapter/section
       let content: string
       if (pendingDiff.sectionId) {
         content = (await window.api.invoke(IPC.SECTION_READ, {
@@ -223,19 +265,23 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
       set({
         activeContent: content,
-        isInDiffMode: false,
-        pendingDiff: null,
-        acceptedGroupIds: new Set(),
         isDirty: false
       })
 
       useProjectStore.getState().refreshManifest()
+
+      // Remove the accepted action from chatStore's pendingActions (clears sidebar indicator)
+      const { useChatStore } = await import('./chatStore')
+      useChatStore.getState().removePendingAction(pendingDiff.chapterId, pendingDiff.sectionId)
+
+      // Advance to next queued diff (or exit diff mode)
+      await advanceToNextDiff(get, set)
     } catch (err) {
       console.error('Failed to accept changes:', err)
     }
   },
 
-  rejectAllChanges: () => {
+  rejectAllChanges: async () => {
     const { pendingDiff } = get()
     if (!pendingDiff) return
 
@@ -246,15 +292,25 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       console.error('Failed to reject changes:', err)
     })
 
-    set({
-      isInDiffMode: false,
-      pendingDiff: null,
-      acceptedGroupIds: new Set()
-    })
+    // Remove the rejected action from chatStore's pendingActions (clears sidebar indicator)
+    const { useChatStore } = await import('./chatStore')
+    useChatStore.getState().removePendingAction(pendingDiff.chapterId, pendingDiff.sectionId)
+
+    // Advance to next queued diff (or exit diff mode)
+    await advanceToNextDiff(get, set)
   },
 
   exitDiffMode: () => {
     get().rejectAllChanges()
+  },
+
+  clearDiffQueue: () => {
+    set({
+      pendingDiffQueue: [],
+      isInDiffMode: false,
+      pendingDiff: null,
+      acceptedGroupIds: new Set()
+    })
   },
 
   reset: () => {
@@ -266,7 +322,89 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       isLoading: false,
       isInDiffMode: false,
       pendingDiff: null,
+      pendingDiffQueue: [],
       acceptedGroupIds: new Set()
     })
   }
 }))
+
+/**
+ * Advance to the next queued diff, or exit diff mode if the queue is empty.
+ * If the next diff targets a different chapter/section, navigate there first.
+ */
+async function advanceToNextDiff(
+  get: () => EditorState,
+  set: (partial: Partial<EditorState> | ((state: EditorState) => Partial<EditorState>)) => void
+): Promise<void> {
+  const queue = get().pendingDiffQueue
+  if (queue.length === 0) {
+    // No more diffs — exit diff mode
+    set({
+      isInDiffMode: false,
+      pendingDiff: null,
+      acceptedGroupIds: new Set()
+    })
+    return
+  }
+
+  // Pop the first item from the queue
+  const [nextDiff, ...remaining] = queue
+  const allGroupIds = new Set(nextDiff.changeGroups.map((g) => g.id))
+
+  // Check if we need to navigate to a different chapter/section
+  const { activeChapterId, activeSectionId } = get()
+  const needsNavigation =
+    nextDiff.chapterId !== activeChapterId ||
+    (nextDiff.sectionId || null) !== (activeSectionId || null)
+
+  if (needsNavigation) {
+    // Navigate to the target chapter/section first (without clearing diff state)
+    try {
+      if (nextDiff.sectionId) {
+        const content = (await window.api.invoke(IPC.SECTION_READ, {
+          chapterId: nextDiff.chapterId,
+          sectionId: nextDiff.sectionId
+        })) as string
+        set({
+          activeChapterId: nextDiff.chapterId,
+          activeSectionId: nextDiff.sectionId,
+          activeContent: content,
+          isDirty: false,
+          isLoading: false
+        })
+        window.api.invoke(IPC.PROJECT_SAVE_LAST_CHAPTER, {
+          chapterId: nextDiff.chapterId,
+          sectionId: nextDiff.sectionId
+        }).catch(() => {})
+      } else {
+        const content = (await window.api.invoke(IPC.CHAPTER_READ, {
+          chapterId: nextDiff.chapterId
+        })) as string
+        set({
+          activeChapterId: nextDiff.chapterId,
+          activeSectionId: null,
+          activeContent: content,
+          isDirty: false,
+          isLoading: false
+        })
+        window.api.invoke(IPC.PROJECT_SAVE_LAST_CHAPTER, {
+          chapterId: nextDiff.chapterId
+        }).catch(() => {})
+      }
+    } catch (err) {
+      console.error('Failed to navigate to next diff target:', err)
+      // Skip this diff and try the next one
+      set({ pendingDiffQueue: remaining })
+      await advanceToNextDiff(get, set)
+      return
+    }
+  }
+
+  // Show the next diff
+  set({
+    isInDiffMode: true,
+    pendingDiff: nextDiff,
+    pendingDiffQueue: remaining,
+    acceptedGroupIds: allGroupIds
+  })
+}

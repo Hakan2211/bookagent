@@ -60,12 +60,34 @@ export function WelcomeScreen() {
     setError(null)
 
     try {
+      // Detect which AI provider has a configured API key
+      const keyStatus = (await window.api.invoke(IPC.SETTINGS_GET_API_KEY_STATUS)) as {
+        anthropic: boolean
+        openai: boolean
+        openrouter: boolean
+      }
+      const settings = (await window.api.invoke(IPC.SETTINGS_GET)) as Record<string, any>
+
+      let aiProvider: 'anthropic' | 'openai' | 'openrouter' = 'anthropic'
+      let aiModel = 'claude-sonnet-4-5-20250929'
+
+      if (keyStatus.openrouter) {
+        aiProvider = 'openrouter'
+        aiModel = settings.openrouterModel || 'anthropic/claude-sonnet-4.6'
+      } else if (keyStatus.anthropic) {
+        aiProvider = 'anthropic'
+        aiModel = settings.anthropicModel || 'claude-sonnet-4-5-20250929'
+      } else if (keyStatus.openai) {
+        aiProvider = 'openai'
+        aiModel = settings.openaiModel || 'gpt-4o'
+      }
+
       const createProject = useProjectStore.getState().createProject
       await createProject(newBookPath, {
         title: newBookTitle.trim(),
         author: newBookAuthor.trim(),
-        aiProvider: 'anthropic',
-        aiModel: 'claude-sonnet-4-5-20250929'
+        aiProvider,
+        aiModel
       })
       setShowNewBookModal(false)
     } catch (err) {

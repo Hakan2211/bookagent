@@ -1,7 +1,8 @@
 import React from 'react'
 import type { ChatMessage as ChatMessageType } from '@shared/types'
 import { formatTimestamp } from '../../lib/formatters'
-import { User, Sparkles, AlertCircle } from 'lucide-react'
+import { useChatStore } from '../../stores/chatStore'
+import { User, Sparkles, AlertCircle, Loader2 } from 'lucide-react'
 
 interface ChatMessageProps {
   message: ChatMessageType
@@ -11,6 +12,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === 'user'
   const isStreaming = message.status === 'streaming'
   const isError = message.status === 'error'
+  const toolActivity = useChatStore((s) => s.toolActivity)
 
   return (
     <div
@@ -49,10 +51,34 @@ export function ChatMessage({ message }: ChatMessageProps) {
         {/* Message content */}
         <div className="whitespace-pre-wrap break-words leading-relaxed">
           {message.content}
-          {isStreaming && (
+          {isStreaming && !toolActivity.length && (
             <span className="inline-block w-1.5 h-4 ml-0.5 bg-[var(--text-accent)] animate-pulse rounded-sm align-text-bottom" />
           )}
         </div>
+
+        {/* Tool activity indicator — shown during streaming when tools are running */}
+        {isStreaming && toolActivity.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-[var(--border)]/50 space-y-1.5">
+            {toolActivity.map((activity, i) => (
+              <div
+                key={i}
+                className={`flex items-center gap-2 text-[12px] ${
+                  i === toolActivity.length - 1
+                    ? 'text-[var(--text-accent)]'
+                    : 'text-[var(--text-tertiary)]'
+                }`}
+                style={i === toolActivity.length - 1 ? { animation: 'slide-up 150ms ease-out' } : undefined}
+              >
+                {i === toolActivity.length - 1 ? (
+                  <Loader2 size={11} className="shrink-0 animate-spin" />
+                ) : (
+                  <span className="shrink-0 w-[11px] text-center text-emerald-400">&#10003;</span>
+                )}
+                <span className="truncate">{activity}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Timestamp */}
         <div

@@ -6,6 +6,7 @@ import { formatWordCount } from '../../lib/formatters'
 import { IPC } from '@shared/ipc-channels'
 import { useProjectStore } from '../../stores/projectStore'
 import { useEditorStore } from '../../stores/editorStore'
+import { useChatStore } from '../../stores/chatStore'
 import { Trash2, Pencil } from 'lucide-react'
 
 interface SectionItemProps {
@@ -23,6 +24,15 @@ export function SectionItem({ chapterId, section, index, isActive, onClick }: Se
   const [renameValue, setRenameValue] = useState('')
   const renameInputRef = useRef<HTMLInputElement>(null)
   const refreshManifest = useProjectStore((s) => s.refreshManifest)
+
+  // Check if this specific section has pending agent changes
+  const pendingActions = useChatStore((s) => s.pendingActions)
+  const hasPendingChanges = pendingActions.some(
+    (a) =>
+      a.type === 'edit_section' &&
+      a.chapterId === chapterId &&
+      a.sectionId === section.id
+  )
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -109,7 +119,16 @@ export function SectionItem({ chapterId, section, index, isActive, onClick }: Se
           <span className="text-[11px] text-[var(--text-secondary)]/60 w-5 text-right shrink-0 tabular-nums font-medium">
             {String(index + 1).padStart(2, '0')}
           </span>
-          <StatusBadge status={section.status} />
+          <div className="relative shrink-0">
+            <StatusBadge status={section.status} />
+            {hasPendingChanges && (
+              <span
+                className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full animate-pulse"
+                style={{ backgroundColor: 'var(--text-accent)', boxShadow: '0 0 6px var(--text-accent)' }}
+                title="Pending agent changes"
+              />
+            )}
+          </div>
           {isRenaming ? (
             <input
               ref={renameInputRef}

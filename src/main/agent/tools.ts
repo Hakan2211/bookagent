@@ -63,43 +63,6 @@ export const AGENT_TOOLS: ToolDefinition[] = [
     }
   },
   {
-    name: 'split_chapter',
-    description: 'Split one chapter into two chapters at a specified point.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        chapterId: { type: 'string', description: 'The chapter ID to split' },
-        splitAtParagraph: {
-          type: 'number',
-          description:
-            'Paragraph number (0-indexed) where the split should occur. The second chapter starts at this paragraph.'
-        },
-        secondChapterTitle: {
-          type: 'string',
-          description: 'Title for the new second chapter'
-        }
-      },
-      required: ['chapterId', 'splitAtParagraph', 'secondChapterTitle']
-    }
-  },
-  {
-    name: 'merge_chapters',
-    description:
-      'Merge two adjacent chapters into one. The second chapter content is appended to the first.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        firstChapterId: { type: 'string', description: 'First chapter ID' },
-        secondChapterId: { type: 'string', description: 'Second chapter ID' },
-        mergedTitle: {
-          type: 'string',
-          description: 'Title for the merged chapter'
-        }
-      },
-      required: ['firstChapterId', 'secondChapterId', 'mergedTitle']
-    }
-  },
-  {
     name: 'read_section',
     description:
       'Read the full text of a specific section within a sectioned chapter. Chapters that have been divided into sections store each section as a separate file for granular editing.',
