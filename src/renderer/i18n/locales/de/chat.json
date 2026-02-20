@@ -5,6 +5,35 @@
   "getStarted": "Erste Schritte",
   "quickActions": "Schnellaktionen",
   "importManuscript": "Manuskript importieren",
+
+  "waitingForAnswers": "Beantworte die Fragen oben...",
+  "reviewPlanAbove": "Pruefe den Plan oben...",
+
+  "clarifyingQuestions": "Rueckfragen",
+  "clarifyingQuestionsDesc": "Hilf mir, deine Vision besser zu verstehen, damit ich genau das liefern kann, was du brauchst.",
+  "typeYourAnswer": "Deine Antwort eingeben...",
+  "continueWithAnswers": "Weiter",
+
+  "planProposal": "Ausfuehrungsplan",
+  "planExecuting": "Plan wird ausgefuehrt",
+  "planComplete": "Plan abgeschlossen",
+  "planSteps": "{{count}} Schritte",
+  "planSteps_one": "{{count}} Schritt",
+  "executePlan": "Plan ausfuehren",
+  "adjustPlan": "Anpassen",
+  "submitAdjustment": "Anpassung senden",
+  "adjustPlanPlaceholder": "Beschreibe, wie du den Plan anpassen moechtest...",
+
+  "phase": {
+    "classifying": "Anfrage wird analysiert...",
+    "questioning": "Weitere Details werden gesammelt...",
+    "planning": "Ausfuehrungsplan wird erstellt...",
+    "awaiting_plan": "Warte auf deine Genehmigung...",
+    "executing": "Plan wird ausgefuehrt...",
+    "done": "Fertig",
+    "error": "Ein Fehler ist aufgetreten"
+  },
+
   "newBook": {
     "createFirst": "Mein erstes Kapitel erstellen",
     "createFirstPrompt": "Hilf mir, mein erstes Kapitel zu erstellen. Frage mich nach dem Genre meines Buches, den Hauptfiguren und der Eröffnungsszene, bevor du schreibst.",

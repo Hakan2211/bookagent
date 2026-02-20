@@ -49,6 +49,15 @@ export const IPC = {
   AGENT_REJECT_CHANGES: 'agent:reject-changes',
   AGENT_CANCEL: 'agent:cancel',
 
+  // ── Agent Workflow (multi-phase) ───────────
+  AGENT_PHASE_CHANGE: 'agent:phase-change',
+  AGENT_QUESTIONS: 'agent:questions',
+  AGENT_QUESTIONS_RESPONSE: 'agent:questions-response',
+  AGENT_PLAN_PROPOSAL: 'agent:plan-proposal',
+  AGENT_PLAN_RESPONSE: 'agent:plan-response',
+  AGENT_STEP_PROGRESS: 'agent:step-progress',
+  AGENT_CLEAR_SESSION: 'agent:clear-session',
+
   // ── Inline Edit ─────────────────────────────
   INLINE_EDIT_REQUEST: 'inline-edit:request',
   INLINE_EDIT_STREAM: 'inline-edit:stream',

@@ -20,7 +20,8 @@ import { AnthropicProvider } from './ai/providers/AnthropicProvider'
 import { OpenAIProvider } from './ai/providers/OpenAIProvider'
 import { OpenRouterProvider } from './ai/providers/OpenRouterProvider'
 import { ImportPipeline } from './import/ImportPipeline'
-import { Agent } from './agent/Agent'
+import { AgentSession } from './agent/Agent'
+import type { AgentQuestionResponse } from '@shared/types'
 import { SnapshotManager } from './history/SnapshotManager'
 import { SearchEngine } from './search/SearchEngine'
 import { ParserFactory } from './import/parsers'
@@ -48,7 +49,7 @@ export function registerIPC(
   snapshotManager: SnapshotManager,
   searchEngine: SearchEngine
 ): void {
-  let currentAgent: Agent | null = null
+  let currentSession: AgentSession | null = null
   let inlineEditAbort: AbortController | null = null
 
   // ── Project Handlers ──────────────────────
@@ -76,6 +77,11 @@ export function registerIPC(
   ipcMain.handle(IPC.PROJECT_CLOSE, async () => {
     fileWatcher.stop()
     projectManager.closeProject()
+    // Clear agent session when project closes
+    if (currentSession) {
+      currentSession.clearHistory()
+      currentSession = null
+    }
   })
 
   ipcMain.handle(IPC.PROJECT_GET_RECENTS, async () => {
@@ -307,18 +313,69 @@ export function registerIPC(
 
   // ── Agent Handlers ────────────────────────
 
+  const describeToolCall = (toolCall: { name: string; input: Record<string, unknown> }): string => {
+    const chapterId = toolCall.input.chapterId as string | undefined
+    const chapterTitle = chapterId
+      ? projectManager.project?.getChapterTitle(chapterId) || chapterId
+      : ''
+    switch (toolCall.name) {
+      case 'read_chapter':
+        return `Reading chapter: ${chapterTitle}`
+      case 'edit_chapter':
+        return `Editing chapter: ${chapterTitle}`
+          case 'create_chapter':
+            return `Creating chapter: ${toolCall.input.title || 'New chapter'}`
+          case 'create_sectioned_chapter':
+            return `Creating sectioned chapter: ${toolCall.input.title || 'New chapter'}`
+      case 'read_section':
+        return `Reading section in ${chapterTitle}`
+      case 'edit_section':
+        return `Editing section in ${chapterTitle}`
+      case 'create_section':
+        return `Creating section in ${chapterTitle}`
+      case 'delete_section':
+        return `Deleting section in ${chapterTitle}`
+      case 'update_outline':
+        return 'Updating outline'
+      case 'update_notes':
+        return `Updating notes: ${toolCall.input.noteId || ''}`
+      case 'search_book':
+        return `Searching book for: "${toolCall.input.query || ''}"`
+      case 'get_book_stats':
+        return 'Getting book statistics'
+      default:
+        return `Running: ${toolCall.name}`
+    }
+  }
+
+  /**
+   * Ensure an AgentSession exists for the current project.
+   * Sessions persist across multiple prompts within the same project.
+   */
+  const ensureSession = (): AgentSession => {
+    if (!projectManager.project) throw new Error('No project open')
+
+    const provider = projectManager.project.manifest.ai.provider
+    if (!aiRegistry.has(provider)) {
+      throw new Error(`AI provider "${provider}" not configured. Please add an API key in settings.`)
+    }
+
+    // Re-create session if provider changed or no session exists
+    if (!currentSession) {
+      const ai = aiRegistry.get(provider)
+      currentSession = new AgentSession(ai, projectManager.project)
+    }
+
+    return currentSession
+  }
+
   ipcMain.handle(
     IPC.AGENT_PROMPT,
     async (_event, args: { prompt: string; openChapterId: string | null }) => {
       if (!projectManager.project) throw new Error('No project open')
 
-      const provider = projectManager.project.manifest.ai.provider
-      if (!aiRegistry.has(provider)) {
-        throw new Error(`AI provider "${provider}" not configured. Please add an API key in settings.`)
-      }
-
-      const ai = aiRegistry.get(provider)
       const win = BrowserWindow.getFocusedWindow()
+      const session = ensureSession()
 
       // Create snapshot before agent edit
       await snapshotManager.createSnapshot(
@@ -326,42 +383,7 @@ export function registerIPC(
         `Before agent edit: ${args.prompt.slice(0, 50)}...`
       )
 
-      currentAgent = new Agent(ai, projectManager.project)
-
-      const describeToolCall = (toolCall: { name: string; input: Record<string, unknown> }): string => {
-        const chapterId = toolCall.input.chapterId as string | undefined
-        const chapterTitle = chapterId
-          ? projectManager.project?.getChapterTitle(chapterId) || chapterId
-          : ''
-        switch (toolCall.name) {
-          case 'read_chapter':
-            return `Reading chapter: ${chapterTitle}`
-          case 'edit_chapter':
-            return `Editing chapter: ${chapterTitle}`
-          case 'create_chapter':
-            return `Creating chapter: ${toolCall.input.title || 'New chapter'}`
-          case 'read_section':
-            return `Reading section in ${chapterTitle}`
-          case 'edit_section':
-            return `Editing section in ${chapterTitle}`
-          case 'create_section':
-            return `Creating section in ${chapterTitle}`
-          case 'delete_section':
-            return `Deleting section in ${chapterTitle}`
-          case 'update_outline':
-            return 'Updating outline'
-          case 'update_notes':
-            return `Updating notes: ${toolCall.input.noteId || ''}`
-          case 'search_book':
-            return `Searching book for: "${toolCall.input.query || ''}"`
-          case 'get_book_stats':
-            return 'Getting book statistics'
-          default:
-            return `Running: ${toolCall.name}`
-        }
-      }
-
-      for await (const event of currentAgent.handlePrompt(
+      for await (const event of session.handlePrompt(
         args.prompt,
         args.openChapterId
       )) {
@@ -380,6 +402,21 @@ export function registerIPC(
                 win.webContents.send(IPC.AGENT_DIFF, event.result.pendingAction)
               }
               break
+            case 'phase_change':
+              win.webContents.send(IPC.AGENT_PHASE_CHANGE, { phase: event.phase })
+              break
+            case 'questions':
+              win.webContents.send(IPC.AGENT_QUESTIONS, { questions: event.questions })
+              break
+            case 'plan_proposal':
+              win.webContents.send(IPC.AGENT_PLAN_PROPOSAL, { plan: event.plan })
+              break
+            case 'step_progress':
+              win.webContents.send(IPC.AGENT_STEP_PROGRESS, {
+                stepId: event.stepId,
+                status: event.status
+              })
+              break
             case 'done':
               win.webContents.send(IPC.AGENT_DONE, {
                 fullResponse: event.fullResponse
@@ -391,8 +428,26 @@ export function registerIPC(
           }
         }
       }
+    }
+  )
 
-      currentAgent = null
+  // User answers to clarifying questions
+  ipcMain.handle(
+    IPC.AGENT_QUESTIONS_RESPONSE,
+    async (_event, args: { answers: AgentQuestionResponse[] }) => {
+      if (currentSession) {
+        currentSession.supplyQuestionAnswers(args.answers)
+      }
+    }
+  )
+
+  // User response to plan proposal (execute / adjust / cancel)
+  ipcMain.handle(
+    IPC.AGENT_PLAN_RESPONSE,
+    async (_event, args: { decision: 'execute' | 'adjust' | 'cancel'; adjustment?: string }) => {
+      if (currentSession) {
+        currentSession.supplyPlanDecision(args.decision, args.adjustment)
+      }
     }
   )
 
@@ -419,10 +474,17 @@ export function registerIPC(
   )
 
   ipcMain.handle(IPC.AGENT_CANCEL, async () => {
-    if (currentAgent) {
-      currentAgent.cancel()
-      currentAgent = null
+    if (currentSession) {
+      currentSession.cancel()
     }
+  })
+
+  // Clear session (on project switch or explicit user action)
+  ipcMain.handle(IPC.AGENT_CLEAR_SESSION, async () => {
+    if (currentSession) {
+      currentSession.clearHistory()
+    }
+    currentSession = null
   })
 
   // ── Inline Edit Handlers ──────────────────

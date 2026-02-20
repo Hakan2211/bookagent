@@ -1,12 +1,13 @@
 import type { BookProject } from '../../project/BookProject'
-import type { ContextBlock } from '@shared/types'
+import type { ContextBlock, ChatMessageData } from '@shared/types'
 import { TokenCounter } from './TokenCounter'
 
 export class ContextAssembler {
   async assemble(
     project: BookProject,
     userPrompt: string,
-    targetChapterIds: string[]
+    targetChapterIds: string[],
+    conversationHistory?: ChatMessageData[]
   ): Promise<{ blocks: ContextBlock[]; totalTokens: number }> {
     const blocks: ContextBlock[] = []
     const tokenLimit = this.getTokenLimit(project.manifest.ai)
@@ -136,6 +137,20 @@ export class ContextAssembler {
       })
     }
 
+    // ── Priority 6: Conversation history ────────
+    if (conversationHistory && conversationHistory.length > 0) {
+      const historyContent = this.formatConversationHistory(conversationHistory)
+      if (historyContent) {
+        blocks.push({
+          type: 'notes',
+          id: 'conversation-history',
+          content: historyContent,
+          tokenEstimate: TokenCounter.estimate(historyContent),
+          priority: 40
+        })
+      }
+    }
+
     // ── Fit to budget ────────────────────────────
     return this.fitToBudget(blocks, budget)
   }
@@ -220,5 +235,25 @@ export class ContextAssembler {
       'building', 'environment', 'atmosphere', 'era', 'time period'
     ]
     return keywords.some(k => prompt.includes(k))
+  }
+
+  private formatConversationHistory(history: ChatMessageData[]): string {
+    if (history.length === 0) return ''
+
+    // Take the last few exchanges (at most 6 messages = 3 pairs)
+    const recent = history.slice(-6)
+    const lines = ['[Previous conversation context]']
+
+    for (const msg of recent) {
+      const role = msg.role === 'user' ? 'Author' : 'Assistant'
+      // Truncate long messages to keep context manageable
+      const content =
+        msg.content.length > 500
+          ? msg.content.slice(0, 500) + '...(truncated)'
+          : msg.content
+      lines.push(`${role}: ${content}`)
+    }
+
+    return lines.join('\n')
   }
 }

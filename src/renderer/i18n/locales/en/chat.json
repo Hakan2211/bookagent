@@ -5,6 +5,35 @@
   "getStarted": "Get started",
   "quickActions": "Quick actions",
   "importManuscript": "Import a manuscript",
+
+  "waitingForAnswers": "Answer the questions above...",
+  "reviewPlanAbove": "Review the plan above...",
+
+  "clarifyingQuestions": "Clarifying Questions",
+  "clarifyingQuestionsDesc": "Help me understand your vision better so I can deliver exactly what you need.",
+  "typeYourAnswer": "Type your answer...",
+  "continueWithAnswers": "Continue",
+
+  "planProposal": "Execution Plan",
+  "planExecuting": "Executing Plan",
+  "planComplete": "Plan Complete",
+  "planSteps": "{{count}} steps",
+  "planSteps_one": "{{count}} step",
+  "executePlan": "Execute Plan",
+  "adjustPlan": "Adjust",
+  "submitAdjustment": "Submit Adjustment",
+  "adjustPlanPlaceholder": "Describe how you'd like to adjust the plan...",
+
+  "phase": {
+    "classifying": "Analyzing your request...",
+    "questioning": "Gathering more details...",
+    "planning": "Creating execution plan...",
+    "awaiting_plan": "Waiting for your approval...",
+    "executing": "Executing plan...",
+    "done": "Done",
+    "error": "An error occurred"
+  },
+
   "newBook": {
     "createFirst": "Create my first chapter",
     "createFirstPrompt": "Help me create my first chapter. Ask me about my book's genre, main characters, and the opening scene before writing.",

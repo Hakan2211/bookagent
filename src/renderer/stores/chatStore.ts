@@ -1,5 +1,13 @@
 import { create } from 'zustand'
-import type { ChatMessage, PendingAction } from '@shared/types'
+import type {
+  ChatMessage,
+  PendingAction,
+  AgentPhase,
+  AgentQuestion,
+  AgentQuestionResponse,
+  AgentPlan,
+  PlanStep
+} from '@shared/types'
 import { IPC } from '@shared/ipc-channels'
 import { useEditorStore } from './editorStore'
 import { useProjectStore } from './projectStore'
@@ -10,6 +18,12 @@ interface ChatState {
   pendingActions: PendingAction[]
   toolActivity: string[]
 
+  // ── Multi-phase workflow state ──────────────
+  agentPhase: AgentPhase
+  currentQuestions: AgentQuestion[] | null
+  currentPlan: AgentPlan | null
+
+  // ── Actions ────────────────────────────────
   sendPrompt: (prompt: string) => Promise<void>
   appendStreamText: (text: string) => void
   addToolActivity: (activity: string) => void
@@ -19,6 +33,15 @@ interface ChatState {
   removePendingAction: (chapterId: string, sectionId?: string) => void
   clearPendingActions: () => void
   clearHistory: () => void
+
+  // ── Multi-phase actions ────────────────────
+  setAgentPhase: (phase: AgentPhase) => void
+  setQuestions: (questions: AgentQuestion[]) => void
+  submitQuestionAnswers: (answers: AgentQuestionResponse[]) => Promise<void>
+  setPlanProposal: (plan: AgentPlan) => void
+  submitPlanDecision: (decision: 'execute' | 'adjust' | 'cancel', adjustment?: string) => Promise<void>
+  updateStepProgress: (stepId: string, status: PlanStep['status']) => void
+
   initListeners: () => () => void
 }
 
@@ -27,6 +50,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
   isAgentWorking: false,
   pendingActions: [],
   toolActivity: [],
+
+  // Multi-phase state
+  agentPhase: 'done',
+  currentQuestions: null,
+  currentPlan: null,
 
   sendPrompt: async (prompt: string) => {
     const userMsg: ChatMessage = {
@@ -52,7 +80,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
       messages: [...state.messages, userMsg, assistantMsg],
       isAgentWorking: true,
       pendingActions: [],
-      toolActivity: []
+      toolActivity: [],
+      agentPhase: 'classifying',
+      currentQuestions: null,
+      currentPlan: null
     }))
 
     try {
@@ -90,12 +121,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
       if (lastMsg && lastMsg.role === 'assistant') {
         messages[messages.length - 1] = {
           ...lastMsg,
-          // Use fullResponse if available, fallback to streamed content
           content: fullResponse || lastMsg.content,
           status: 'complete'
         }
       }
-      return { messages, isAgentWorking: false, toolActivity: [] }
+      return {
+        messages,
+        isAgentWorking: false,
+        toolActivity: [],
+        agentPhase: 'done' as AgentPhase,
+        currentQuestions: null
+      }
     })
   },
 
@@ -110,7 +146,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
           status: 'error'
         }
       }
-      return { messages, isAgentWorking: false, toolActivity: [] }
+      return {
+        messages,
+        isAgentWorking: false,
+        toolActivity: [],
+        agentPhase: 'error' as AgentPhase,
+        currentQuestions: null,
+        currentPlan: null
+      }
     })
   },
 
@@ -122,7 +165,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   removePendingAction: (chapterId: string, sectionId?: string) => {
     set((state) => {
-      // Find and remove the first matching pending action
       const idx = state.pendingActions.findIndex((a) => {
         if (sectionId) {
           return a.type === 'edit_section' && a.chapterId === chapterId && a.sectionId === sectionId
@@ -141,7 +183,60 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   clearHistory: () => {
-    set({ messages: [], pendingActions: [] })
+    set({
+      messages: [],
+      pendingActions: [],
+      agentPhase: 'done',
+      currentQuestions: null,
+      currentPlan: null
+    })
+    // Also clear the session on the main process
+    window.api.invoke(IPC.AGENT_CLEAR_SESSION).catch(() => {})
+  },
+
+  // ── Multi-phase actions ────────────────────
+
+  setAgentPhase: (phase: AgentPhase) => {
+    set({ agentPhase: phase })
+  },
+
+  setQuestions: (questions: AgentQuestion[]) => {
+    set({ currentQuestions: questions })
+  },
+
+  submitQuestionAnswers: async (answers: AgentQuestionResponse[]) => {
+    set({ currentQuestions: null, agentPhase: 'planning' })
+    await window.api.invoke(IPC.AGENT_QUESTIONS_RESPONSE, { answers })
+  },
+
+  setPlanProposal: (plan: AgentPlan) => {
+    set({ currentPlan: plan })
+  },
+
+  submitPlanDecision: async (
+    decision: 'execute' | 'adjust' | 'cancel',
+    adjustment?: string
+  ) => {
+    if (decision === 'cancel') {
+      set({ currentPlan: null, agentPhase: 'done', isAgentWorking: false })
+    } else if (decision === 'execute') {
+      set({ agentPhase: 'executing' })
+    } else if (decision === 'adjust') {
+      set({ agentPhase: 'planning' })
+    }
+    await window.api.invoke(IPC.AGENT_PLAN_RESPONSE, { decision, adjustment })
+  },
+
+  updateStepProgress: (stepId: string, status: PlanStep['status']) => {
+    set((state) => {
+      if (!state.currentPlan) return state
+      const updatedSteps = state.currentPlan.steps.map((s) =>
+        s.id === stepId ? { ...s, status } : s
+      )
+      return {
+        currentPlan: { ...state.currentPlan, steps: updatedSteps }
+      }
+    })
   },
 
   initListeners: () => {
@@ -151,7 +246,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     const unsubDone = window.api.on(IPC.AGENT_DONE, (data: any) => {
       get().setAgentDone(data.fullResponse)
-      // Refresh project manifest in case the agent created/modified files
       useProjectStore.getState().refreshManifest()
     })
 
@@ -165,12 +259,29 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     const unsubDiff = window.api.on(IPC.AGENT_DIFF, (action: any) => {
       get().addPendingAction(action)
-      // If it's an edit action, enter diff mode in the editor
       if (action.type === 'edit') {
         useEditorStore.getState().enterDiffMode(action)
       } else if (action.type === 'edit_section') {
         useEditorStore.getState().enterSectionDiffMode(action)
       }
+    })
+
+    // ── Multi-phase listeners ──────────────────
+
+    const unsubPhaseChange = window.api.on(IPC.AGENT_PHASE_CHANGE, (data: any) => {
+      get().setAgentPhase(data.phase)
+    })
+
+    const unsubQuestions = window.api.on(IPC.AGENT_QUESTIONS, (data: any) => {
+      get().setQuestions(data.questions)
+    })
+
+    const unsubPlanProposal = window.api.on(IPC.AGENT_PLAN_PROPOSAL, (data: any) => {
+      get().setPlanProposal(data.plan)
+    })
+
+    const unsubStepProgress = window.api.on(IPC.AGENT_STEP_PROGRESS, (data: any) => {
+      get().updateStepProgress(data.stepId, data.status)
     })
 
     return () => {
@@ -179,6 +290,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
       unsubError()
       unsubPlan()
       unsubDiff()
+      unsubPhaseChange()
+      unsubQuestions()
+      unsubPlanProposal()
+      unsubStepProgress()
     }
   }
 }))

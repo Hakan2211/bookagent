@@ -127,6 +127,103 @@ export class BookProject {
     return chapterMeta
   }
 
+  /**
+   * Create a new chapter that is immediately sectioned (folder-based) with
+   * multiple section files. Use this when the user wants subchapters/sections.
+   *
+   * On disk this creates:
+   *   chapters/NN-slug/
+   *     01-section-one.md
+   *     02-section-two.md
+   *     ...
+   */
+  async addSectionedChapter(
+    title: string,
+    sections: { title: string; content: string }[],
+    afterChapterId?: string
+  ): Promise<ChapterMeta> {
+    if (!sections || sections.length === 0) {
+      throw new Error('At least one section is required for a sectioned chapter')
+    }
+
+    // Generate chapter ID using monotonic counter
+    const maxNum = this.manifest.chapters.reduce((max, ch) => {
+      const num = parseInt(ch.id.replace('ch-', ''), 10)
+      return isNaN(num) ? max : Math.max(max, num)
+    }, this.manifest._nextChapterNum ?? 0)
+    const nextNum = maxNum + 1
+    this.manifest._nextChapterNum = nextNum
+    const chapterId = `ch-${String(nextNum).padStart(2, '0')}`
+
+    // Generate folder name (no .md extension — this IS the folder)
+    const fileIndex = afterChapterId
+      ? this.manifest.chapters.findIndex(ch => ch.id === afterChapterId) + 2
+      : this.manifest.chapters.length + 1
+    const folderName = SectionFile.formatChapterFolderName(fileIndex, title)
+    const folderPath = `chapters/${folderName}`
+
+    // Create the chapter folder
+    await fs.mkdir(path.join(this.projectPath, folderPath), { recursive: true })
+
+    // Write each section file into the folder
+    const sectionMetas: SectionMeta[] = []
+    let totalWordCount = 0
+
+    for (let i = 0; i < sections.length; i++) {
+      const sec = sections[i]
+      const sectionNum = i + 1
+      const sectionId = `sec-${String(sectionNum).padStart(2, '0')}`
+      const sectionFilename = SectionFile.formatSectionFilename(sectionNum, sec.title)
+      const sectionFilePath = `${folderPath}/${sectionFilename}`
+
+      const wordCount = await SectionFile.write(
+        this.projectPath,
+        sectionFilePath,
+        sectionId,
+        sec.title,
+        sec.content
+      )
+
+      sectionMetas.push({
+        id: sectionId,
+        file: sectionFilePath,
+        title: sec.title,
+        status: 'draft',
+        wordCount,
+        summary: ''
+      })
+
+      totalWordCount += wordCount
+    }
+
+    // Build chapter metadata — file points to folder, sections are populated
+    const chapterMeta: ChapterMeta = {
+      id: chapterId,
+      file: folderPath,
+      title,
+      status: 'draft',
+      wordCount: totalWordCount,
+      summary: '',
+      sections: sectionMetas,
+      _nextSectionNum: sections.length
+    }
+
+    // Insert into manifest at correct position
+    if (afterChapterId) {
+      const idx = this.manifest.chapters.findIndex(ch => ch.id === afterChapterId)
+      if (idx >= 0) {
+        this.manifest.chapters.splice(idx + 1, 0, chapterMeta)
+      } else {
+        this.manifest.chapters.push(chapterMeta)
+      }
+    } else {
+      this.manifest.chapters.push(chapterMeta)
+    }
+
+    await this.saveManifest()
+    return chapterMeta
+  }
+
   async deleteChapter(chapterId: string): Promise<void> {
     const chapter = this.getChapterMeta(chapterId)
     if (!chapter) throw new Error(`Chapter "${chapterId}" not found`)

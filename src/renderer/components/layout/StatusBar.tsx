@@ -14,6 +14,7 @@ export function StatusBar() {
   const isDirty = useEditorStore((s) => s.isDirty)
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
   const isAgentWorking = useChatStore((s) => s.isAgentWorking)
+  const agentPhase = useChatStore((s) => s.agentPhase)
 
   const apiStatus = useUIStore((s) => s.apiStatus)
   const apiModelName = useUIStore((s) => s.apiModelName)
@@ -61,7 +62,15 @@ export function StatusBar() {
   if (isAgentWorking) {
     dotColor = 'var(--color-warning)'
     dotPulse = true
-    statusLabel = displayName || t('common:working')
+    // Show phase-specific label when agent is working
+    const phaseLabels: Record<string, string> = {
+      classifying: t('common:analyzing'),
+      questioning: t('common:askingQuestions'),
+      planning: t('common:planning'),
+      awaiting_plan: t('common:awaitingApproval'),
+      executing: t('common:executing')
+    }
+    statusLabel = phaseLabels[agentPhase] || displayName || t('common:working')
   } else {
     switch (apiStatus as ApiStatusState) {
       case 'connected':

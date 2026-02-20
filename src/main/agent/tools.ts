@@ -41,7 +41,8 @@ export const AGENT_TOOLS: ToolDefinition[] = [
   },
   {
     name: 'create_chapter',
-    description: 'Create a new chapter and insert it at a specific position in the book.',
+    description:
+      'Create a new flat (single-file) chapter and insert it at a specific position in the book. Use this for simple chapters WITHOUT sub-sections. If the user wants subchapters or sections, use create_sectioned_chapter instead.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -60,6 +61,45 @@ export const AGENT_TOOLS: ToolDefinition[] = [
         }
       },
       required: ['title', 'content']
+    }
+  },
+  {
+    name: 'create_sectioned_chapter',
+    description:
+      'Create a new chapter that contains multiple sections (subchapters). This creates a folder-based chapter where each section is a separate file. Use this when the user asks for subchapters, sections, scenes, or any structured content within a chapter. Look at how existing chapters in the book are structured — if they use sections, new chapters should too for consistency.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: 'The chapter title'
+        },
+        sections: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              title: {
+                type: 'string',
+                description: 'The section/subchapter title'
+              },
+              content: {
+                type: 'string',
+                description: 'The section text (in markdown)'
+              }
+            },
+            required: ['title', 'content']
+          },
+          description:
+            'Array of sections to create within the chapter. Each section has a title and content. Must contain at least one section.'
+        },
+        afterChapterId: {
+          type: 'string',
+          description:
+            'Insert after this chapter ID. Omit to append at end.'
+        }
+      },
+      required: ['title', 'sections']
     }
   },
   {

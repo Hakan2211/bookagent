@@ -10,6 +10,7 @@ export function ChatInput() {
   const { t } = useTranslation('chat')
   const [input, setInput] = useState('')
   const isAgentWorking = useChatStore((s) => s.isAgentWorking)
+  const agentPhase = useChatStore((s) => s.agentPhase)
   const sendPrompt = useChatStore((s) => s.sendPrompt)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -170,7 +171,15 @@ export function ChatInput() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isAgentWorking ? t('chat:agentWorking') : t('chat:askAnything')}
+            placeholder={
+              agentPhase === 'questioning'
+                ? t('chat:waitingForAnswers')
+                : agentPhase === 'awaiting_plan'
+                ? t('chat:reviewPlanAbove')
+                : isAgentWorking
+                ? t('chat:agentWorking')
+                : t('chat:askAnything')
+            }
             disabled={isAgentWorking}
             rows={1}
             className="flex-1 bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-2xl px-5 py-4 text-[15px] resize-none outline-none shadow-[inset_0_1px_2px_rgba(0,0,0,0.2),0_0_8px_rgba(129,140,248,0.06)] focus:border-[var(--border-active)] focus:shadow-[inset_0_1px_2px_rgba(0,0,0,0.15),0_0_0_2px_var(--focus-ring-soft),0_0_20px_rgba(129,140,248,0.12)] placeholder:text-[var(--text-tertiary)]/70 disabled:opacity-50 transition-all duration-200 leading-relaxed"

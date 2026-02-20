@@ -297,13 +297,86 @@ export interface SearchResult {
   matchEnd: number
 }
 
-// ─── Agent Types ─────────────────────────────
+// ─── Agent Workflow Types ────────────────────
+
+export type AgentIntent =
+  | 'write_new'     // Create new chapter(s) or section(s)
+  | 'edit_existing'  // Modify existing content
+  | 'structural'     // Reorganize chapters/sections (split, merge, reorder)
+  | 'feedback'       // Review/critique without changes
+  | 'planning'       // Outline, brainstorm, develop ideas
+  | 'question'       // Simple Q&A about the book
+
+export type AgentClarity = 'clear' | 'moderate' | 'vague'
+
+export type AgentScope =
+  | 'selection'
+  | 'section'
+  | 'chapter'
+  | 'multi-chapter'
+  | 'book'
+
+export type AgentPhase =
+  | 'classifying'    // Analyzing the prompt
+  | 'questioning'    // Asking clarifying questions
+  | 'planning'       // Building the execution plan
+  | 'awaiting_plan'  // Waiting for user to approve plan
+  | 'executing'      // Running the plan
+  | 'done'           // Finished
+  | 'error'          // Something went wrong
+
+export interface IntentClassification {
+  intent: AgentIntent
+  clarity: AgentClarity
+  scope: AgentScope
+  targetChapters: string[]
+  requiresApproval: boolean
+  reasoning: string
+}
+
+export interface AgentQuestion {
+  id: string
+  question: string
+  type: 'text' | 'choice' | 'multi-choice'
+  options?: string[]
+  placeholder?: string
+  required: boolean
+}
+
+export interface AgentQuestionResponse {
+  questionId: string
+  answer: string | string[]
+}
+
+export interface PlanStep {
+  id: string
+  description: string
+  tool: string
+  target: string
+  status: 'pending' | 'in_progress' | 'complete' | 'skipped'
+}
+
+export interface AgentPlan {
+  id: string
+  summary: string
+  intent: AgentIntent
+  steps: PlanStep[]
+  affectedChapters: { id: string; title: string; action: string }[]
+  estimatedScope: string
+  risks?: string[]
+}
+
+// ─── Agent Events ────────────────────────────
 
 export type AgentEvent =
   | { type: 'stream'; text: string }
   | { type: 'tool_call'; toolCall: ToolCall }
   | { type: 'tool_result'; result: ToolResult }
   | { type: 'plan'; plan: string }
+  | { type: 'phase_change'; phase: AgentPhase }
+  | { type: 'questions'; questions: AgentQuestion[] }
+  | { type: 'plan_proposal'; plan: AgentPlan }
+  | { type: 'step_progress'; stepId: string; status: PlanStep['status'] }
   | { type: 'done'; fullResponse: string }
   | { type: 'error'; error: string }
 
