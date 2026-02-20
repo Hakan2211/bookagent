@@ -14,6 +14,34 @@ interface PendingDiffItem {
   newContent: string
 }
 
+export type InlineEditAction =
+  | 'rewrite'
+  | 'change-tone'
+  | 'expand'
+  | 'shorten'
+  | 'continue'
+  | 'custom'
+
+export interface InlineEditState {
+  /** Whether an inline edit is actively running or showing results */
+  isActive: boolean
+  /** The action being performed */
+  action: InlineEditAction | null
+  /** Original selected text */
+  selectedText: string
+  /** Accumulated streamed replacement text */
+  streamedText: string
+  /** Final replacement text (set when done) */
+  resultText: string | null
+  /** Whether the LLM is still streaming */
+  isStreaming: boolean
+  /** Error message if the edit failed */
+  error: string | null
+  /** Selection range in the editor (ProseMirror positions) */
+  selectionFrom: number
+  selectionTo: number
+}
+
 interface EditorState {
   activeChapterId: string | null
   activeSectionId: string | null
@@ -38,6 +66,16 @@ interface EditorState {
   exitDiffMode: () => void
   clearDiffQueue: () => void
   reset: () => void
+
+  // ── Inline Edit ───────────────────────────
+  inlineEdit: InlineEditState
+  startInlineEdit: (action: InlineEditAction, selectedText: string, from: number, to: number) => void
+  appendInlineEditText: (text: string) => void
+  completeInlineEdit: (fullText: string) => void
+  setInlineEditError: (error: string) => void
+  acceptInlineEdit: () => void
+  rejectInlineEdit: () => void
+  clearInlineEdit: () => void
 }
 
 /** Build a PendingDiffItem from raw action content */
@@ -323,7 +361,131 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       isInDiffMode: false,
       pendingDiff: null,
       pendingDiffQueue: [],
-      acceptedGroupIds: new Set()
+      acceptedGroupIds: new Set(),
+      inlineEdit: {
+        isActive: false,
+        action: null,
+        selectedText: '',
+        streamedText: '',
+        resultText: null,
+        isStreaming: false,
+        error: null,
+        selectionFrom: 0,
+        selectionTo: 0
+      }
+    })
+  },
+
+  // ── Inline Edit Implementation ────────────
+
+  inlineEdit: {
+    isActive: false,
+    action: null,
+    selectedText: '',
+    streamedText: '',
+    resultText: null,
+    isStreaming: false,
+    error: null,
+    selectionFrom: 0,
+    selectionTo: 0
+  },
+
+  startInlineEdit: (action, selectedText, from, to) => {
+    set({
+      inlineEdit: {
+        isActive: true,
+        action,
+        selectedText,
+        streamedText: '',
+        resultText: null,
+        isStreaming: true,
+        error: null,
+        selectionFrom: from,
+        selectionTo: to
+      }
+    })
+  },
+
+  appendInlineEditText: (text) => {
+    set((state) => ({
+      inlineEdit: {
+        ...state.inlineEdit,
+        streamedText: state.inlineEdit.streamedText + text
+      }
+    }))
+  },
+
+  completeInlineEdit: (fullText) => {
+    set((state) => ({
+      inlineEdit: {
+        ...state.inlineEdit,
+        isStreaming: false,
+        resultText: fullText,
+        streamedText: fullText
+      }
+    }))
+  },
+
+  setInlineEditError: (error) => {
+    set((state) => ({
+      inlineEdit: {
+        ...state.inlineEdit,
+        isStreaming: false,
+        error
+      }
+    }))
+  },
+
+  acceptInlineEdit: () => {
+    // The actual text replacement is handled by the hook/component
+    // that calls this — it uses editor.commands to replace the selection
+    set({
+      inlineEdit: {
+        isActive: false,
+        action: null,
+        selectedText: '',
+        streamedText: '',
+        resultText: null,
+        isStreaming: false,
+        error: null,
+        selectionFrom: 0,
+        selectionTo: 0
+      }
+    })
+  },
+
+  rejectInlineEdit: () => {
+    // Cancel any ongoing stream
+    window.api.invoke(IPC.INLINE_EDIT_CANCEL).catch(() => {})
+    set({
+      inlineEdit: {
+        isActive: false,
+        action: null,
+        selectedText: '',
+        streamedText: '',
+        resultText: null,
+        isStreaming: false,
+        error: null,
+        selectionFrom: 0,
+        selectionTo: 0
+      }
+    })
+  },
+
+  clearInlineEdit: () => {
+    window.api.invoke(IPC.INLINE_EDIT_CANCEL).catch(() => {})
+    set({
+      inlineEdit: {
+        isActive: false,
+        action: null,
+        selectedText: '',
+        streamedText: '',
+        resultText: null,
+        isStreaming: false,
+        error: null,
+        selectionFrom: 0,
+        selectionTo: 0
+      }
     })
   }
 }))

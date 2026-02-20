@@ -4,8 +4,11 @@ import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import { useEditorStore } from '../../stores/editorStore'
 import { useAutoSave } from '../../hooks/useAutoSave'
+import { useInlineEdit } from '../../hooks/useInlineEdit'
 import { markdownToHtml, htmlToMarkdown } from '../../lib/markdown'
 import { EditorToolbar } from './EditorToolbar'
+import { SelectionMenu } from './SelectionMenu'
+import { InlineDiffView } from './InlineDiffView'
 
 export function TiptapEditor() {
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
@@ -17,6 +20,9 @@ export function TiptapEditor() {
 
   // Track whether content update came from the editor itself
   const isEditorUpdateRef = useRef(false)
+
+  // Ref for the editor container (used by SelectionMenu portal)
+  const editorContainerRef = useRef<HTMLDivElement>(null)
 
   const editor = useEditor({
     extensions: [
@@ -41,6 +47,16 @@ export function TiptapEditor() {
     }
   })
 
+  // Inline edit hook — handles selection tracking, IPC, and state
+  const {
+    menuPosition,
+    inlineEdit,
+    requestInlineEdit,
+    handleAccept,
+    handleReject,
+    handleCancel
+  } = useInlineEdit(editor)
+
   // Sync content from store to editor when it changes externally
   // (chapter switch, diff accept, or any non-editor-initiated change)
   useEffect(() => {
@@ -58,12 +74,12 @@ export function TiptapEditor() {
     }
   }, [activeChapterId, activeContent, editor]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Toggle editable state when entering/exiting diff mode
+  // Toggle editable state when entering/exiting diff mode or inline edit
   useEffect(() => {
     if (editor) {
-      editor.setEditable(!isInDiffMode)
+      editor.setEditable(!isInDiffMode && !inlineEdit.isActive)
     }
-  }, [editor, isInDiffMode])
+  }, [editor, isInDiffMode, inlineEdit.isActive])
 
   // Auto-save
   useAutoSave(activeContent, isDirty, saveChapter, 1500)
@@ -73,8 +89,21 @@ export function TiptapEditor() {
   return (
     <div className="h-full flex flex-col">
       <EditorToolbar editor={editor} />
-      <div className="tiptap-editor flex-1 overflow-y-auto">
+      {inlineEdit.isActive && (
+        <InlineDiffView
+          inlineEdit={inlineEdit}
+          onAccept={handleAccept}
+          onReject={handleReject}
+          onCancel={handleCancel}
+        />
+      )}
+      <div className="tiptap-editor flex-1 overflow-y-auto" ref={editorContainerRef} style={{ position: 'relative' }}>
         <EditorContent editor={editor} />
+        <SelectionMenu
+          position={menuPosition}
+          onAction={requestInlineEdit}
+          containerRef={editorContainerRef}
+        />
       </div>
     </div>
   )

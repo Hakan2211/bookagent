@@ -32,5 +32,28 @@
   "statusOutline": "Outline",
   "statusDraft": "Draft",
   "statusRevised": "Revised",
-  "statusFinal": "Final"
+  "statusFinal": "Final",
+  "inlineEdit": {
+    "rewrite": "Rewrite",
+    "rewriteDesc": "Improve clarity and flow",
+    "changeTone": "Change Tone",
+    "changeToneDesc": "Adjust the emotional register",
+    "expand": "Expand",
+    "expandDesc": "Add more detail and depth",
+    "shorten": "Shorten",
+    "shortenDesc": "Make more concise",
+    "continue": "Continue",
+    "continueDesc": "Continue writing from here",
+    "custom": "Custom...",
+    "customDesc": "Enter a custom editing instruction",
+    "customPlaceholder": "Describe how to edit this text...",
+    "apply": "Apply",
+    "accept": "Accept",
+    "reject": "Discard",
+    "cancel": "Cancel",
+    "dismiss": "Dismiss",
+    "generating": "Generating...",
+    "reviewChanges": "Review Changes",
+    "error": "Error"
+  }
 }

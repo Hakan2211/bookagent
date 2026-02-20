@@ -25,6 +25,7 @@ import { SnapshotManager } from './history/SnapshotManager'
 import { SearchEngine } from './search/SearchEngine'
 import { ParserFactory } from './import/parsers'
 import { ExportEngine, PdfExporter, EpubExporter } from './export'
+import { streamInlineEdit, type InlineEditRequest } from './ai/inlineEdit'
 import Store from 'electron-store'
 
 const settingsStore = new Store<AppSettings>({
@@ -48,6 +49,7 @@ export function registerIPC(
   searchEngine: SearchEngine
 ): void {
   let currentAgent: Agent | null = null
+  let inlineEditAbort: AbortController | null = null
 
   // ── Project Handlers ──────────────────────
 
@@ -420,6 +422,61 @@ export function registerIPC(
     if (currentAgent) {
       currentAgent.cancel()
       currentAgent = null
+    }
+  })
+
+  // ── Inline Edit Handlers ──────────────────
+
+  ipcMain.handle(
+    IPC.INLINE_EDIT_REQUEST,
+    async (_event, args: InlineEditRequest) => {
+      if (!projectManager.project) throw new Error('No project open')
+
+      const provider = projectManager.project.manifest.ai.provider
+      if (!aiRegistry.has(provider)) {
+        throw new Error(`AI provider "${provider}" not configured. Please add an API key in settings.`)
+      }
+
+      const ai = aiRegistry.get(provider)
+      const win = BrowserWindow.getFocusedWindow()
+
+      // Cancel any ongoing inline edit
+      if (inlineEditAbort) {
+        inlineEditAbort.abort()
+      }
+      inlineEditAbort = new AbortController()
+
+      try {
+        for await (const event of streamInlineEdit(
+          args,
+          projectManager.project,
+          ai,
+          inlineEditAbort.signal
+        )) {
+          if (win) {
+            if (event.type === 'text') {
+              win.webContents.send(IPC.INLINE_EDIT_STREAM, { text: event.text })
+            } else if (event.type === 'done') {
+              win.webContents.send(IPC.INLINE_EDIT_DONE, { fullText: event.fullText })
+            }
+          }
+        }
+      } catch (err: unknown) {
+        if ((err as Error).name === 'AbortError') return
+        const message = err instanceof Error ? err.message : String(err)
+        if (win) {
+          win.webContents.send(IPC.INLINE_EDIT_ERROR, { error: message })
+        }
+      } finally {
+        inlineEditAbort = null
+      }
+    }
+  )
+
+  ipcMain.handle(IPC.INLINE_EDIT_CANCEL, async () => {
+    if (inlineEditAbort) {
+      inlineEditAbort.abort()
+      inlineEditAbort = null
     }
   })
 

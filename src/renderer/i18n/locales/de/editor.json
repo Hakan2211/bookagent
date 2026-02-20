@@ -32,5 +32,28 @@
   "statusOutline": "Gliederung",
   "statusDraft": "Entwurf",
   "statusRevised": "Überarbeitet",
-  "statusFinal": "Fertig"
+  "statusFinal": "Fertig",
+  "inlineEdit": {
+    "rewrite": "Umschreiben",
+    "rewriteDesc": "Klarheit und Fluss verbessern",
+    "changeTone": "Ton ändern",
+    "changeToneDesc": "Emotionalen Ausdruck anpassen",
+    "expand": "Erweitern",
+    "expandDesc": "Mehr Details und Tiefe hinzufügen",
+    "shorten": "Kürzen",
+    "shortenDesc": "Prägnanter formulieren",
+    "continue": "Fortsetzen",
+    "continueDesc": "Von hier aus weiterschreiben",
+    "custom": "Eigene...",
+    "customDesc": "Eigene Bearbeitungsanweisung eingeben",
+    "customPlaceholder": "Beschreibe, wie der Text bearbeitet werden soll...",
+    "apply": "Anwenden",
+    "accept": "Annehmen",
+    "reject": "Verwerfen",
+    "cancel": "Abbrechen",
+    "dismiss": "Schließen",
+    "generating": "Wird generiert...",
+    "reviewChanges": "Änderungen prüfen",
+    "error": "Fehler"
+  }
 }

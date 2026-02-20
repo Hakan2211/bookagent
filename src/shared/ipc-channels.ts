@@ -49,6 +49,13 @@ export const IPC = {
   AGENT_REJECT_CHANGES: 'agent:reject-changes',
   AGENT_CANCEL: 'agent:cancel',
 
+  // ── Inline Edit ─────────────────────────────
+  INLINE_EDIT_REQUEST: 'inline-edit:request',
+  INLINE_EDIT_STREAM: 'inline-edit:stream',
+  INLINE_EDIT_DONE: 'inline-edit:done',
+  INLINE_EDIT_ERROR: 'inline-edit:error',
+  INLINE_EDIT_CANCEL: 'inline-edit:cancel',
+
   // ── Settings ────────────────────────────────
   SETTINGS_GET: 'settings:get',
   SETTINGS_SET: 'settings:set',
