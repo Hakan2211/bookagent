@@ -60,27 +60,10 @@ export function WelcomeScreen() {
     setError(null)
 
     try {
-      // Detect which AI provider has a configured API key
-      const keyStatus = (await window.api.invoke(IPC.SETTINGS_GET_API_KEY_STATUS)) as {
-        anthropic: boolean
-        openai: boolean
-        openrouter: boolean
-      }
       const settings = (await window.api.invoke(IPC.SETTINGS_GET)) as Record<string, any>
 
-      let aiProvider: 'anthropic' | 'openai' | 'openrouter' = 'anthropic'
-      let aiModel = 'claude-sonnet-4-5-20250929'
-
-      if (keyStatus.openrouter) {
-        aiProvider = 'openrouter'
-        aiModel = settings.openrouterModel || 'anthropic/claude-sonnet-4.6'
-      } else if (keyStatus.anthropic) {
-        aiProvider = 'anthropic'
-        aiModel = settings.anthropicModel || 'claude-sonnet-4-5-20250929'
-      } else if (keyStatus.openai) {
-        aiProvider = 'openai'
-        aiModel = settings.openaiModel || 'gpt-4o'
-      }
+      const aiProvider = 'openrouter' as const
+      const aiModel = settings.openrouterModel || 'google/gemini-3-flash-preview'
 
       const createProject = useProjectStore.getState().createProject
       await createProject(newBookPath, {

@@ -5,7 +5,7 @@ export function buildSystemPrompt(project: BookProject): string {
   const style = project.manifest.style
   const totalWords = project.getTotalWordCount()
 
-  return `You are ChapterForge's writing assistant — a skilled editor and creative writing partner. You help authors write, edit, structure, and refine their books.
+  return `You are Kitapmi's writing assistant — a skilled editor and creative writing partner. You help authors write, edit, structure, and refine their books.
 
 ## YOUR ROLE
 - You are a collaborative partner, not an autonomous writer

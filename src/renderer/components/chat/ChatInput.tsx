@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import ReactDOM from 'react-dom'
 import { useChatStore } from '../../stores/chatStore'
+import { useProjectStore } from '../../stores/projectStore'
 import { IPC } from '@shared/ipc-channels'
 import type { ModelInfo } from '@shared/types'
 import { SendHorizontal, Square, ChevronDown, Check } from 'lucide-react'
@@ -79,6 +80,19 @@ export function ChatInput() {
     setSelectedModel(modelId)
     setIsModelOpen(false)
     await window.api.invoke(IPC.SETTINGS_SET, { openrouterModel: modelId })
+
+    // Also update the open project's AI config so periodic status checks stay in sync
+    const projectState = useProjectStore.getState()
+    if (projectState.isOpen && projectState.manifest) {
+      await window.api.invoke(IPC.PROJECT_UPDATE_SETTINGS, {
+        aiProvider: 'openrouter',
+        aiModel: modelId
+      })
+      projectState.updateManifest({
+        ai: { provider: 'openrouter' as any, model: modelId, keyRef: 'kitapmi-openrouter-key' }
+      })
+    }
+
     // Update the status bar model name instantly
     const { refreshModelName } = await import('../../stores/uiStore').then((m) => m.useUIStore.getState())
     refreshModelName('openrouter', modelId)

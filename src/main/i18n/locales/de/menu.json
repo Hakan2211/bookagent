@@ -15,8 +15,8 @@
   "searchBook": "Buch durchsuchen",
   "quickSwitchChapter": "Kapitel schnell wechseln",
   "help": "Hilfe",
-  "aboutChapterForge": "Über ChapterForge",
-  "aboutVersion": "ChapterForge v0.1.0",
+  "aboutKitapmi": "Über Kitapmi",
+  "aboutVersion": "Kitapmi v0.1.0",
   "aboutDetail": "KI-gestützte Schreib-IDE für Bücher.\nCursor für Bücher.",
   "settings": "Einstellungen..."
 }

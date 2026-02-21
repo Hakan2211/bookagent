@@ -646,6 +646,29 @@ export class BookProject {
     const manifestPath = path.join(projectPath, 'book.json')
     const raw = await fs.readFile(manifestPath, 'utf-8')
     const manifest: BookManifest = JSON.parse(raw)
+
+    // ── Auto-migrate old projects that used direct Anthropic/OpenAI providers ──
+    const provider = manifest.ai?.provider as string
+    if (provider === 'anthropic' || provider === 'openai') {
+      manifest.ai.provider = 'openrouter'
+      // Map old direct model IDs to their OpenRouter equivalents
+      if (provider === 'anthropic') {
+        const model = manifest.ai.model
+        if (model && !model.includes('/')) {
+          manifest.ai.model = `anthropic/${model}`
+        }
+      } else if (provider === 'openai') {
+        const model = manifest.ai.model
+        if (model && !model.includes('/')) {
+          manifest.ai.model = `openai/${model}`
+        }
+      }
+      manifest.ai.keyRef = 'kitapmi-openrouter-key'
+
+      // Persist the migration
+      await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8')
+    }
+
     return new BookProject(projectPath, manifest)
   }
 }

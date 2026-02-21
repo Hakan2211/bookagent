@@ -9,7 +9,7 @@ export class SnapshotManager {
     changedFiles?: string[]
   ): Promise<Snapshot> {
     const id = new Date().toISOString().replace(/[:.]/g, '-')
-    const snapshotDir = path.join(projectPath, '.chapterforge', 'history', id)
+    const snapshotDir = path.join(projectPath, '.kitapmi', 'history', id)
 
     await fs.mkdir(snapshotDir, { recursive: true })
 
@@ -72,7 +72,7 @@ export class SnapshotManager {
   async restoreSnapshot(projectPath: string, snapshotId: string): Promise<void> {
     const snapshotDir = path.join(
       projectPath,
-      '.chapterforge',
+      '.kitapmi',
       'history',
       snapshotId
     )
@@ -124,7 +124,7 @@ export class SnapshotManager {
   }
 
   async listSnapshots(projectPath: string): Promise<Snapshot[]> {
-    const historyDir = path.join(projectPath, '.chapterforge', 'history')
+    const historyDir = path.join(projectPath, '.kitapmi', 'history')
     const snapshots: Snapshot[] = []
 
     try {
@@ -159,7 +159,7 @@ export class SnapshotManager {
     if (snapshots.length <= maxSnapshots) return
 
     const toDelete = snapshots.slice(maxSnapshots)
-    const historyDir = path.join(projectPath, '.chapterforge', 'history')
+    const historyDir = path.join(projectPath, '.kitapmi', 'history')
 
     for (const snapshot of toDelete) {
       const dir = path.join(historyDir, snapshot.id)

@@ -63,7 +63,7 @@ export class PdfExporter {
 
     // Temp file for the HTML content (data: URLs have size limits)
     const tempDir = app.getPath('temp')
-    const tempHtmlPath = path.join(tempDir, `chapterforge-export-${Date.now()}.html`)
+    const tempHtmlPath = path.join(tempDir, `kitapmi-export-${Date.now()}.html`)
 
     try {
       // Step 1: Assemble HTML

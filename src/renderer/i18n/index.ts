@@ -64,7 +64,7 @@ i18n
       // Check localStorage first (where we persist the user's choice),
       // then fall back to navigator language
       order: ['localStorage', 'navigator'],
-      lookupLocalStorage: 'chapterforge-language',
+      lookupLocalStorage: 'kitapmi-language',
       caches: ['localStorage']
     }
   })

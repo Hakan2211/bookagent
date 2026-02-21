@@ -9,7 +9,7 @@ export function createMainWindow(): BrowserWindow {
     height: 900,
     minWidth: 900,
     minHeight: 600,
-    title: 'ChapterForge',
+    title: 'Kitapmi',
     backgroundColor: '#1a1a2e',
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: { x: 12, y: 12 },

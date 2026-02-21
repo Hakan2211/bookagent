@@ -112,7 +112,7 @@ export const useUIStore = create<UIState>((set, get) => ({
   // Language
   setLanguage: (lang: string) => {
     i18n.changeLanguage(lang)
-    localStorage.setItem('chapterforge-language', lang)
+    localStorage.setItem('kitapmi-language', lang)
     set({ language: lang })
     // Notify main process to rebuild menus
     window.api.invoke(IPC.LANGUAGE_CHANGED, { language: lang }).catch(() => {})

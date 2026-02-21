@@ -69,8 +69,8 @@ export class OpenRouterProvider implements AIProvider {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.apiKey}`,
-        'HTTP-Referer': 'https://chapterforge.app',
-        'X-Title': 'ChapterForge'
+        'HTTP-Referer': 'https://kitapmi.com',
+        'X-Title': 'Kitapmi'
       },
       body: JSON.stringify(body)
     })
@@ -173,8 +173,8 @@ export class OpenRouterProvider implements AIProvider {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.apiKey}`,
-        'HTTP-Referer': 'https://chapterforge.app',
-        'X-Title': 'ChapterForge'
+        'HTTP-Referer': 'https://kitapmi.com',
+        'X-Title': 'Kitapmi'
       },
       body: JSON.stringify(body),
       signal: request.signal

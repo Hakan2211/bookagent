@@ -15,8 +15,8 @@
   "searchBook": "Search Book",
   "quickSwitchChapter": "Quick Switch Chapter",
   "help": "Help",
-  "aboutChapterForge": "About ChapterForge",
-  "aboutVersion": "ChapterForge v0.1.0",
+  "aboutKitapmi": "About Kitapmi",
+  "aboutVersion": "Kitapmi v0.1.0",
   "aboutDetail": "AI-powered book writing IDE.\nCursor for books.",
   "settings": "Settings..."
 }

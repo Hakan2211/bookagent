@@ -10,17 +10,9 @@ import { useUIStore } from '../../stores/uiStore'
 
 export function AIProviderConfig() {
   const { t } = useTranslation(['settings', 'common'])
-  const [anthropicKey, setAnthropicKey] = useState('')
-  const [openaiKey, setOpenaiKey] = useState('')
   const [openrouterKey, setOpenrouterKey] = useState('')
-  const [anthropicHasKey, setAnthropicHasKey] = useState(false)
-  const [openaiHasKey, setOpenaiHasKey] = useState(false)
   const [openrouterHasKey, setOpenrouterHasKey] = useState(false)
-  const [anthropicModel, setAnthropicModel] = useState('claude-sonnet-4-5-20250929')
-  const [openaiModel, setOpenaiModel] = useState('gpt-4o')
-  const [openrouterModel, setOpenrouterModel] = useState('anthropic/claude-sonnet-4.6')
-  const [anthropicModels, setAnthropicModels] = useState<ModelInfo[]>([])
-  const [openaiModels, setOpenaiModels] = useState<ModelInfo[]>([])
+  const [openrouterModel, setOpenrouterModel] = useState('google/gemini-3-flash-preview')
   const [openrouterModels, setOpenrouterModels] = useState<ModelInfo[]>([])
   const [isValidating, setIsValidating] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
@@ -32,64 +24,40 @@ export function AIProviderConfig() {
 
   const loadStatus = async () => {
     const keyStatus = (await window.api.invoke(IPC.SETTINGS_GET_API_KEY_STATUS)) as {
-      anthropic: boolean
-      openai: boolean
       openrouter: boolean
     }
-    setAnthropicHasKey(keyStatus.anthropic)
-    setOpenaiHasKey(keyStatus.openai)
     setOpenrouterHasKey(keyStatus.openrouter)
 
     const settings = (await window.api.invoke(IPC.SETTINGS_GET)) as Record<string, any>
-    if (settings.anthropicModel) setAnthropicModel(settings.anthropicModel)
-    if (settings.openaiModel) setOpenaiModel(settings.openaiModel)
     if (settings.openrouterModel) setOpenrouterModel(settings.openrouterModel)
   }
 
   const loadModels = async () => {
-    const aModels = (await window.api.invoke(IPC.SETTINGS_GET_MODELS, {
-      provider: 'anthropic'
-    })) as ModelInfo[]
-    setAnthropicModels(aModels)
-
-    const oModels = (await window.api.invoke(IPC.SETTINGS_GET_MODELS, {
-      provider: 'openai'
-    })) as ModelInfo[]
-    setOpenaiModels(oModels)
-
     const orModels = (await window.api.invoke(IPC.SETTINGS_GET_MODELS, {
       provider: 'openrouter'
     })) as ModelInfo[]
     setOpenrouterModels(orModels)
   }
 
-  const handleSaveKey = async (provider: string, key: string) => {
+  const handleSaveKey = async (key: string) => {
     if (!key.trim()) return
     setIsValidating(true)
     setStatus(null)
 
     try {
       const result = (await window.api.invoke(IPC.SETTINGS_SET_API_KEY, {
-        provider,
+        provider: 'openrouter',
         key: key.trim()
       })) as { valid: boolean }
 
       if (result.valid) {
-        setStatus(t('settings:ai.keySaved', { provider }))
-        if (provider === 'anthropic') {
-          setAnthropicHasKey(true)
-          setAnthropicKey('')
-        } else if (provider === 'openai') {
-          setOpenaiHasKey(true)
-          setOpenaiKey('')
-        } else if (provider === 'openrouter') {
-          setOpenrouterHasKey(true)
-          setOpenrouterKey('')
-        }
+        setStatus(t('settings:ai.keySaved', { provider: 'OpenRouter' }))
+        setOpenrouterHasKey(true)
+        setOpenrouterKey('')
         // Refresh status bar connectivity immediately
         useUIStore.getState().checkApiStatus()
       } else {
-        setStatus(t('settings:ai.invalidKey', { provider }))
+        setStatus(t('settings:ai.invalidKey', { provider: 'OpenRouter' }))
       }
     } catch (err) {
       setStatus(`Error: ${(err as Error).message}`)
@@ -98,32 +66,24 @@ export function AIProviderConfig() {
     }
   }
 
-  const handleModelChange = async (provider: string, model: string) => {
-    if (provider === 'anthropic') {
-      setAnthropicModel(model)
-      await window.api.invoke(IPC.SETTINGS_SET, { anthropicModel: model })
-    } else if (provider === 'openai') {
-      setOpenaiModel(model)
-      await window.api.invoke(IPC.SETTINGS_SET, { openaiModel: model })
-    } else if (provider === 'openrouter') {
-      setOpenrouterModel(model)
-      await window.api.invoke(IPC.SETTINGS_SET, { openrouterModel: model })
-    }
+  const handleModelChange = async (model: string) => {
+    setOpenrouterModel(model)
+    await window.api.invoke(IPC.SETTINGS_SET, { openrouterModel: model })
 
-    // Also update the open project's AI config to use this provider and model
+    // Also update the open project's AI config
     const projectState = useProjectStore.getState()
     if (projectState.isOpen && projectState.manifest) {
       await window.api.invoke(IPC.PROJECT_UPDATE_SETTINGS, {
-        aiProvider: provider,
+        aiProvider: 'openrouter',
         aiModel: model
       })
       projectState.updateManifest({
-        ai: { provider: provider as any, model, keyRef: `chapterforge-${provider}-key` }
+        ai: { provider: 'openrouter' as any, model, keyRef: 'kitapmi-openrouter-key' }
       })
     }
 
     // Instantly update the status bar model name
-    useUIStore.getState().refreshModelName(provider, model)
+    useUIStore.getState().refreshModelName('openrouter', model)
   }
 
   const isStatusError = status?.includes('Error') || status?.includes('Invalid')
@@ -143,84 +103,6 @@ export function AIProviderConfig() {
           {status}
         </div>
       )}
-
-      {/* Anthropic */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2.5">
-          <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('settings:ai.anthropicClaude')}</h3>
-          {anthropicHasKey && (
-            <span className="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 font-medium">
-              {t('settings:ai.connected')}
-            </span>
-          )}
-        </div>
-
-        <div className="flex gap-3">
-          <input
-            type="password"
-            value={anthropicKey}
-            onChange={(e) => setAnthropicKey(e.target.value)}
-            placeholder={anthropicHasKey ? t('settings:ai.keySavedPlaceholder') : 'sk-ant-...'}
-            className="flex-1 px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
-          />
-          <Button
-            size="md"
-            onClick={() => handleSaveKey('anthropic', anthropicKey)}
-            isLoading={isValidating}
-            disabled={!anthropicKey.trim()}
-          >
-            {t('common:save')}
-          </Button>
-        </div>
-
-        <Dropdown
-          options={anthropicModels.map((m) => ({ value: m.id, label: m.name }))}
-          value={anthropicModel}
-          onChange={(v) => handleModelChange('anthropic', v)}
-          placeholder={t('settings:ai.selectModel')}
-        />
-      </div>
-
-      <div className="border-t border-[var(--border)]" />
-
-      {/* OpenAI */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2.5">
-          <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('settings:ai.openai')}</h3>
-          {openaiHasKey && (
-            <span className="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 font-medium">
-              {t('settings:ai.connected')}
-            </span>
-          )}
-        </div>
-
-        <div className="flex gap-3">
-          <input
-            type="password"
-            value={openaiKey}
-            onChange={(e) => setOpenaiKey(e.target.value)}
-            placeholder={openaiHasKey ? t('settings:ai.keySavedPlaceholder') : 'sk-...'}
-            className="flex-1 px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
-          />
-          <Button
-            size="md"
-            onClick={() => handleSaveKey('openai', openaiKey)}
-            isLoading={isValidating}
-            disabled={!openaiKey.trim()}
-          >
-            {t('common:save')}
-          </Button>
-        </div>
-
-        <Dropdown
-          options={openaiModels.map((m) => ({ value: m.id, label: m.name }))}
-          value={openaiModel}
-          onChange={(v) => handleModelChange('openai', v)}
-          placeholder={t('settings:ai.selectModel')}
-        />
-      </div>
-
-      <div className="border-t border-[var(--border)]" />
 
       {/* OpenRouter */}
       <div className="space-y-4">
@@ -247,7 +129,7 @@ export function AIProviderConfig() {
           />
           <Button
             size="md"
-            onClick={() => handleSaveKey('openrouter', openrouterKey)}
+            onClick={() => handleSaveKey(openrouterKey)}
             isLoading={isValidating}
             disabled={!openrouterKey.trim()}
           >
@@ -258,7 +140,7 @@ export function AIProviderConfig() {
         <Dropdown
           options={openrouterModels.map((m) => ({ value: m.id, label: m.name }))}
           value={openrouterModel}
-          onChange={(v) => handleModelChange('openrouter', v)}
+          onChange={(v) => handleModelChange(v)}
           placeholder={t('settings:ai.selectModel')}
         />
       </div>

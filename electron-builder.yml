@@ -1,5 +1,5 @@
-appId: com.chapterforge.app
-productName: ChapterForge
+appId: com.kitapmi.app
+productName: Kitapmi
 directories:
   buildResources: resources
   output: dist

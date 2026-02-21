@@ -1,14 +1,12 @@
 {
   "title": "Settings",
   "tabs": {
-    "ai": "AI Providers",
+    "ai": "AI Provider",
     "style": "Style Guide",
     "project": "Project",
     "language": "Language"
   },
   "ai": {
-    "anthropicClaude": "Anthropic (Claude)",
-    "openai": "OpenAI",
     "openrouter": "OpenRouter",
     "openrouterDesc": "Access 200+ models from all major providers through a single API key.",
     "connected": "Connected",

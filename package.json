@@ -1,5 +1,5 @@
 {
-  "name": "chapterforge",
+  "name": "kitapmi",
   "version": "0.1.0",
   "description": "AI-powered book writing IDE — Cursor for books",
   "main": "./out/main/index.js",

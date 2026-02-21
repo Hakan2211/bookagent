@@ -7,8 +7,6 @@
     "language": "Sprache"
   },
   "ai": {
-    "anthropicClaude": "Anthropic (Claude)",
-    "openai": "OpenAI",
     "openrouter": "OpenRouter",
     "openrouterDesc": "Zugriff auf über 200 Modelle von allen großen Anbietern mit einem einzigen API-Schlüssel.",
     "connected": "Verbunden",

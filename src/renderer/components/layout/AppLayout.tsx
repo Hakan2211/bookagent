@@ -24,7 +24,7 @@ export function AppLayout() {
 
       {/* Main content area */}
       <div className="flex-1 min-h-0">
-        <PanelGroup direction="horizontal" autoSaveId="chapterforge-layout">
+        <PanelGroup direction="horizontal" autoSaveId="kitapmi-layout">
           {/* Sidebar */}
           {!sidebarCollapsed && (
             <>

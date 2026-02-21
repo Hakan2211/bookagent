@@ -25,8 +25,8 @@ export class ProjectManager {
     await fs.mkdir(path.join(projectPath, 'chapters'), { recursive: true })
     await fs.mkdir(path.join(projectPath, 'notes'), { recursive: true })
     await fs.mkdir(path.join(projectPath, 'imports'), { recursive: true })
-    await fs.mkdir(path.join(projectPath, '.chapterforge', 'history'), { recursive: true })
-    await fs.mkdir(path.join(projectPath, '.chapterforge', 'chat-history'), { recursive: true })
+    await fs.mkdir(path.join(projectPath, '.kitapmi', 'history'), { recursive: true })
+    await fs.mkdir(path.join(projectPath, '.kitapmi', 'chat-history'), { recursive: true })
 
     const now = new Date().toISOString()
 
@@ -58,7 +58,7 @@ export class ProjectManager {
       ai: {
         provider: metadata.aiProvider || 'anthropic',
         model: metadata.aiModel || 'claude-sonnet-4-5-20250929',
-        keyRef: `chapterforge-${metadata.aiProvider || 'anthropic'}-key`
+        keyRef: `kitapmi-${metadata.aiProvider || 'anthropic'}-key`
       },
       imports: []
     }
@@ -97,9 +97,9 @@ export class ProjectManager {
     // Write .gitignore
     await fs.writeFile(
       path.join(projectPath, '.gitignore'),
-      `# ChapterForge internal data
-.chapterforge/cache.json
-.chapterforge/chat-history/
+      `# Kitapmi internal data
+.kitapmi/cache.json
+.kitapmi/chat-history/
 
 # OS files
 .DS_Store
@@ -110,7 +110,7 @@ Thumbs.db
 
     // Write initial summaries
     await fs.writeFile(
-      path.join(projectPath, '.chapterforge/summaries.json'),
+      path.join(projectPath, '.kitapmi/summaries.json'),
       JSON.stringify({ generatedAt: now, chapters: {} }, null, 2),
       'utf-8'
     )

@@ -186,12 +186,9 @@ export class ContextAssembler {
     return parts.join('\n')
   }
 
-  private getTokenLimit(aiConfig: { provider: string; model: string }): number {
-    if (aiConfig.provider === 'anthropic') return 180000
-    if (aiConfig.provider === 'openrouter') return 180000
-    if (aiConfig.model === 'gpt-4o') return 120000
-    if (aiConfig.model === 'gpt-4o-mini') return 120000
-    return 100000
+  private getTokenLimit(_aiConfig: { provider: string; model: string }): number {
+    // All models are accessed via OpenRouter; use a generous default
+    return 180000
   }
 
   private detectReferencedChapters(prompt: string, project: BookProject) {

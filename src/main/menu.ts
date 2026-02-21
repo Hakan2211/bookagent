@@ -124,11 +124,11 @@ export function createMenu(mainWindow: BrowserWindow): void {
       label: t('help'),
       submenu: [
         {
-          label: t('aboutChapterForge'),
+          label: t('aboutKitapmi'),
           click: () => {
             dialog.showMessageBox(mainWindow, {
               type: 'info',
-              title: t('aboutChapterForge'),
+              title: t('aboutKitapmi'),
               message: t('aboutVersion'),
               detail: t('aboutDetail')
             })
