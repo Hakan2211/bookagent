@@ -2,6 +2,10 @@
   "name": "kitapmi",
   "version": "0.1.0",
   "description": "AI-powered book writing IDE — Cursor for books",
+  "author": {
+    "name": "Hakan",
+    "email": "Hakan2211@users.noreply.github.com"
+  },
   "main": "./out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
