@@ -3,7 +3,7 @@ import { MessageList } from './MessageList'
 import { ChatInput } from './ChatInput'
 import { QuickActions } from './QuickActions'
 import { AgentStepper } from './AgentStepper'
-import { AgentQuestionsCard } from './AgentQuestionsCard'
+import { AgentQuestionsCard, AnsweredQuestionsCard } from './AgentQuestionsCard'
 import { AgentPlanCard } from './AgentPlanCard'
 import { useChatStore } from '../../stores/chatStore'
 import { useTranslation } from 'react-i18next'
@@ -29,6 +29,7 @@ export function ChatContainer() {
   const agentPhase = useChatStore((s) => s.agentPhase)
   const currentQuestions = useChatStore((s) => s.currentQuestions)
   const currentPlan = useChatStore((s) => s.currentPlan)
+  const answeredQuestions = useChatStore((s) => s.answeredQuestions)
 
   useEffect(() => {
     const cleanup = initListeners()
@@ -49,6 +50,12 @@ export function ChatContainer() {
           {currentQuestions && currentQuestions.length > 0 && agentPhase === 'questioning' && (
             <AgentQuestionsCard questions={currentQuestions} />
           )}
+
+          {/* Answered questions, collapsed */}
+          {answeredQuestions && agentPhase !== 'questioning' && agentPhase !== 'error' &&
+            (currentPlan || agentPhase === 'planning') && (
+              <AnsweredQuestionsCard {...answeredQuestions} />
+            )}
 
           {/* Plan proposal / execution card */}
           {currentPlan && (agentPhase === 'awaiting_plan' || agentPhase === 'executing' || agentPhase === 'done') && (

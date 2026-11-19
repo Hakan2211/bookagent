@@ -21,6 +21,8 @@ interface ChatState {
   // ── Multi-phase workflow state ──────────────
   agentPhase: AgentPhase
   currentQuestions: AgentQuestion[] | null
+  /** Questions the writer already answered this turn (shown collapsed above the plan). */
+  answeredQuestions: { questions: AgentQuestion[]; answers: AgentQuestionResponse[] } | null
   currentPlan: AgentPlan | null
 
   // ── Actions ────────────────────────────────
@@ -54,6 +56,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   // Multi-phase state
   agentPhase: 'done',
   currentQuestions: null,
+  answeredQuestions: null,
   currentPlan: null,
 
   sendPrompt: async (prompt: string) => {
@@ -83,6 +86,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       toolActivity: [],
       agentPhase: 'classifying',
       currentQuestions: null,
+      answeredQuestions: null,
       currentPlan: null
     }))
 
@@ -152,6 +156,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         toolActivity: [],
         agentPhase: 'error' as AgentPhase,
         currentQuestions: null,
+        answeredQuestions: null,
         currentPlan: null
       }
     })
@@ -188,6 +193,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       pendingActions: [],
       agentPhase: 'done',
       currentQuestions: null,
+      answeredQuestions: null,
       currentPlan: null
     })
     // Also clear the session on the main process
@@ -205,7 +211,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   submitQuestionAnswers: async (answers: AgentQuestionResponse[]) => {
-    set({ currentQuestions: null, agentPhase: 'planning' })
+    set((state) => ({
+      answeredQuestions: state.currentQuestions
+        ? { questions: state.currentQuestions, answers }
+        : null,
+      currentQuestions: null,
+      agentPhase: 'planning'
+    }))
     await window.api.invoke(IPC.AGENT_QUESTIONS_RESPONSE, { answers })
   },
 

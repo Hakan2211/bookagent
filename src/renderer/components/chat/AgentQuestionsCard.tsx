@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { MessageCircleQuestion, Send } from 'lucide-react'
+import { Check, ChevronDown, MessageCircleQuestion, Send } from 'lucide-react'
 import type { AgentQuestion, AgentQuestionResponse } from '@shared/types'
 import { useChatStore } from '../../stores/chatStore'
 
@@ -155,6 +155,66 @@ export function AgentQuestionsCard({ questions }: AgentQuestionsCardProps) {
           {t('chat:continueWithAnswers')}
         </button>
       </div>
+    </div>
+  )
+}
+
+interface AnsweredQuestionsCardProps {
+  questions: AgentQuestion[]
+  answers: AgentQuestionResponse[]
+}
+
+function formatAnswer(answer: string | string[] | undefined): string {
+  if (Array.isArray(answer)) return answer.join(', ')
+  return answer?.trim() ?? ''
+}
+
+/** Collapsed summary of the questions already answered this turn. */
+export function AnsweredQuestionsCard({ questions, answers }: AnsweredQuestionsCardProps) {
+  const { t } = useTranslation('chat')
+  const [open, setOpen] = useState(false)
+  const answered = questions.filter((q) =>
+    formatAnswer(answers.find((a) => a.questionId === q.id)?.answer)
+  ).length
+
+  return (
+    <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--bg-surface)]">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="w-full flex items-center gap-3 px-4 h-11 text-left"
+      >
+        <MessageCircleQuestion size={17} strokeWidth={1.5} className="text-[var(--text-secondary)] shrink-0" />
+        <span className="font-serif text-[16px] text-[var(--text-primary)]">{t('chat:questions')}</span>
+        <span className="w-px h-4 bg-[var(--border-strong)]" />
+        <span className="flex-1 min-w-0 truncate font-serif italic text-[14px] text-[var(--text-secondary)]">
+          {t('chat:questionsAnswered', { count: answered })}
+          <Check size={13} className="inline ml-1.5 -mt-0.5" />
+        </span>
+        <ChevronDown
+          size={16}
+          className={`text-[var(--text-secondary)] shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {open && (
+        <ol className="px-4 pb-4 pt-1 space-y-3 border-t border-[var(--border)]">
+          {questions.map((q, index) => {
+            const answer = formatAnswer(answers.find((a) => a.questionId === q.id)?.answer)
+            return (
+              <li key={q.id} className="flex gap-2 font-serif text-[14px] leading-relaxed pt-2">
+                <span className="text-[var(--text-tertiary)] tabular-nums shrink-0">{index + 1}.</span>
+                <div className="min-w-0">
+                  <p className="text-[var(--text-secondary)]">{q.question}</p>
+                  <p className={answer ? 'text-[var(--text-primary)]' : 'italic text-[var(--text-tertiary)]'}>
+                    {answer || t('chat:skipped')}
+                  </p>
+                </div>
+              </li>
+            )
+          })}
+        </ol>
+      )}
     </div>
   )
 }

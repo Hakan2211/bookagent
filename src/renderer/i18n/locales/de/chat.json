@@ -72,5 +72,9 @@
   },
   "planTitle": "Plan",
   "runPlan": "Plan ausführen",
-  "touches": "Betrifft: {{list}}"
+  "touches": "Betrifft: {{list}}",
+  "questions": "Fragen",
+  "questionsAnswered_one": "{{count}} Frage beantwortet",
+  "questionsAnswered_other": "{{count}} Fragen beantwortet",
+  "skipped": "Übersprungen"
 }

@@ -72,5 +72,9 @@
   },
   "planTitle": "Plan",
   "runPlan": "Run plan",
-  "touches": "Touches: {{list}}"
+  "touches": "Touches: {{list}}",
+  "questions": "Questions",
+  "questionsAnswered_one": "{{count}} question answered",
+  "questionsAnswered_other": "{{count}} questions answered",
+  "skipped": "Skipped"
 }
