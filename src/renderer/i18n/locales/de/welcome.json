@@ -34,5 +34,7 @@
   "chapters_one": "{{count}} Kapitel",
   "chapters_other": "{{count}} Kapitel",
   "percentOf": "{{pct}} % von {{target}}",
-  "missing": "Ordner nicht gefunden"
+  "missing": "Ordner nicht gefunden",
+  "wordsThisWeek_one": "Diese Woche hast du {{formatted}} Wort geschrieben.",
+  "wordsThisWeek_other": "Diese Woche hast du {{formatted}} Wörter geschrieben."
 }

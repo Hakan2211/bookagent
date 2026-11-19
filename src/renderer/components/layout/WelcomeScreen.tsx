@@ -12,7 +12,7 @@ import { TitleBar } from './TitleBar'
 import type { ProjectPeek } from '@shared/types'
 
 export function WelcomeScreen() {
-  const { t } = useTranslation(['welcome', 'common'])
+  const { t, i18n } = useTranslation(['welcome', 'common'])
   const recentProjects = useProjectStore((s) => s.recentProjects)
   const openProject = useProjectStore((s) => s.openProject)
   const openModal = useUIStore((s) => s.openModal)
@@ -27,6 +27,14 @@ export function WelcomeScreen() {
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [peeks, setPeeks] = useState<Record<string, ProjectPeek>>({})
+  const [weekWords, setWeekWords] = useState(0)
+
+  useEffect(() => {
+    window.api
+      .invoke(IPC.STATS_WEEK_WORDS)
+      .then((n) => setWeekWords(typeof n === 'number' ? n : 0))
+      .catch(() => {})
+  }, [])
 
   // Read chapter/word stats for the library shelf.
   useEffect(() => {
@@ -133,7 +141,12 @@ export function WelcomeScreen() {
               {firstName ? t(greetingKey, { name: firstName }) : t(greetingKey + 'Anon')}
             </h1>
             <p className="font-serif text-[17px] text-[var(--text-secondary)] mt-2">
-              {lastBook ? (
+              {weekWords > 0 ? (
+                t('welcome:wordsThisWeek', {
+                  count: weekWords,
+                  formatted: weekWords.toLocaleString(i18n.language)
+                })
+              ) : lastBook ? (
                 <button
                   onClick={() => openProject(lastBook.path)}
                   className="hover:text-[var(--text-primary)] underline decoration-[var(--border-strong)] underline-offset-4 hover:decoration-[var(--accent-primary)]"

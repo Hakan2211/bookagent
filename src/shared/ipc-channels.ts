@@ -5,6 +5,7 @@ export const IPC = {
   PROJECT_CLOSE: 'project:close',
   PROJECT_GET_RECENTS: 'project:get-recents',
   PROJECT_PEEK: 'project:peek',
+  STATS_WEEK_WORDS: 'stats:week-words',
   PROJECT_GET_STATE: 'project:get-state',
   PROJECT_SAVE_LAST_CHAPTER: 'project:save-last-chapter',
   PROJECT_GET_LAST_CHAPTER: 'project:get-last-chapter',

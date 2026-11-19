@@ -25,6 +25,7 @@ import { SnapshotManager } from './history/SnapshotManager'
 import { SearchEngine } from './search/SearchEngine'
 import { ParserFactory } from './import/parsers'
 import { ExportEngine, PdfExporter, EpubExporter, DocxExporter } from './export'
+import { writingLog } from './stats'
 import { streamInlineEdit, type InlineEditRequest } from './ai/inlineEdit'
 import Store from 'electron-store'
 
@@ -130,6 +131,8 @@ export function registerIPC(
 
   // ── Chapter Handlers ──────────────────────
 
+  ipcMain.handle(IPC.STATS_WEEK_WORDS, () => writingLog.weekTotal())
+
   ipcMain.handle(IPC.CHAPTER_READ, async (_event, args: { chapterId: string }) => {
     if (!projectManager.project) throw new Error('No project open')
     return projectManager.project.readChapter(args.chapterId)
@@ -139,10 +142,12 @@ export function registerIPC(
     IPC.CHAPTER_SAVE,
     async (_event, args: { chapterId: string; content: string }) => {
       if (!projectManager.project) throw new Error('No project open')
+      const before = projectManager.project.getChapterMeta(args.chapterId)?.wordCount ?? 0
       const wordCount = await projectManager.project.saveChapter(
         args.chapterId,
         args.content
       )
+      writingLog.record(wordCount - before)
       return { wordCount }
     }
   )
@@ -202,11 +207,16 @@ export function registerIPC(
     IPC.SECTION_SAVE,
     async (_event, args: { chapterId: string; sectionId: string; content: string }) => {
       if (!projectManager.project) throw new Error('No project open')
+      const before =
+        projectManager.project
+          .getChapterMeta(args.chapterId)
+          ?.sections?.find((s) => s.id === args.sectionId)?.wordCount ?? 0
       const wordCount = await projectManager.project.saveSection(
         args.chapterId,
         args.sectionId,
         args.content
       )
+      writingLog.record(wordCount - before)
       return { wordCount }
     }
   )
