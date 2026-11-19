@@ -1,5 +1,6 @@
 import { ipcMain, dialog, BrowserWindow, app } from 'electron'
 import path from 'path'
+import fs from 'fs'
 import { IPC } from '@shared/ipc-channels'
 import { setMainProcessLanguage } from './i18n'
 import { createMenu } from './menu'
@@ -19,7 +20,7 @@ import { keychain } from './ai/keychain'
 import { OpenRouterProvider } from './ai/providers/OpenRouterProvider'
 import { ImportPipeline } from './import/ImportPipeline'
 import { AgentSession } from './agent/Agent'
-import type { AgentQuestionResponse } from '@shared/types'
+import type { AgentQuestionResponse, ProjectPeek, BookManifest as PeekManifest } from '@shared/types'
 import { SnapshotManager } from './history/SnapshotManager'
 import { SearchEngine } from './search/SearchEngine'
 import { ParserFactory } from './import/parsers'
@@ -82,6 +83,34 @@ export function registerIPC(
 
   ipcMain.handle(IPC.PROJECT_GET_RECENTS, async () => {
     return projectManager.getRecentProjects()
+  })
+
+  ipcMain.handle(IPC.PROJECT_PEEK, async (_event, paths: string[]): Promise<ProjectPeek[]> => {
+    return Promise.all(
+      paths.map(async (p) => {
+        try {
+          const raw = await fs.promises.readFile(path.join(p, 'book.json'), 'utf-8')
+          const m = JSON.parse(raw) as PeekManifest
+          const words = m.chapters.reduce(
+            (sum, ch) =>
+              sum +
+              (ch.sections?.length
+                ? ch.sections.reduce((s, sec) => s + (sec.wordCount || 0), 0)
+                : ch.wordCount || 0),
+            0
+          )
+          return {
+            path: p,
+            exists: true,
+            chapters: m.chapters.length,
+            words,
+            targetWords: m.targets?.totalWords || 0
+          }
+        } catch {
+          return { path: p, exists: false, chapters: 0, words: 0, targetWords: 0 }
+        }
+      })
+    )
   })
 
   ipcMain.handle(IPC.PROJECT_GET_STATE, async () => {

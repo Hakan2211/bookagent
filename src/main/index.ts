@@ -57,6 +57,8 @@ app.whenReady().then(async () => {
     wc.on('console-message', (_e, _level, msg) => console.error('[renderer]', msg))
     wc.once('did-finish-load', async () => {
       const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+      // Background windows throttle CSS animations; freeze them at their end state.
+      await wc.insertCSS('*,*::before,*::after{animation-duration:0s!important;animation-delay:0s!important;transition:none!important}')
       await wait(1500)
       if (process.env.KITAPMI_OPEN) wc.send('menu:open-project', process.env.KITAPMI_OPEN)
       await wait(1500)

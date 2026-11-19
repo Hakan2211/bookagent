@@ -22,19 +22,20 @@ export function Button({
 
   const variants = {
     primary:
-      'bg-[var(--accent-primary)] text-[var(--text-on-accent)] shadow-[var(--elevation-1)] hover:bg-[var(--accent-primary-strong)] active:brightness-95 active:scale-[0.98]',
+      'bg-[var(--accent-primary)] text-[var(--text-on-accent)] hover:bg-[var(--accent-primary-strong)] active:scale-[0.98]',
     secondary:
-      'bg-[var(--bg-input)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--border-active)] shadow-[var(--shadow-xs)] hover:shadow-[var(--elevation-1)] active:scale-[0.98]',
+      'bg-transparent text-[var(--text-primary)] border border-[var(--border-strong)] hover:bg-[var(--bg-hover)] hover:border-[var(--text-tertiary)] active:scale-[0.98]',
     ghost:
       'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] active:scale-[0.98]',
     danger:
-      'bg-[var(--color-error)]/10 text-[var(--color-error)] hover:bg-[var(--color-error)]/20 border border-[var(--color-error)]/30 hover:border-[var(--color-error)]/50 active:scale-[0.98]'
+      'bg-transparent text-[var(--color-error)] border border-[var(--color-error)]/40 hover:bg-[var(--color-error)]/10 active:scale-[0.98]'
   }
 
+  // md/lg buttons speak in the book serif, like the mockups; sm stays UI-sans.
   const sizes = {
-    sm: 'h-9 px-3.5 text-[13px] gap-1.5 rounded-lg',
-    md: 'h-10 px-5 text-[14px] gap-2 rounded-xl',
-    lg: 'h-12 px-7 text-[15px] gap-2.5 rounded-xl font-semibold'
+    sm: 'h-8 px-3 text-[12.5px] gap-1.5 rounded-[var(--radius-sm)]',
+    md: 'h-10 px-5 text-[15px] gap-2 rounded-[var(--radius-md)] font-serif font-normal',
+    lg: 'h-11 px-7 text-[16px] gap-2.5 rounded-[var(--radius-md)] font-serif font-normal'
   }
 
   return (

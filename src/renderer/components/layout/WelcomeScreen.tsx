@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useProjectStore } from '../../stores/projectStore'
 import { useUIStore } from '../../stores/uiStore'
@@ -6,7 +6,10 @@ import { IPC } from '@shared/ipc-channels'
 import { formatDate } from '../../lib/formatters'
 import { Modal } from '../common/Modal'
 import { Button } from '../common/Button'
-import { Plus, FolderOpen, FileUp, Settings, BookOpen, Clock } from 'lucide-react'
+import { Plus, Settings } from 'lucide-react'
+import { BookCover } from '../library/BookCover'
+import { TitleBar } from './TitleBar'
+import type { ProjectPeek } from '@shared/types'
 
 export function WelcomeScreen() {
   const { t } = useTranslation(['welcome', 'common'])
@@ -23,6 +26,20 @@ export function WelcomeScreen() {
   const [manualPath, setManualPath] = useState(false)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [peeks, setPeeks] = useState<Record<string, ProjectPeek>>({})
+
+  // Read chapter/word stats for the library shelf.
+  useEffect(() => {
+    if (recentProjects.length === 0) return
+    window.api
+      .invoke(IPC.PROJECT_PEEK, recentProjects.map((p) => p.path))
+      .then((list) => {
+        const map: Record<string, ProjectPeek> = {}
+        for (const p of list as ProjectPeek[]) map[p.path] = p
+        setPeeks(map)
+      })
+      .catch(() => {})
+  }, [recentProjects])
 
   const handleNewBook = async () => {
     const basePath = (await window.api.invoke(IPC.APP_GET_DOCUMENTS_PATH)) as string
@@ -91,118 +108,139 @@ export function WelcomeScreen() {
     }
   }
 
+  const greetingKey = (() => {
+    const h = new Date().getHours()
+    if (h < 5) return 'welcome:greetingNight'
+    if (h < 12) return 'welcome:greetingMorning'
+    if (h < 18) return 'welcome:greetingAfternoon'
+    return 'welcome:greetingEvening'
+  })()
+  const firstName = recentProjects[0]?.author?.trim().split(/\s+/)[0]
+  const lastBook = recentProjects.find((p) => peeks[p.path]?.exists !== false)
+
   return (
-    <div
-      className="h-full flex items-center justify-center bg-[var(--bg-base)]"
-      style={{ backgroundImage: 'var(--gradient-hero)' }}
-    >
-      <div
-        className="text-center max-w-2xl w-full px-12"
-        style={{ animation: 'slide-up 500ms cubic-bezier(0.16, 1, 0.3, 1)' }}
-      >
-        {/* Brand */}
-        <div className="mb-16">
-          <h1 className="text-5xl font-bold tracking-tight mb-3">
-            <span className="text-gradient">{t('common:appName')}</span>
-          </h1>
-          <p className="text-base text-[var(--text-secondary)] font-medium">
-            {t('common:appTagline')}
-          </p>
-        </div>
+    <div className="h-full flex flex-col bg-[var(--bg-base)]">
+      <TitleBar />
 
-        {/* Action Cards */}
-        <div className="grid grid-cols-2 gap-5 mb-14">
-          <button
-            onClick={handleNewBook}
-            className="group p-7 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-active)] transition-all text-left hover:shadow-[var(--elevation-2)]"
-          >
-            <div className="w-11 h-11 rounded-xl bg-[var(--bg-hover)] flex items-center justify-center mb-4 group-hover:bg-[var(--bg-active)] transition-colors">
-              <Plus size={22} className="text-[var(--text-accent)]" />
-            </div>
-            <div className="text-base font-medium text-[var(--text-primary)]">
-              {t('welcome:newBook')}
-            </div>
-            <div className="text-sm text-[var(--text-secondary)] mt-1">
-              {t('welcome:newBookDesc')}
-            </div>
-          </button>
-
-          <button
-            onClick={handleOpenBook}
-            className="group p-7 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-active)] transition-all text-left hover:shadow-[var(--elevation-2)]"
-          >
-            <div className="w-11 h-11 rounded-xl bg-[var(--bg-hover)] flex items-center justify-center mb-4 group-hover:bg-[var(--bg-active)] transition-colors">
-              <FolderOpen size={22} className="text-[var(--color-success)]" />
-            </div>
-            <div className="text-base font-medium text-[var(--text-primary)]">
-              {t('welcome:openExisting')}
-            </div>
-            <div className="text-sm text-[var(--text-secondary)] mt-1">
-              {t('welcome:openExistingDesc')}
-            </div>
-          </button>
-
-          <button
-            onClick={openImportWizard}
-            className="group p-7 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-active)] transition-all text-left hover:shadow-[var(--elevation-2)]"
-          >
-            <div className="w-11 h-11 rounded-xl bg-[var(--bg-hover)] flex items-center justify-center mb-4 group-hover:bg-[var(--bg-active)] transition-colors">
-              <FileUp size={22} className="text-[var(--color-warning)]" />
-            </div>
-            <div className="text-base font-medium text-[var(--text-primary)]">
-              {t('welcome:importFile')}
-            </div>
-            <div className="text-sm text-[var(--text-secondary)] mt-1">
-              {t('welcome:importFileDesc')}
-            </div>
-          </button>
-
-          <button
-            onClick={() => openModal('settings')}
-            className="group p-7 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-active)] transition-all text-left hover:shadow-[var(--elevation-2)]"
-          >
-            <div className="w-11 h-11 rounded-xl bg-[var(--bg-hover)] flex items-center justify-center mb-4 group-hover:bg-[var(--bg-active)] transition-colors">
-              <Settings size={22} className="text-[var(--text-secondary)]" />
-            </div>
-            <div className="text-base font-medium text-[var(--text-primary)]">
-              {t('common:settings')}
-            </div>
-            <div className="text-sm text-[var(--text-secondary)] mt-1">
-              {t('welcome:settingsDesc')}
-            </div>
-          </button>
-        </div>
-
-        {/* Recent Projects */}
-        {recentProjects.length > 0 && (
-          <div className="text-left">
-            <div className="flex items-center gap-2.5 mb-4">
-              <Clock size={14} className="text-[var(--text-tertiary)]" />
-              <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)]">
-                {t('welcome:recentProjects')}
-              </h3>
-            </div>
-            <div className="space-y-1">
-              {recentProjects.map((project) => (
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <div
+          className="mx-auto w-full max-w-[920px] px-12 pt-10 pb-16"
+          style={{ animation: 'slide-up 500ms var(--ease-out-expo)' }}
+        >
+          {/* Greeting */}
+          <div className="text-center">
+            <h1 className="font-serif text-[44px] leading-tight text-[var(--text-primary)] tracking-[-0.01em]">
+              {firstName ? t(greetingKey, { name: firstName }) : t(greetingKey + 'Anon')}
+            </h1>
+            <p className="font-serif text-[17px] text-[var(--text-secondary)] mt-2">
+              {lastBook ? (
                 <button
-                  key={project.path}
-                  onClick={() => openProject(project.path)}
-                  className="w-full text-left px-4 py-4 rounded-xl hover:bg-[var(--bg-hover)] transition-all group flex items-center gap-4"
+                  onClick={() => openProject(lastBook.path)}
+                  className="hover:text-[var(--text-primary)] underline decoration-[var(--border-strong)] underline-offset-4 hover:decoration-[var(--accent-primary)]"
                 >
-                  <BookOpen size={16} className="text-[var(--text-tertiary)] shrink-0 group-hover:text-[var(--text-accent)]" />
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[15px] text-[var(--text-primary)] font-medium truncate">
-                      {project.title}
-                    </div>
-                    <div className="text-xs text-[var(--text-tertiary)] truncate mt-0.5">
-                      {project.path} — {formatDate(project.lastOpened)}
-                    </div>
-                  </div>
+                  {t('welcome:continueWith', { title: lastBook.title })}
                 </button>
-              ))}
+              ) : (
+                t('welcome:subtitleEmpty')
+              )}
+            </p>
+          </div>
+
+          {/* Actions */}
+          <div className="relative mt-9 flex items-center justify-center gap-3">
+            <Button variant="primary" onClick={handleNewBook} className="min-w-[150px]">
+              {t('welcome:newBook')}
+            </Button>
+            <Button variant="secondary" onClick={handleOpenBook}>
+              {t('welcome:openFolder')}
+            </Button>
+            <Button variant="secondary" onClick={openImportWizard}>
+              {t('welcome:importShort')}
+            </Button>
+            <button
+              onClick={() => openModal('settings')}
+              title={t('common:settings')}
+              className="absolute right-0 p-2 rounded-[var(--radius-md)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
+            >
+              <Settings size={20} strokeWidth={1.5} />
+            </button>
+          </div>
+
+          {/* Library */}
+          <div className="mt-14">
+            <div className="label-caps pb-2 border-b border-[var(--border)]">
+              {t('welcome:yourBooks')}
+            </div>
+
+            <div className="mt-8 grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-x-10 gap-y-12">
+              {recentProjects.map((project) => {
+                const peek = peeks[project.path]
+                const missing = peek && !peek.exists
+                const pct =
+                  peek && peek.targetWords > 0
+                    ? Math.min(100, Math.round((peek.words / peek.targetWords) * 100))
+                    : null
+                return (
+                  <button
+                    key={project.path}
+                    onClick={() => !missing && openProject(project.path)}
+                    title={project.path}
+                    className={`group flex flex-col items-center text-center ${missing ? 'opacity-45 cursor-default' : ''}`}
+                  >
+                    <div className="transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:-translate-y-1.5">
+                      <BookCover
+                        title={project.title}
+                        author={project.author ? t('welcome:byAuthor', { author: project.author }) : undefined}
+                        width={210}
+                      />
+                    </div>
+                    <div className="mt-4 font-serif text-[14.5px] text-[var(--text-secondary)] tabular">
+                      {missing ? (
+                        t('welcome:missing')
+                      ) : peek ? (
+                        <>
+                          {t('welcome:chapters', { count: peek.chapters })} ·{' '}
+                          {peek.words.toLocaleString()} {t('common:words')}{' '}
+                          · {formatDate(project.lastOpened)}
+                        </>
+                      ) : (
+                        formatDate(project.lastOpened)
+                      )}
+                    </div>
+                    {pct !== null && !missing && (
+                      <div className="mt-2 flex w-full max-w-[230px] items-center gap-3">
+                        <div className="h-[5px] flex-1 rounded-full bg-[var(--bg-active)] overflow-hidden">
+                          <div className="h-full rounded-full bg-[var(--accent-primary)]" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="font-serif text-[13px] text-[var(--text-tertiary)] tabular whitespace-nowrap">
+                          {t('welcome:percentOf', { pct, target: peek!.targetWords.toLocaleString() })}
+                        </span>
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
+
+              {/* New book placeholder */}
+              <button
+                onClick={handleNewBook}
+                className="group flex flex-col items-center"
+              >
+                <div
+                  className="flex flex-col items-center justify-center gap-3 rounded-[6px] border border-dashed border-[var(--border-strong)] text-[var(--text-secondary)] group-hover:border-[var(--accent-primary)] group-hover:text-[var(--text-primary)] transition-colors"
+                  style={{ width: 210, height: 223 }}
+                >
+                  <Plus size={30} strokeWidth={1.25} />
+                  <span className="font-serif text-[17px]">{t('welcome:startNewBook')}</span>
+                </div>
+              </button>
             </div>
           </div>
-        )}
+
+          {error && (
+            <div className="mt-8 text-sm text-[var(--color-error)] text-center">{error}</div>
+          )}
+        </div>
       </div>
 
       {/* New Book Modal */}
@@ -220,7 +258,7 @@ export function WelcomeScreen() {
               type="text"
               value={newBookTitle}
               onChange={(e) => handleTitleChange(e.target.value)}
-              className="w-full bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-xl px-4 py-3 text-[15px] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+              className="w-full bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-[var(--radius-md)] px-4 py-2.5 text-[15px] outline-none focus:border-[var(--border-active)] transition-all"
               placeholder={t('welcome:myNovel')}
               autoFocus
             />
@@ -234,7 +272,7 @@ export function WelcomeScreen() {
               type="text"
               value={newBookAuthor}
               onChange={(e) => setNewBookAuthor(e.target.value)}
-              className="w-full bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-xl px-4 py-3 text-[15px] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+              className="w-full bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-[var(--radius-md)] px-4 py-2.5 text-[15px] outline-none focus:border-[var(--border-active)] transition-all"
               placeholder={t('welcome:janeDoe')}
             />
           </div>
@@ -245,7 +283,7 @@ export function WelcomeScreen() {
             </label>
             <div className="flex gap-3">
               <div
-                className="flex-1 text-[15px] text-[var(--text-primary)] bg-[var(--bg-input)] rounded-xl px-4 py-3 border border-[var(--border)] truncate"
+                className="flex-1 text-[15px] text-[var(--text-primary)] bg-[var(--bg-input)] rounded-[var(--radius-md)] px-4 py-2.5 border border-[var(--border)] truncate"
                 title={newBookPath || ''}
               >
                 {newBookPath}

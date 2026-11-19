@@ -382,6 +382,15 @@ export type AgentEvent =
 
 // ─── UI Types ────────────────────────────────
 
+/** Lightweight stats read from a book.json without opening the project. */
+export interface ProjectPeek {
+  path: string
+  exists: boolean
+  chapters: number
+  words: number
+  targetWords: number
+}
+
 export interface RecentProject {
   path: string
   title: string
