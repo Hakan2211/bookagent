@@ -1,5 +1,28 @@
 import type { AIProvider, AIRequest, AIResponse, AIStreamChunk, ModelInfo, ToolDefinition } from '../types'
 import { AIError } from '../types'
+import { DEFAULT_MODEL, estimateCost, getModels } from '../models'
+import { reportAIUsage } from '../usage'
+
+interface OpenRouterUsage {
+  prompt_tokens?: number
+  completion_tokens?: number
+  /** Credits (USD) charged for this request. */
+  cost?: number
+}
+
+function report(model: string, usage: OpenRouterUsage | undefined): void {
+  if (!usage) return
+  const inputTokens = usage.prompt_tokens ?? 0
+  const outputTokens = usage.completion_tokens ?? 0
+  const hasCost = typeof usage.cost === 'number' && Number.isFinite(usage.cost)
+  reportAIUsage({
+    model,
+    inputTokens,
+    outputTokens,
+    cost: hasCost ? (usage.cost as number) : estimateCost(model, inputTokens, outputTokens),
+    estimated: !hasCost
+  })
+}
 
 const BASE_URL = 'https://openrouter.ai/api/v1'
 
@@ -8,7 +31,7 @@ export class OpenRouterProvider implements AIProvider {
 
   constructor(
     private apiKey: string,
-    private model: string = 'anthropic/claude-sonnet-4.6'
+    private model: string = DEFAULT_MODEL
   ) {}
 
   setApiKey(key: string): void {
@@ -19,9 +42,18 @@ export class OpenRouterProvider implements AIProvider {
     this.model = model
   }
 
+  getModel(): string {
+    return this.model
+  }
+
+  /** A provider sharing this key but using a different model. */
+  withModel(model: string): OpenRouterProvider {
+    return new OpenRouterProvider(this.apiKey, model || this.model)
+  }
+
   async complete(request: AIRequest): Promise<AIResponse> {
     const body: Record<string, unknown> = {
-      model: this.model,
+      model: request.model || this.model,
       max_tokens: request.maxTokens ?? 4096,
       messages: [
         { role: 'system', content: request.systemPrompt },
@@ -97,10 +129,11 @@ export class OpenRouterProvider implements AIProvider {
         }
         finish_reason: string
       }>
-      usage: { prompt_tokens: number; completion_tokens: number }
+      usage: OpenRouterUsage & { prompt_tokens: number; completion_tokens: number }
       model: string
     }
 
+    report(request.model || this.model, data.usage)
     const choice = data.choices[0]
 
     return {
@@ -128,9 +161,10 @@ export class OpenRouterProvider implements AIProvider {
 
   async *stream(request: AIRequest): AsyncIterable<AIStreamChunk> {
     const body: Record<string, unknown> = {
-      model: this.model,
+      model: request.model || this.model,
       max_tokens: request.maxTokens ?? 4096,
       stream: true,
+      stream_options: { include_usage: true },
       messages: [
         { role: 'system', content: request.systemPrompt },
         ...request.messages.map((m) => {
@@ -217,6 +251,7 @@ export class OpenRouterProvider implements AIProvider {
 
           try {
             const data = JSON.parse(jsonStr) as {
+              usage?: OpenRouterUsage
               choices: Array<{
                 finish_reason?: string
                 delta: {
@@ -230,7 +265,8 @@ export class OpenRouterProvider implements AIProvider {
               }>
             }
 
-            const choice = data.choices[0]
+            if (data.usage) report(request.model || this.model, data.usage)
+            const choice = data.choices?.[0]
             if (choice?.finish_reason) finishReason = choice.finish_reason
             const delta = choice?.delta
             if (delta?.content) {
@@ -289,98 +325,6 @@ export class OpenRouterProvider implements AIProvider {
   }
 
   getModels(): ModelInfo[] {
-    return [
-      {
-        id: 'anthropic/claude-sonnet-4.6',
-        name: 'Claude Sonnet 4.6',
-        contextWindow: 1000000,
-        supportsTools: true,
-        supportsStreaming: true
-      },
-      {
-        id: 'anthropic/claude-opus-4.6',
-        name: 'Claude Opus 4.6',
-        contextWindow: 1000000,
-        supportsTools: true,
-        supportsStreaming: true
-      },
-      {
-        id: 'openai/gpt-5.2',
-        name: 'GPT-5.2',
-        contextWindow: 400000,
-        supportsTools: true,
-        supportsStreaming: true
-      },
-      {
-        id: 'openai/gpt-5.2-pro',
-        name: 'GPT-5.2 Pro',
-        contextWindow: 400000,
-        supportsTools: true,
-        supportsStreaming: true
-      },
-      {
-        id: 'openai/gpt-5.2-chat',
-        name: 'GPT-5.2 Chat',
-        contextWindow: 128000,
-        supportsTools: true,
-        supportsStreaming: true
-      },
-      {
-        id: 'google/gemini-3-pro-preview',
-        name: 'Gemini 3 Pro Preview',
-        contextWindow: 1048576,
-        supportsTools: true,
-        supportsStreaming: true
-      },
-      {
-        id: 'google/gemini-3-flash-preview',
-        name: 'Gemini 3 Flash Preview',
-        contextWindow: 1048576,
-        supportsTools: true,
-        supportsStreaming: true
-      },
-      {
-        id: 'deepseek/deepseek-v3.2',
-        name: 'DeepSeek V3.2',
-        contextWindow: 163840,
-        supportsTools: true,
-        supportsStreaming: true
-      },
-      {
-        id: 'deepseek/deepseek-v3.2-speciale',
-        name: 'DeepSeek V3.2 Speciale',
-        contextWindow: 163840,
-        supportsTools: true,
-        supportsStreaming: true
-      },
-      {
-        id: 'x-ai/grok-4.1-fast',
-        name: 'Grok 4.1 Fast',
-        contextWindow: 2000000,
-        supportsTools: true,
-        supportsStreaming: true
-      },
-      {
-        id: 'moonshotai/kimi-k2.5',
-        name: 'Kimi K2.5',
-        contextWindow: 262144,
-        supportsTools: true,
-        supportsStreaming: true
-      },
-      {
-        id: 'minimax/minimax-m2.5',
-        name: 'MiniMax M2.5',
-        contextWindow: 196608,
-        supportsTools: true,
-        supportsStreaming: true
-      },
-      {
-        id: 'z-ai/glm-5',
-        name: 'GLM 5',
-        contextWindow: 204800,
-        supportsTools: true,
-        supportsStreaming: true
-      }
-    ]
+    return getModels()
   }
 }

@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../common/Button'
-import { Dropdown } from '../common/Dropdown'
+import { ModelPicker } from '../common/ModelPicker'
 import { IPC } from '@shared/ipc-channels'
 import type { ModelInfo } from '@shared/types'
 import { CheckCircle2, AlertCircle, Info } from 'lucide-react'
-import { useProjectStore } from '../../stores/projectStore'
+import { selectUtilityModel, selectWritingModel } from '../../lib/models'
 import { useUIStore } from '../../stores/uiStore'
+import { useUsageStore } from '../../stores/usageStore'
 
 export function AIProviderConfig() {
   const { t } = useTranslation(['settings', 'common'])
   const [openrouterKey, setOpenrouterKey] = useState('')
   const [openrouterHasKey, setOpenrouterHasKey] = useState(false)
-  const [openrouterModel, setOpenrouterModel] = useState('google/gemini-3-flash-preview')
+  const [openrouterModel, setOpenrouterModel] = useState('')
+  const [utilityModel, setUtilityModel] = useState('')
   const [openrouterModels, setOpenrouterModels] = useState<ModelInfo[]>([])
   const [isValidating, setIsValidating] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
@@ -30,6 +32,7 @@ export function AIProviderConfig() {
 
     const settings = (await window.api.invoke(IPC.SETTINGS_GET)) as Record<string, any>
     if (settings.openrouterModel) setOpenrouterModel(settings.openrouterModel)
+    if (settings.openrouterUtilityModel) setUtilityModel(settings.openrouterUtilityModel)
   }
 
   const loadModels = async () => {
@@ -56,6 +59,7 @@ export function AIProviderConfig() {
         setOpenrouterKey('')
         // Refresh status bar connectivity immediately
         useUIStore.getState().checkApiStatus()
+        void useUsageStore.getState().refreshCredits()
       } else {
         setStatus(t('settings:ai.invalidKey', { provider: 'OpenRouter' }))
       }
@@ -68,22 +72,12 @@ export function AIProviderConfig() {
 
   const handleModelChange = async (model: string) => {
     setOpenrouterModel(model)
-    await window.api.invoke(IPC.SETTINGS_SET, { openrouterModel: model })
+    await selectWritingModel(model)
+  }
 
-    // Also update the open project's AI config
-    const projectState = useProjectStore.getState()
-    if (projectState.isOpen && projectState.manifest) {
-      await window.api.invoke(IPC.PROJECT_UPDATE_SETTINGS, {
-        aiProvider: 'openrouter',
-        aiModel: model
-      })
-      projectState.updateManifest({
-        ai: { provider: 'openrouter' as any, model, keyRef: 'kitapmi-openrouter-key' }
-      })
-    }
-
-    // Instantly update the status bar model name
-    useUIStore.getState().refreshModelName('openrouter', model)
+  const handleUtilityModelChange = async (model: string) => {
+    setUtilityModel(model)
+    await selectUtilityModel(model)
   }
 
   const isStatusError = status?.includes('Error') || status?.includes('Invalid')
@@ -137,12 +131,21 @@ export function AIProviderConfig() {
           </Button>
         </div>
 
-        <Dropdown
-          options={openrouterModels.map((m) => ({ value: m.id, label: m.name }))}
-          value={openrouterModel}
-          onChange={(v) => handleModelChange(v)}
-          placeholder={t('settings:ai.selectModel')}
-        />
+        {openrouterModel && openrouterModels.length > 0 && (
+          <div className="space-y-1.5">
+            <label className="block label-caps">{t('settings:ai.writingModel')}</label>
+            <ModelPicker models={openrouterModels} value={openrouterModel} onChange={handleModelChange} />
+            <p className="text-[12px] text-[var(--text-tertiary)]">{t('settings:ai.writingModelDesc')}</p>
+          </div>
+        )}
+
+        {utilityModel && openrouterModels.length > 0 && (
+          <div className="space-y-1.5">
+            <label className="block label-caps">{t('settings:ai.utilityModel')}</label>
+            <ModelPicker models={openrouterModels} value={utilityModel} onChange={handleUtilityModelChange} />
+            <p className="text-[12px] text-[var(--text-tertiary)]">{t('settings:ai.utilityModelDesc')}</p>
+          </div>
+        )}
 
         <p className="flex items-center gap-2 font-serif text-[14px] text-[var(--text-secondary)]">
           <Info size={14} strokeWidth={1.5} className="shrink-0" />

@@ -16,7 +16,11 @@
     "invalidKey": "Ungültiger {{provider}} API-Schlüssel",
     "keySavedPlaceholder": "Schlüssel gespeichert (neuen eingeben zum Ersetzen)",
     "selectModel": "Modell auswählen",
-    "privacyNote": "Dein Text wird nur gesendet, wenn du den Lektor fragst."
+    "privacyNote": "Dein Text wird nur gesendet, wenn du den Lektor fragst.",
+    "writingModel": "Schreibmodell",
+    "writingModelDesc": "Für Chat, Agent und Inline-Bearbeitungen.",
+    "utilityModel": "Hintergrundmodell",
+    "utilityModelDesc": "Für den Manuskript-Import und das Verstehen von Anfragen. Ein günstigeres Modell reicht hier."
   },
   "style": {
     "genre": "Genre",

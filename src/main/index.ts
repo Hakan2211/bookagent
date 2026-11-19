@@ -11,11 +11,31 @@ import { SnapshotManager } from './history/SnapshotManager'
 import { SearchEngine } from './search/SearchEngine'
 import Store from 'electron-store'
 import { initUpdater } from './updater'
+import { DEFAULT_MODEL, DEFAULT_UTILITY_MODEL, refreshPricing, resolveModel } from './ai/models'
+import { onAIUsage, setUtilityModel } from './ai/usage'
+import { IPC } from '@shared/ipc-channels'
 
 const settingsStore = new Store({
   defaults: {
-    openrouterModel: 'google/gemini-3-flash-preview'
+    openrouterModel: DEFAULT_MODEL,
+    openrouterUtilityModel: DEFAULT_UTILITY_MODEL
   }
+})
+
+// Retired or unknown model ids fall back to the current defaults.
+settingsStore.set(
+  'openrouterModel',
+  resolveModel(settingsStore.get('openrouterModel') as string, DEFAULT_MODEL)
+)
+settingsStore.set(
+  'openrouterUtilityModel',
+  resolveModel(settingsStore.get('openrouterUtilityModel') as string, DEFAULT_UTILITY_MODEL)
+)
+setUtilityModel(settingsStore.get('openrouterUtilityModel') as string)
+
+// Tell every window what each AI request cost.
+onAIUsage((event) => {
+  for (const win of BrowserWindow.getAllWindows()) win.webContents.send(IPC.AI_USAGE, event)
 })
 
 const projectManager = new ProjectManager()
@@ -27,6 +47,9 @@ const searchEngine = new SearchEngine()
 app.whenReady().then(async () => {
   // Set app user model id for Windows
   app.setAppUserModelId('com.kitapmi.app')
+
+  // Refresh model prices in the background; the built-in list is the fallback.
+  void refreshPricing()
 
   // Initialize OpenRouter provider from stored key
   try {

@@ -10,6 +10,7 @@ import { Plus, Settings } from 'lucide-react'
 import { BookCover } from '../library/BookCover'
 import { TitleBar } from './TitleBar'
 import type { ProjectPeek } from '@shared/types'
+import { DEFAULT_MODEL } from '@shared/defaultModels'
 
 export function WelcomeScreen() {
   const { t, i18n } = useTranslation(['welcome', 'common'])
@@ -88,7 +89,7 @@ export function WelcomeScreen() {
       const settings = (await window.api.invoke(IPC.SETTINGS_GET)) as Record<string, any>
 
       const aiProvider = 'openrouter' as const
-      const aiModel = settings.openrouterModel || 'google/gemini-3-flash-preview'
+      const aiModel = settings.openrouterModel || DEFAULT_MODEL
 
       const createProject = useProjectStore.getState().createProject
       await createProject(newBookPath, {

@@ -6,6 +6,8 @@ import { useChatStore } from '../../stores/chatStore'
 import { useUIStore } from '../../stores/uiStore'
 import type { ApiStatusState } from '../../stores/uiStore'
 import { Check } from 'lucide-react'
+import { useUsageStore } from '../../stores/usageStore'
+import { formatCost } from '../../lib/cost'
 
 const STATUS_CHECK_INTERVAL = 30_000
 
@@ -21,7 +23,6 @@ export function StatusBar() {
   const apiModelName = useUIStore((s) => s.apiModelName)
   const apiProvider = useUIStore((s) => s.apiProvider)
   const checkApiStatus = useUIStore((s) => s.checkApiStatus)
-  const refreshModelName = useUIStore((s) => s.refreshModelName)
   const language = useUIStore((s) => s.language)
   const setLanguage = useUIStore((s) => s.setLanguage)
 
@@ -39,15 +40,9 @@ export function StatusBar() {
   }
   const sessionWords = sessionBase.current ? totalWords - sessionBase.current.words : 0
 
-  // On mount: immediately show model name from manifest (no network),
-  // then start background connectivity check
-  const manifestProvider = manifest?.ai?.provider
-  const manifestModel = manifest?.ai?.model
-  useEffect(() => {
-    if (manifestProvider && manifestModel) {
-      refreshModelName(manifestProvider, manifestModel)
-    }
-  }, [manifestProvider, manifestModel, refreshModelName])
+  // AI spend this app session and what's left on the OpenRouter account.
+  const sessionCost = useUsageStore((s) => s.sessionCost)
+  const creditsRemaining = useUsageStore((s) => s.creditsRemaining)
 
   // Poll API connectivity in the background on mount and every 30s
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -126,6 +121,19 @@ export function StatusBar() {
       </div>
 
       <div className="flex items-center justify-end gap-4">
+        {/* AI spend */}
+        {(sessionCost > 0 || creditsRemaining !== null) && (
+          <div className="flex items-center gap-1.5 text-[var(--text-tertiary)]" title={t('common:costTooltip')}>
+            {sessionCost > 0 && <span>{t('common:sessionCost', { cost: formatCost(sessionCost, language) })}</span>}
+            {sessionCost > 0 && creditsRemaining !== null && <span aria-hidden>·</span>}
+            {creditsRemaining !== null && (
+              <span className={creditsRemaining < 1 ? 'text-[var(--color-warning)]' : undefined}>
+                {t('common:creditsLeft', { cost: formatCost(creditsRemaining, language) })}
+              </span>
+            )}
+          </div>
+        )}
+
         {/* API status */}
         <div className="flex items-center gap-1.5">
           <span className="max-w-[180px] truncate">{statusLabel}</span>

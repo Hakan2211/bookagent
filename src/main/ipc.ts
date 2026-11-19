@@ -10,6 +10,7 @@ import type {
   ImportConfig,
   ConfirmedChapter,
   AppSettings,
+  AICredits,
   ExportConfig,
   AIProviderName
 } from '@shared/types'
@@ -26,12 +27,15 @@ import { SearchEngine } from './search/SearchEngine'
 import { ParserFactory } from './import/parsers'
 import { ExportEngine, PdfExporter, EpubExporter, DocxExporter } from './export'
 import { writingLog } from './stats'
+import { DEFAULT_MODEL, DEFAULT_UTILITY_MODEL, findModel, getModels, resolveModel } from './ai/models'
+import { getUtilityModel, setUtilityModel } from './ai/usage'
 import { streamInlineEdit, type InlineEditRequest } from './ai/inlineEdit'
 import Store from 'electron-store'
 
 const settingsStore = new Store<AppSettings>({
   defaults: {
-    openrouterModel: 'google/gemini-3-flash-preview',
+    openrouterModel: DEFAULT_MODEL,
+    openrouterUtilityModel: DEFAULT_UTILITY_MODEL,
     theme: 'dark',
     sidebarWidth: 220,
     chatPanelWidth: 350,
@@ -301,7 +305,7 @@ export function registerIPC(
       if (!provider) throw new Error('No AI provider configured. Please add an API key in settings.')
       
       const ai = aiRegistry.get(provider)
-      const pipeline = new ImportPipeline(ai)
+      const pipeline = new ImportPipeline(ai.withModel?.(getUtilityModel()) ?? ai)
       
       const win = BrowserWindow.getFocusedWindow()
       const result = await pipeline.execute(args.filePath, args.config, (step, percent) => {
@@ -327,7 +331,7 @@ export function registerIPC(
       if (!provider) throw new Error('No AI provider configured')
       
       const ai = aiRegistry.get(provider)
-      const pipeline = new ImportPipeline(ai)
+      const pipeline = new ImportPipeline(ai.withModel?.(getUtilityModel()) ?? ai)
       
       const manifest = await pipeline.confirmAndCreate(
         args.projectPath,
@@ -584,9 +588,54 @@ export function registerIPC(
   })
 
   ipcMain.handle(IPC.SETTINGS_SET, async (_event, args: Partial<AppSettings>) => {
+    if (args.openrouterModel !== undefined) {
+      args.openrouterModel = resolveModel(args.openrouterModel, DEFAULT_MODEL)
+    }
+    if (args.openrouterUtilityModel !== undefined) {
+      args.openrouterUtilityModel = resolveModel(args.openrouterUtilityModel, DEFAULT_UTILITY_MODEL)
+    }
     for (const [key, value] of Object.entries(args)) {
       settingsStore.set(key as keyof AppSettings, value as any)
     }
+    // Apply model changes to the live provider right away (not just after a restart).
+    if (args.openrouterModel && aiRegistry.has('openrouter')) {
+      const provider = aiRegistry.get('openrouter') as OpenRouterProvider
+      provider.setModel(args.openrouterModel)
+    }
+    if (args.openrouterUtilityModel) setUtilityModel(args.openrouterUtilityModel)
+  })
+
+  ipcMain.handle(IPC.AI_GET_CREDITS, async (): Promise<AICredits> => {
+    const apiKey = await keychain.getKey('openrouter').catch(() => null)
+    if (!apiKey) return { remaining: null }
+    const headers = { Authorization: `Bearer ${apiKey}` }
+    try {
+      // Account balance (all keys).
+      const res = await fetch('https://openrouter.ai/api/v1/credits', {
+        headers,
+        signal: AbortSignal.timeout(8_000)
+      })
+      if (res.ok) {
+        const body = (await res.json()) as { data?: { total_credits?: number; total_usage?: number } }
+        const { total_credits, total_usage } = body.data ?? {}
+        if (typeof total_credits === 'number' && typeof total_usage === 'number') {
+          return { remaining: Math.max(0, total_credits - total_usage) }
+        }
+      }
+      // Fallback: the spending limit left on this key, if it has one.
+      const keyRes = await fetch('https://openrouter.ai/api/v1/key', {
+        headers,
+        signal: AbortSignal.timeout(8_000)
+      })
+      if (keyRes.ok) {
+        const body = (await keyRes.json()) as { data?: { limit_remaining?: number | null } }
+        const left = body.data?.limit_remaining
+        if (typeof left === 'number') return { remaining: Math.max(0, left) }
+      }
+    } catch {
+      /* offline — unknown */
+    }
+    return { remaining: null }
   })
 
   ipcMain.handle(
@@ -622,7 +671,7 @@ export function registerIPC(
     IPC.SETTINGS_GET_MODELS,
     async (_event, args: { provider: string }) => {
       if (args.provider === 'openrouter') {
-        return new OpenRouterProvider('').getModels()
+        return getModels()
       }
       return []
     }
@@ -643,9 +692,8 @@ export function registerIPC(
             connected = true
             activeProvider = 'openrouter'
 
-            // Get model from project or settings
-            const projectModel = projectManager.project?.manifest.ai.model
-            activeModel = projectModel || (settingsStore.get('openrouterModel') as string)
+            // The model actually used for requests is the app-wide setting.
+            activeModel = settingsStore.get('openrouterModel') as string
           }
         }
       } catch {
@@ -658,8 +706,7 @@ export function registerIPC(
     // Look up a friendly model name
     let modelName = activeModel
     if (connected && activeModel) {
-      const modelList = new OpenRouterProvider('').getModels()
-      const found = modelList.find((m) => m.id === activeModel)
+      const found = findModel(activeModel)
       if (found) modelName = found.name
     }
 

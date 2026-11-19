@@ -3,6 +3,7 @@ import path from 'path'
 import Store from 'electron-store'
 import type { BookManifest, BookMetadata, RecentProject } from '@shared/types'
 import { BookProject } from './BookProject'
+import { DEFAULT_MODEL } from '@shared/defaultModels'
 
 const store = new Store<{ recentProjects: RecentProject[] }>({
   defaults: {
@@ -57,7 +58,7 @@ export class ProjectManager {
       },
       ai: {
         provider: metadata.aiProvider || 'anthropic',
-        model: metadata.aiModel || 'claude-sonnet-4-5-20250929',
+        model: metadata.aiModel || DEFAULT_MODEL,
         keyRef: `kitapmi-${metadata.aiProvider || 'anthropic'}-key`
       },
       imports: []

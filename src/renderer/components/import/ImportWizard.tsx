@@ -10,6 +10,7 @@ import { LoadingSpinner } from '../common/LoadingSpinner'
 import { useUIStore } from '../../stores/uiStore'
 import { useProjectStore } from '../../stores/projectStore'
 import { IPC } from '@shared/ipc-channels'
+import { DEFAULT_MODEL } from '@shared/defaultModels'
 import type { ProposedSplit, BookMetadata } from '@shared/types'
 import { ArrowLeft, Check, Download } from 'lucide-react'
 
@@ -107,11 +108,12 @@ export function ImportWizard() {
         return
       }
 
+      const settings = (await window.api.invoke(IPC.SETTINGS_GET)) as { openrouterModel?: string }
       const metadata: BookMetadata = {
         title: title || t('import:untitledBook'),
         author: author || t('import:unknownAuthor'),
         aiProvider: 'openrouter',
-        aiModel: 'google/gemini-3-flash-preview',
+        aiModel: settings.openrouterModel || DEFAULT_MODEL,
         sourceFile: filePath,
         detectedGenre: proposedSplit.detectedGenre,
         detectedPOV: proposedSplit.detectedPOV,

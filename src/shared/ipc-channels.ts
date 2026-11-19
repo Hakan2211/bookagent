@@ -74,6 +74,8 @@ export const IPC = {
   SETTINGS_GET_API_KEY_STATUS: 'settings:get-api-key-status',
   SETTINGS_GET_MODELS: 'settings:get-models',
   SETTINGS_CHECK_API_STATUS: 'settings:check-api-status',
+  AI_USAGE: 'ai:usage',
+  AI_GET_CREDITS: 'ai:get-credits',
 
   // ── Project Settings ───────────────────────
   PROJECT_UPDATE_SETTINGS: 'project:update-settings',

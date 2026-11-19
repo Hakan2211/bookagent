@@ -5,6 +5,7 @@ import type {
   AgentPhase,
   AgentQuestion,
   AgentQuestionResponse,
+  AIUsageEvent,
   AgentPlan,
   PlanStep
 } from '@shared/types'
@@ -265,6 +266,20 @@ export const useChatStore = create<ChatState>((set, get) => ({
       get().setAgentError(data.error)
     })
 
+    // Attribute AI spend to the reply the agent is working on.
+    const unsubUsage = window.api.on(IPC.AI_USAGE, (event: unknown) => {
+      const { cost } = event as AIUsageEvent
+      set((state) => {
+        const i = state.messages.length - 1
+        const last = state.messages[i]
+        if (!last || last.role !== 'assistant') return state
+        if (!state.isAgentWorking && last.status !== 'streaming') return state
+        const messages = [...state.messages]
+        messages[i] = { ...last, cost: (last.cost ?? 0) + cost }
+        return { messages }
+      })
+    })
+
     const unsubPlan = window.api.on(IPC.AGENT_PLAN, (data: any) => {
       get().addToolActivity(data.plan)
     })
@@ -297,6 +312,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     })
 
     return () => {
+      unsubUsage()
       unsubStream()
       unsubDone()
       unsubError()

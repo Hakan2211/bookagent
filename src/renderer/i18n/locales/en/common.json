@@ -61,5 +61,28 @@
   "sessionWords": "Session: {{words}} words",
   "library": "Back to library",
   "toggleSidebar": "Toggle chapters (Ctrl+B)",
-  "toggleEditor": "Toggle editor panel"
+  "toggleEditor": "Toggle editor panel",
+  "costOfReply": "What this reply cost on OpenRouter",
+  "costTooltip": "AI spend since Kitapmi started, and the credit left on your OpenRouter account",
+  "sessionCost": "{{cost}} this session",
+  "creditsLeft": "{{cost}} left",
+  "models": {
+    "perMillion": "per 1M tokens",
+    "pricingNote": "Prices are input / output per million tokens (about 750k words). A typical chapter edit uses about 15k in and 4k out.",
+    "tier": {
+      "best": "Best",
+      "strong": "Strong",
+      "everyday": "Everyday",
+      "budget": "Budget"
+    },
+    "strength": {
+      "deepest": "Deepest thinking, finest prose",
+      "prose": "Natural, literary prose",
+      "reasoning": "Strong reasoning and planning",
+      "balanced": "Well-rounded, reliable",
+      "longContext": "Great with long manuscripts",
+      "fast": "Fast and inexpensive",
+      "cheap": "Very cheap, good for drafts"
+    }
+  }
 }

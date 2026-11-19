@@ -118,9 +118,13 @@ export interface AIProvider {
   stream(request: AIRequest): AsyncIterable<AIStreamChunk>
   validateKey(apiKey: string): Promise<boolean>
   getModels(): ModelInfo[]
+  /** Same credentials, different model (used for cheaper background work). */
+  withModel?(model: string): AIProvider
 }
 
 export interface AIRequest {
+  /** Override the provider's model for this request. */
+  model?: string
   systemPrompt: string
   messages: ChatMessageData[]
   tools?: ToolDefinition[]
@@ -155,12 +159,49 @@ export interface AIStreamChunk {
   finishReason?: 'end_turn' | 'tool_use' | 'max_tokens' | 'stop'
 }
 
+export type ModelTier = 'best' | 'strong' | 'everyday' | 'budget'
+
+/** What a model is good at — an i18n key under `models.strength.*`. */
+export type ModelStrength =
+  | 'deepest'
+  | 'prose'
+  | 'reasoning'
+  | 'balanced'
+  | 'longContext'
+  | 'fast'
+  | 'cheap'
+
+export interface ModelPricing {
+  /** USD per 1M input tokens */
+  input: number
+  /** USD per 1M output tokens */
+  output: number
+}
+
 export interface ModelInfo {
   id: string
   name: string
   contextWindow: number
   supportsTools: boolean
   supportsStreaming: boolean
+  tier: ModelTier
+  strength: ModelStrength
+  pricing: ModelPricing
+}
+
+/** One billed AI request, reported by the main process after it finishes. */
+export interface AIUsageEvent {
+  model: string
+  inputTokens: number
+  outputTokens: number
+  /** USD actually charged (from OpenRouter), or an estimate from list prices. */
+  cost: number
+  estimated: boolean
+}
+
+export interface AICredits {
+  /** USD left, or null when the key has no limit and the account balance is unknown. */
+  remaining: number | null
 }
 
 // ─── Tool Types ──────────────────────────────
@@ -402,6 +443,8 @@ export interface RecentProject {
 
 export interface AppSettings {
   openrouterModel: string
+  /** Cheaper model for import analysis and intent classification. */
+  openrouterUtilityModel: string
   theme: 'dark' | 'light'
   sidebarWidth: number
   chatPanelWidth: number
@@ -434,6 +477,8 @@ export interface ChatMessage {
   content: string
   timestamp: string
   status: 'complete' | 'streaming' | 'error'
+  /** USD spent on AI requests while producing this reply. */
+  cost?: number
   plan?: string
   pendingActions?: PendingAction[]
 }

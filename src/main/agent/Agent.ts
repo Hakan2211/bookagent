@@ -15,6 +15,7 @@ import type { BookProject } from '../project/BookProject'
 import { ContextAssembler } from './context/ContextAssembler'
 import { detectTargetChapters } from './context/ChapterDetector'
 import { IntentClassifier } from './IntentClassifier'
+import { getUtilityModel } from '../ai/usage'
 import { buildSystemPrompt, buildExecutionSystemPrompt } from './prompts/system'
 import { buildQuestioningPrompt } from './prompts/questioning'
 import { AGENT_TOOLS } from './tools'
@@ -47,7 +48,7 @@ export class AgentSession {
     private ai: AIProvider,
     private project: BookProject
   ) {
-    this.intentClassifier = new IntentClassifier(ai)
+    this.intentClassifier = new IntentClassifier(ai.withModel?.(getUtilityModel()) ?? ai)
   }
 
   /**

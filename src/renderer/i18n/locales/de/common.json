@@ -61,5 +61,28 @@
   "sessionWords": "Sitzung: {{words}} Wörter",
   "library": "Zur Bibliothek",
   "toggleSidebar": "Kapitel ein/aus (Strg+B)",
-  "toggleEditor": "Lektor-Panel ein/aus"
+  "toggleEditor": "Lektor-Panel ein/aus",
+  "costOfReply": "Was diese Antwort bei OpenRouter gekostet hat",
+  "costTooltip": "KI-Kosten seit dem Start von Kitapmi und das verbleibende Guthaben auf deinem OpenRouter-Konto",
+  "sessionCost": "{{cost}} in dieser Sitzung",
+  "creditsLeft": "{{cost}} übrig",
+  "models": {
+    "perMillion": "pro 1 Mio. Tokens",
+    "pricingNote": "Preise für Eingabe / Ausgabe pro Million Tokens (etwa 750.000 Wörter). Eine typische Kapitelüberarbeitung braucht etwa 15k Eingabe und 4k Ausgabe.",
+    "tier": {
+      "best": "Spitzenklasse",
+      "strong": "Stark",
+      "everyday": "Alltag",
+      "budget": "Günstig"
+    },
+    "strength": {
+      "deepest": "Tiefstes Denken, feinste Prosa",
+      "prose": "Natürliche, literarische Prosa",
+      "reasoning": "Starkes Denken und Planen",
+      "balanced": "Ausgewogen und zuverlässig",
+      "longContext": "Stark bei langen Manuskripten",
+      "fast": "Schnell und günstig",
+      "cheap": "Sehr günstig, gut für Entwürfe"
+    }
+  }
 }

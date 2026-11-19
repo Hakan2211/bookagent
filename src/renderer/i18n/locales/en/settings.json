@@ -16,7 +16,11 @@
     "invalidKey": "Invalid {{provider}} API key",
     "keySavedPlaceholder": "Key saved (enter new to replace)",
     "selectModel": "Select model",
-    "privacyNote": "Your text is only sent when you ask the editor."
+    "privacyNote": "Your text is only sent when you ask the editor.",
+    "writingModel": "Writing model",
+    "writingModelDesc": "Used for chat, the agent and inline edits.",
+    "utilityModel": "Background model",
+    "utilityModelDesc": "Used for importing manuscripts and understanding requests. A cheaper model works well here."
   },
   "style": {
     "genre": "Genre",

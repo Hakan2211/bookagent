@@ -1,6 +1,8 @@
 import React from 'react'
 import type { ChatMessage as ChatMessageType } from '@shared/types'
 import { formatTimestamp } from '../../lib/formatters'
+import { formatCost } from '../../lib/cost'
+import { useTranslation } from 'react-i18next'
 import { useChatStore } from '../../stores/chatStore'
 import { User, AlertCircle, Loader2, Check } from 'lucide-react'
 import { Monogram } from './Monogram'
@@ -18,6 +20,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
   const isStreaming = message.status === 'streaming'
   const isError = message.status === 'error'
   const toolActivity = useChatStore((s) => s.toolActivity)
+  const { t } = useTranslation('common')
 
   if (isUser) {
     return (
@@ -73,8 +76,15 @@ export function ChatMessage({ message }: ChatMessageProps) {
           </div>
         )}
 
-        <div className="mt-1 text-[11px] text-[var(--text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity">
-          {formatTimestamp(message.timestamp)}
+        <div className="mt-1 flex items-center gap-2 text-[11px] text-[var(--text-tertiary)]">
+          {!isStreaming && message.cost !== undefined && message.cost > 0 && (
+            <span className="tabular-nums" title={t('common:costOfReply')}>
+              {formatCost(message.cost)}
+            </span>
+          )}
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity">
+            {formatTimestamp(message.timestamp)}
+          </span>
         </div>
       </div>
     </div>

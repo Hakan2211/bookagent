@@ -9,7 +9,9 @@ import { useProjectStore } from './stores/projectStore'
 import { useUIStore } from './stores/uiStore'
 import { useEditorStore } from './stores/editorStore'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
-import type { ExportFormat } from '@shared/types'
+import type { AIUsageEvent, ExportFormat } from '@shared/types'
+import { IPC } from '@shared/ipc-channels'
+import { useUsageStore } from './stores/usageStore'
 
 export function App() {
   const isOpen = useProjectStore((s) => s.isOpen)
@@ -30,6 +32,13 @@ export function App() {
   useEffect(() => {
     loadRecents()
   }, [loadRecents])
+
+  // Track AI spend for the whole app session (chat, inline edits, import).
+  useEffect(() => {
+    const { addUsage, refreshCredits } = useUsageStore.getState()
+    void refreshCredits()
+    return window.api.on(IPC.AI_USAGE, (event: unknown) => addUsage(event as AIUsageEvent))
+  }, [])
 
   // Listen for menu events from main process
   const handleMenuEvent = useCallback(
