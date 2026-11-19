@@ -489,3 +489,10 @@
 [data-theme='paper'] .focus-vignette {
   background: radial-gradient(ellipse 70% 60% at 50% 45%, transparent 55%, rgba(120, 90, 50, 0.12) 100%);
 }
+
+/* contenteditable always matches :focus-visible — the page itself needs no ring. */
+.ProseMirror:focus,
+.ProseMirror:focus-visible {
+  box-shadow: none;
+  outline: none;
+}
