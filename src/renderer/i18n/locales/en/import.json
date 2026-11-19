@@ -12,5 +12,12 @@
   "dropFileHere": "Drop your file here",
   "fileTypes": "PDF, DOCX, TXT, or MD",
   "browseFiles": "Browse files",
-  "splitAdjusterNote": "Visual split adjustment coming in a future update."
+  "splitAdjusterNote": "Visual split adjustment coming in a future update.",
+  "wizardStep": {
+    "upload": "Upload",
+    "review": "Split",
+    "confirm": "Confirm"
+  },
+  "importChapters": "Import {{count}} chapters",
+  "importChapters_one": "Import {{count}} chapter"
 }

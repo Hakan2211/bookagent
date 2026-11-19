@@ -4,7 +4,9 @@
     "ai": "KI-Anbieter",
     "style": "Stilvorlage",
     "project": "Projekt",
-    "language": "Sprache"
+    "language": "Sprache",
+    "appearance": "Darstellung",
+    "about": "Über"
   },
   "ai": {
     "openrouter": "OpenRouter",
@@ -13,7 +15,8 @@
     "keySaved": "{{provider}}-Schlüssel erfolgreich gespeichert",
     "invalidKey": "Ungültiger {{provider}} API-Schlüssel",
     "keySavedPlaceholder": "Schlüssel gespeichert (neuen eingeben zum Ersetzen)",
-    "selectModel": "Modell auswählen"
+    "selectModel": "Modell auswählen",
+    "privacyNote": "Dein Text wird nur gesendet, wenn du den Lektor fragst."
   },
   "style": {
     "genre": "Genre",
@@ -50,5 +53,13 @@
     "description": "Wähle die Anzeigesprache für die Anwendungsoberfläche.",
     "current": "Aktuelle Sprache",
     "switchNote": "Die Oberfläche wird sofort aktualisiert, wenn du die Sprache änderst."
+  },
+  "appearance": {
+    "desc": "Wähle, wie dein Schreibzimmer aussieht.",
+    "ink": "Tinte (dunkel)",
+    "paper": "Papier (hell)"
+  },
+  "about": {
+    "desc": "Ein Schreibstudio für Bücher, mit einem KI-Lektor an deiner Seite. Dein Manuskript bleibt als Markdown-Dateien auf deinem Computer."
   }
 }

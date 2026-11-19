@@ -29,9 +29,9 @@ export function LanguageSettings() {
           <button
             key={lang.code}
             onClick={() => setLanguage(lang.code)}
-            className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl border transition-all text-left ${
+            className={`w-full flex items-center gap-4 px-5 py-4 rounded-[var(--radius-md)] border transition-all text-left ${
               language === lang.code
-                ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 shadow-[var(--shadow-glow-sm)]'
+                ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/10'
                 : 'border-[var(--border)] bg-[var(--bg-input)] hover:border-[var(--border-active)] hover:bg-[var(--bg-hover)]'
             }`}
           >

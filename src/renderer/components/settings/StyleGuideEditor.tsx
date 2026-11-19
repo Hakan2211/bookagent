@@ -65,7 +65,7 @@ export function StyleGuideEditor() {
     )
   }
 
-  const inputClasses = "w-full px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+  const inputClasses = "w-full h-10 px-3 font-serif text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-[var(--radius-md)] text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] transition-all"
 
   return (
     <div className="space-y-6">

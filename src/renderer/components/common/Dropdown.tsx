@@ -81,7 +81,7 @@ export function Dropdown({
   const menu = isOpen
     ? ReactDOM.createPortal(
         <div
-          className="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl overflow-y-auto py-1.5"
+          className="bg-[var(--bg-elevated)] border border-[var(--border-strong)] rounded-[var(--radius-md)] overflow-y-auto py-1 shadow-[var(--shadow-md)]"
           style={{
             ...menuStyle,
             animation: 'slide-up 150ms cubic-bezier(0.16, 1, 0.3, 1)',
@@ -96,7 +96,7 @@ export function Dropdown({
                 onChange(option.value)
                 setIsOpen(false)
               }}
-              className={`w-full text-left px-4 py-3 text-[14px] flex items-center justify-between hover:bg-[var(--bg-hover)] transition-colors ${
+              className={`w-full text-left px-3 py-2 font-serif text-[14.5px] flex items-center justify-between hover:bg-[var(--bg-hover)] transition-colors ${
                 option.value === value
                   ? 'text-[var(--text-accent)]'
                   : 'text-[var(--text-primary)]'
@@ -117,9 +117,9 @@ export function Dropdown({
     <div ref={ref} className={`relative ${className}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-3 text-[14px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] hover:border-[var(--border-active)] transition-all shadow-[var(--shadow-xs)] focus-visible:shadow-[0_0_0_2px_var(--focus-ring-soft)]"
+        className="w-full h-9 flex items-center justify-between gap-2 px-3 font-serif text-[14.5px] bg-[var(--bg-input)] border border-[var(--border-strong)] rounded-[var(--radius-md)] text-[var(--text-primary)] hover:border-[var(--text-tertiary)] focus-visible:border-[var(--border-active)] outline-none"
       >
-        <span className={selectedOption ? '' : 'text-[var(--text-tertiary)]'}>
+        <span className={`truncate ${selectedOption ? '' : 'text-[var(--text-tertiary)]'}`}>
           {selectedOption?.label || placeholder}
         </span>
         <ChevronDown

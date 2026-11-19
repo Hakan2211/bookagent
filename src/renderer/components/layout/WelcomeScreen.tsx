@@ -295,7 +295,7 @@ export function WelcomeScreen() {
           </div>
 
           {error && (
-            <div className="text-sm text-[var(--color-error)] bg-[var(--color-error)]/10 border border-[var(--color-error)]/30 rounded-xl px-4 py-3">
+            <div className="text-sm text-[var(--color-error)] bg-[var(--color-error)]/10 border border-[var(--color-error)]/30 rounded-[var(--radius-md)] px-4 py-3">
               {error}
             </div>
           )}

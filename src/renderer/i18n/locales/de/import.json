@@ -12,5 +12,12 @@
   "dropFileHere": "Datei hier ablegen",
   "fileTypes": "PDF, DOCX, TXT oder MD",
   "browseFiles": "Dateien durchsuchen",
-  "splitAdjusterNote": "Visuelle Aufteilungsanpassung kommt in einem zukünftigen Update."
+  "splitAdjusterNote": "Visuelle Aufteilungsanpassung kommt in einem zukünftigen Update.",
+  "wizardStep": {
+    "upload": "Hochladen",
+    "review": "Aufteilen",
+    "confirm": "Bestätigen"
+  },
+  "importChapters": "{{count}} Kapitel importieren",
+  "importChapters_one": "{{count}} Kapitel importieren"
 }

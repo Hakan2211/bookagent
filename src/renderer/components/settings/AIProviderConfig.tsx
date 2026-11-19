@@ -4,7 +4,7 @@ import { Button } from '../common/Button'
 import { Dropdown } from '../common/Dropdown'
 import { IPC } from '@shared/ipc-channels'
 import type { ModelInfo } from '@shared/types'
-import { CheckCircle2, AlertCircle } from 'lucide-react'
+import { CheckCircle2, AlertCircle, Info } from 'lucide-react'
 import { useProjectStore } from '../../stores/projectStore'
 import { useUIStore } from '../../stores/uiStore'
 
@@ -92,7 +92,7 @@ export function AIProviderConfig() {
     <div className="space-y-8">
       {status && (
         <div
-          className={`p-4 rounded-xl text-sm flex items-center gap-2.5 ${
+          className={`p-4 rounded-[var(--radius-md)] text-sm flex items-center gap-2.5 ${
             isStatusError
               ? 'bg-red-500/10 text-red-300 border border-red-500/20'
               : 'bg-[var(--diff-insert-bg)] text-[var(--color-success)] border border-[var(--status-final)]/30'
@@ -125,7 +125,7 @@ export function AIProviderConfig() {
             value={openrouterKey}
             onChange={(e) => setOpenrouterKey(e.target.value)}
             placeholder={openrouterHasKey ? t('settings:ai.keySavedPlaceholder') : 'sk-or-...'}
-            className="flex-1 px-4 py-3 text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+            className="flex-1 h-10 px-3 font-serif text-[15px] bg-[var(--bg-input)] border border-[var(--border)] rounded-[var(--radius-md)] text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] transition-all"
           />
           <Button
             size="md"
@@ -143,6 +143,11 @@ export function AIProviderConfig() {
           onChange={(v) => handleModelChange(v)}
           placeholder={t('settings:ai.selectModel')}
         />
+
+        <p className="flex items-center gap-2 font-serif text-[14px] text-[var(--text-secondary)]">
+          <Info size={14} strokeWidth={1.5} className="shrink-0" />
+          {t('settings:ai.privacyNote')}
+        </p>
       </div>
     </div>
   )

@@ -10,9 +10,42 @@ import { useUIStore } from '../../stores/uiStore'
 import { useProjectStore } from '../../stores/projectStore'
 import { IPC } from '@shared/ipc-channels'
 import type { ProposedSplit, ProposedChapter, BookMetadata } from '@shared/types'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Check, Download } from 'lucide-react'
 
 type WizardStep = 'upload' | 'parsing' | 'review' | 'confirm'
+
+const WIZARD_STEPS = ['upload', 'review', 'confirm'] as const
+
+/** Upload · Split · Confirm progress dots. */
+function WizardSteps({ step }: { step: string }) {
+  const { t } = useTranslation('import')
+  const current = step === 'upload' ? 0 : step === 'parsing' ? 0 : step === 'review' ? 1 : 2
+  return (
+    <div className="flex items-start justify-center mb-6 -mt-1">
+      {WIZARD_STEPS.map((s, i) => (
+        <React.Fragment key={s}>
+          <div className="flex flex-col items-center gap-1 w-20">
+            <div
+              className={`w-7 h-7 rounded-full flex items-center justify-center font-serif text-[13px] border ${
+                i === current
+                  ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-[var(--text-on-accent)]'
+                  : i < current
+                    ? 'bg-[var(--text-secondary)] border-[var(--text-secondary)] text-[var(--bg-base)]'
+                    : 'border-[var(--border-strong)] text-[var(--text-tertiary)]'
+              }`}
+            >
+              {i < current ? <Check size={13} /> : i + 1}
+            </div>
+            <span className={`font-serif text-[13px] ${i === current ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'}`}>
+              {t(`import:wizardStep.${s}`)}
+            </span>
+          </div>
+          {i < WIZARD_STEPS.length - 1 && <div className="w-24 h-px mt-3.5 bg-[var(--border-strong)]" />}
+        </React.Fragment>
+      ))}
+    </div>
+  )
+}
 
 export function ImportWizard() {
   const { t } = useTranslation(['import', 'common'])
@@ -119,8 +152,9 @@ export function ImportWizard() {
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={t('import:importManuscript')} size="xl">
       <div className="p-6">
+        <WizardSteps step={step} />
         {error && (
-          <div className="mb-5 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-300">
+          <div className="mb-5 p-3 rounded-[var(--radius-md)] border border-[var(--color-error)]/40 text-sm text-[var(--color-error)]">
             {error}
           </div>
         )}
@@ -132,7 +166,7 @@ export function ImportWizard() {
         {step === 'parsing' && (
           <div className="text-center py-16">
             <LoadingSpinner size="lg" className="mx-auto mb-5" />
-            <p className="text-sm text-[var(--text-primary)] mb-3 font-medium">{progress.step}</p>
+            <p className="font-serif text-[16px] text-[var(--text-primary)] mb-3">{progress.step}</p>
             <ProgressBar value={progress.percent} showPercentage className="max-w-xs mx-auto" />
           </div>
         )}
@@ -142,31 +176,31 @@ export function ImportWizard() {
           <div>
             <div className="grid grid-cols-2 gap-4 mb-5">
               <div>
-                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
+                <label className="block label-caps mb-1.5">
                   {t('import:bookTitle')}
                 </label>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder={t('import:myNovel')}
-                  className="w-full px-3.5 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+                  className="w-full h-10 px-3 font-serif text-[15px] bg-[var(--bg-input)] border border-[var(--border-strong)] rounded-[var(--radius-md)] text-[var(--text-primary)] outline-none focus:border-[var(--border-active)]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
+                <label className="block label-caps mb-1.5">
                   {t('import:author')}
                 </label>
                 <input
                   value={author}
                   onChange={(e) => setAuthor(e.target.value)}
                   placeholder={t('import:janeDoe')}
-                  className="w-full px-3.5 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] outline-none focus:border-[var(--border-active)] focus:shadow-[var(--shadow-glow-sm)] transition-all"
+                  className="w-full h-10 px-3 font-serif text-[15px] bg-[var(--bg-input)] border border-[var(--border-strong)] rounded-[var(--radius-md)] text-[var(--text-primary)] outline-none focus:border-[var(--border-active)]"
                 />
               </div>
             </div>
 
             <div className="mb-3 flex items-center justify-between">
-              <span className="text-sm text-[var(--text-primary)] font-medium">
+              <span className="font-serif text-[18px] text-[var(--text-primary)]">
                 {t('import:chaptersDetected', { count: chapters.length, words: proposedSplit.totalWords.toLocaleString() })}
               </span>
               {proposedSplit.detectedGenre && (
@@ -185,13 +219,14 @@ export function ImportWizard() {
               }}
             />
 
-            <div className="flex justify-end gap-2 mt-5">
-              <Button variant="ghost" onClick={() => setStep('upload')}>
+            <div className="flex justify-between gap-2 mt-6">
+              <Button variant="secondary" onClick={() => setStep('upload')}>
                 <ArrowLeft size={14} />
                 {t('common:back')}
               </Button>
               <Button variant="primary" onClick={handleConfirm} isLoading={isProcessing}>
-                {t('import:createProject')}
+                <Download size={15} />
+                {t('import:importChapters', { count: chapters.length })}
               </Button>
             </div>
           </div>
@@ -201,7 +236,7 @@ export function ImportWizard() {
         {step === 'confirm' && (
           <div className="text-center py-16">
             <LoadingSpinner size="lg" className="mx-auto mb-5" />
-            <p className="text-sm text-[var(--text-primary)] font-medium">{t('import:creatingProject')}</p>
+            <p className="font-serif text-[16px] text-[var(--text-primary)]">{t('import:creatingProject')}</p>
           </div>
         )}
       </div>

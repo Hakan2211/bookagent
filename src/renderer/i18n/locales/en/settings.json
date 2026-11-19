@@ -4,7 +4,9 @@
     "ai": "AI Provider",
     "style": "Style Guide",
     "project": "Project",
-    "language": "Language"
+    "language": "Language",
+    "appearance": "Appearance",
+    "about": "About"
   },
   "ai": {
     "openrouter": "OpenRouter",
@@ -13,7 +15,8 @@
     "keySaved": "{{provider}} key saved successfully",
     "invalidKey": "Invalid {{provider}} API key",
     "keySavedPlaceholder": "Key saved (enter new to replace)",
-    "selectModel": "Select model"
+    "selectModel": "Select model",
+    "privacyNote": "Your text is only sent when you ask the editor."
   },
   "style": {
     "genre": "Genre",
@@ -50,5 +53,13 @@
     "description": "Choose the display language for the application interface.",
     "current": "Current language",
     "switchNote": "The interface will update immediately when you change the language."
+  },
+  "appearance": {
+    "desc": "Choose how your writing room looks.",
+    "ink": "Ink (dark)",
+    "paper": "Paper (light)"
+  },
+  "about": {
+    "desc": "A writing studio for books, with an AI editor by your side. Your manuscript stays in plain Markdown files on your computer."
   }
 }

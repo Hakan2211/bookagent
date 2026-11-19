@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '../common/Modal'
+import { ExportPreviewPane } from './ExportPreviewPane'
 import { Button } from '../common/Button'
 import { Dropdown } from '../common/Dropdown'
 import { ProgressBar } from '../common/ProgressBar'
@@ -28,6 +29,20 @@ import {
 } from 'lucide-react'
 
 const presetKeys = ['standardPaperback', 'manuscript', 'eReader', 'compact']
+
+/** Tiny page glyph for preset cards. */
+function PageThumb({ lines, wide }: { lines: number; wide: boolean }) {
+  return (
+    <div
+      className="rounded-[2px] bg-[var(--bg-page)] border border-[var(--border-strong)] px-1.5 py-2 flex flex-col gap-[3px]"
+      style={{ width: wide ? 34 : 28, height: 40 }}
+    >
+      {Array.from({ length: lines }).map((_, i) => (
+        <div key={i} className="h-px bg-[var(--text-tertiary)]" style={{ width: i === lines - 1 ? '60%' : '100%' }} />
+      ))}
+    </div>
+  )
+}
 
 export function ExportModal() {
   const { t } = useTranslation(['export', 'common'])
@@ -162,22 +177,24 @@ export function ExportModal() {
   const isEpub = config.format === 'epub'
 
   return (
-    <Modal isOpen={isOpen} onClose={closeExportModal} title={t('export:exportBook')} size="xl">
-      <div className="px-8 py-6">
-        {/* Format & Scope row */}
-        <div className="flex gap-4 mb-6">
+    <Modal isOpen={isOpen} onClose={closeExportModal} title={t('export:exportBook')} size="wide">
+      <div>
+      <div className="grid grid-cols-[380px_1fr] grid-rows-[minmax(0,1fr)] h-[calc(84vh-150px)] min-h-[420px]">
+      <div className="overflow-y-auto px-6 py-5 border-r border-[var(--border)]">
+        {/* Format & Scope */}
+        <div className="flex flex-col gap-5 mb-6">
           {/* Format selection */}
           <div className="flex-1">
-            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
+            <label className="block label-caps mb-2">
               {t('export:format')}
             </label>
             <div className="flex gap-2">
               <button
                 onClick={() => updateConfig('format', 'pdf')}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all text-sm font-medium ${
+                className={`flex-1 flex items-center justify-center gap-2 h-9 rounded-[var(--radius-md)] border transition-colors font-serif text-[15px] ${
                   config.format === 'pdf'
-                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 text-[var(--text-accent)]'
-                    : 'border-[var(--border)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:border-[var(--border-active)]'
+                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-[var(--text-on-accent)]'
+                    : 'border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'
                 }`}
               >
                 <FileDown size={16} />
@@ -185,10 +202,10 @@ export function ExportModal() {
               </button>
               <button
                 onClick={() => updateConfig('format', 'epub')}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all text-sm font-medium ${
+                className={`flex-1 flex items-center justify-center gap-2 h-9 rounded-[var(--radius-md)] border transition-colors font-serif text-[15px] ${
                   config.format === 'epub'
-                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 text-[var(--text-accent)]'
-                    : 'border-[var(--border)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:border-[var(--border-active)]'
+                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-[var(--text-on-accent)]'
+                    : 'border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'
                 }`}
               >
                 <BookOpen size={16} />
@@ -199,16 +216,16 @@ export function ExportModal() {
 
           {/* Scope selection */}
           <div className="flex-1">
-            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
+            <label className="block label-caps mb-2">
               {t('export:scope')}
             </label>
             <div className="flex gap-2">
               <button
                 onClick={() => updateConfig('scope', 'book')}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all text-sm font-medium ${
+                className={`flex-1 flex items-center justify-center gap-2 h-9 rounded-[var(--radius-md)] border transition-colors font-serif text-[15px] ${
                   config.scope === 'book'
-                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 text-[var(--text-accent)]'
-                    : 'border-[var(--border)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:border-[var(--border-active)]'
+                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-[var(--text-on-accent)]'
+                    : 'border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'
                 }`}
               >
                 <BookOpen size={16} />
@@ -220,10 +237,10 @@ export function ExportModal() {
                   if (activeChapterId) updateConfig('chapterId', activeChapterId)
                 }}
                 disabled={!activeChapterId}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed ${
+                className={`flex-1 flex items-center justify-center gap-2 h-9 rounded-[var(--radius-md)] border transition-colors font-serif text-[15px] disabled:opacity-40 disabled:cursor-not-allowed ${
                   config.scope === 'chapter'
-                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 text-[var(--text-accent)]'
-                    : 'border-[var(--border)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:border-[var(--border-active)]'
+                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-[var(--text-on-accent)]'
+                    : 'border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'
                 }`}
               >
                 <FileText size={16} />
@@ -240,25 +257,38 @@ export function ExportModal() {
 
         {/* Presets */}
         <div className="mb-6">
-          <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
+          <label className="block label-caps mb-2">
             {t('export:quickPresets')}
           </label>
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {EXPORT_PRESETS.map((preset, i) => (
-              <button
-                key={preset.name}
-                onClick={() => applyPreset(i)}
-                className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:border-[var(--border-active)] hover:text-[var(--text-primary)] transition-all text-sm group"
-              >
-                <Zap size={13} className="text-[var(--text-tertiary)] group-hover:text-[var(--accent-secondary)]" />
-                {t(`export:presets.${presetKeys[i]}`)}
-              </button>
-            ))}
+          <div className="grid grid-cols-4 gap-2">
+            {EXPORT_PRESETS.map((preset, i) => {
+              const c = preset.config
+              const active =
+                c.pageSize === config.pageSize &&
+                c.fontFamily === config.fontFamily &&
+                c.fontSize === config.fontSize &&
+                c.lineSpacing === config.lineSpacing
+              return (
+                <button
+                  key={preset.name}
+                  onClick={() => applyPreset(i)}
+                  title={t(`export:presets.${presetKeys[i]}Desc`)}
+                  className={`flex flex-col items-center gap-1.5 rounded-[var(--radius-md)] border px-1 pt-2.5 pb-2 transition-colors ${
+                    active ? 'border-[var(--accent-primary)] bg-[var(--accent-tint)]' : 'border-[var(--border-strong)] hover:bg-[var(--bg-hover)]'
+                  }`}
+                >
+                  <PageThumb lines={c.lineSpacing && c.lineSpacing >= 2 ? 5 : 8} wide={c.pageSize === 'a4' || c.pageSize === 'letter'} />
+                  <span className="font-serif text-[12px] leading-tight text-[var(--text-primary)] text-center">
+                    {t(`export:presets.${presetKeys[i]}`)}
+                  </span>
+                </button>
+              )
+            })}
           </div>
         </div>
 
         {/* Settings grid */}
-        <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-5">
           {/* Page Size */}
           {!isEpub && (
             <div>
@@ -411,7 +441,7 @@ export function ExportModal() {
                   value={config.headerText}
                   onChange={(e) => updateConfig('headerText', e.target.value)}
                   placeholder={t('export:headerPlaceholder')}
-                  className="w-full px-4 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:border-[var(--border-active)] focus:outline-none"
+                  className="w-full px-4 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-[var(--radius-md)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:border-[var(--border-active)] focus:outline-none"
                 />
               </div>
               <div>
@@ -423,7 +453,7 @@ export function ExportModal() {
                   value={config.footerText}
                   onChange={(e) => updateConfig('footerText', e.target.value)}
                   placeholder={t('export:footerPlaceholder')}
-                  className="w-full px-4 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:border-[var(--border-active)] focus:outline-none"
+                  className="w-full px-4 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-[var(--radius-md)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:border-[var(--border-active)] focus:outline-none"
                 />
               </div>
             </>
@@ -432,7 +462,7 @@ export function ExportModal() {
 
         {/* Progress bar */}
         {exportProgress && (
-          <div className="mt-6 p-4 rounded-xl bg-[var(--bg-input)] border border-[var(--border)]">
+          <div className="mt-6">
             <ProgressBar
               value={exportProgress.percent}
               showPercentage
@@ -448,14 +478,17 @@ export function ExportModal() {
           </div>
         )}
 
+      </div>
+      <ExportPreviewPane config={config} />
+      </div>
+
         {/* Actions */}
-        <div className="flex items-center justify-between mt-8 pt-6 border-t border-[var(--border)]">
-          <Button variant="ghost" onClick={closeExportModal}>
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--border)]">
+          <Button variant="secondary" onClick={closeExportModal}>
             {t('common:cancel')}
           </Button>
           <Button
             variant="primary"
-            size="lg"
             onClick={handleExport}
             isLoading={isExporting}
             disabled={isExporting || exportProgress?.stage === 'done'}

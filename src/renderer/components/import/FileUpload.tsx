@@ -39,17 +39,17 @@ export function FileUpload({ onFileSelected }: FileUploadProps) {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`border-2 border-dashed rounded-2xl p-14 text-center transition-all cursor-pointer ${
+        className={`border border-dashed rounded-[var(--radius-lg)] p-14 text-center transition-all cursor-pointer ${
           isDragOver
             ? 'border-[var(--border-active)] bg-[var(--bg-hover)] shadow-[var(--shadow-glow)]'
             : 'border-[var(--border)] hover:border-[var(--text-tertiary)] hover:bg-[var(--bg-hover)]'
         }`}
         onClick={handleBrowse}
       >
-        <div className="w-14 h-14 rounded-2xl bg-[var(--bg-active)] flex items-center justify-center mx-auto mb-4">
-          <Upload size={24} className="text-[var(--text-accent)]" />
+        <div className="w-14 h-14 rounded-[var(--radius-md)] bg-[var(--bg-active)] flex items-center justify-center mx-auto mb-4">
+          <Upload size={22} strokeWidth={1.5} className="text-[var(--text-secondary)]" />
         </div>
-        <p className="text-sm text-[var(--text-primary)] mb-1 font-medium">
+        <p className="font-serif text-[18px] text-[var(--text-primary)] mb-1">
           {t('import:dropFileHere')}
         </p>
         <p className="text-xs text-[var(--text-tertiary)]">
