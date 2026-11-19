@@ -39,5 +39,21 @@
   "language": "Sprache",
   "english": "English",
   "german": "Deutsch",
-  "chapterNum": "Kapitel {{num}}"
+  "chapterNum": "Kapitel {{num}}",
+  "update": {
+    "available": "Kitapmi {{version}} ist verfügbar",
+    "ready": "Kitapmi {{version}} ist bereit",
+    "current": "Du nutzt {{version}}.",
+    "downloading": "Wird geladen… {{percent}} %",
+    "restartHint": "Neu starten, um das Update abzuschließen. Deine Arbeit ist gespeichert.",
+    "failed": "Download fehlgeschlagen. Bitte erneut versuchen.",
+    "updateNow": "Jetzt aktualisieren",
+    "openDownload": "Herunterladen",
+    "restart": "Neu starten & aktualisieren",
+    "later": "Später",
+    "checkNow": "Nach Updates suchen",
+    "upToDate": "Du bist auf dem neuesten Stand",
+    "checking": "Wird geprüft…",
+    "version": "Version {{version}}"
+  }
 }

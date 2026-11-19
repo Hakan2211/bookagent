@@ -101,6 +101,14 @@ export const IPC = {
 
   // ── App ────────────────────────────────────
   APP_GET_DOCUMENTS_PATH: 'app:get-documents-path',
+  APP_GET_VERSION: 'app:get-version',
+
+  // ── Updates ────────────────────────────────
+  UPDATE_STATUS: 'update:status',
+  UPDATE_GET_STATUS: 'update:get-status',
+  UPDATE_CHECK: 'update:check',
+  UPDATE_DOWNLOAD: 'update:download',
+  UPDATE_INSTALL: 'update:install',
 } as const
 
 export type IPCChannel = (typeof IPC)[keyof typeof IPC]

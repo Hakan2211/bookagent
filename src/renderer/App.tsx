@@ -4,6 +4,7 @@ import { WelcomeScreen } from './components/layout/WelcomeScreen'
 import { ImportWizard } from './components/import/ImportWizard'
 import { SettingsModal } from './components/settings/SettingsModal'
 import { ExportModal } from './components/export/ExportModal'
+import { UpdateNotice } from './components/update/UpdateNotice'
 import { useProjectStore } from './stores/projectStore'
 import { useUIStore } from './stores/uiStore'
 import { useEditorStore } from './stores/editorStore'
@@ -83,6 +84,7 @@ export function App() {
       <ImportWizard />
       <SettingsModal />
       <ExportModal />
+      <UpdateNotice />
     </>
   )
 }

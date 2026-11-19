@@ -75,8 +75,8 @@ export function ImportWizard() {
       const metadata: BookMetadata = {
         title: title || t('import:untitledBook'),
         author: author || t('import:unknownAuthor'),
-        aiProvider: 'anthropic',
-        aiModel: 'claude-sonnet-4-5-20250929',
+        aiProvider: 'openrouter',
+        aiModel: 'google/gemini-3-flash-preview',
         sourceFile: filePath,
         detectedGenre: proposedSplit.detectedGenre,
         detectedPOV: proposedSplit.detectedPOV,

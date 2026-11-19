@@ -10,6 +10,7 @@ import { OpenRouterProvider } from './ai/providers/OpenRouterProvider'
 import { SnapshotManager } from './history/SnapshotManager'
 import { SearchEngine } from './search/SearchEngine'
 import Store from 'electron-store'
+import { initUpdater } from './updater'
 
 const settingsStore = new Store({
   defaults: {
@@ -48,6 +49,9 @@ app.whenReady().then(async () => {
   // Create the main window
   const mainWindow = createMainWindow()
   createMenu(mainWindow)
+
+  // Check GitHub Releases for new versions (packaged builds only)
+  initUpdater()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

@@ -474,3 +474,24 @@ export class AIError extends Error {
     this.name = 'AIError'
   }
 }
+
+// ── App updates ──────────────────────────────
+export type UpdateState =
+  | 'idle'
+  | 'checking'
+  | 'available'
+  | 'not-available'
+  | 'downloading'
+  | 'downloaded'
+  | 'error'
+
+export interface UpdateStatus {
+  state: UpdateState
+  currentVersion: string
+  version?: string
+  releaseNotes?: string
+  percent?: number
+  error?: string
+  /** True when the platform cannot self-install (e.g. unsigned macOS) — update opens the download page instead. */
+  manual?: boolean
+}

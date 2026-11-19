@@ -13,7 +13,7 @@ publish:
   provider: github
   owner: Hakan2211
   repo: bookagent
-  releaseType: draft
+  releaseType: release
 
 mac:
   category: public.app-category.productivity
@@ -29,6 +29,8 @@ win:
       arch: [x64]
 
 nsis:
+  # Hyphenated name so the uploaded asset matches the url in latest.yml (GitHub turns spaces into dots).
+  artifactName: ${productName}-Setup-${version}.${ext}
   oneClick: true
   perMachine: false
   allowToChangeInstallationDirectory: false
