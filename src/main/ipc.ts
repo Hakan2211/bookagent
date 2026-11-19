@@ -24,7 +24,7 @@ import type { AgentQuestionResponse, ProjectPeek, BookManifest as PeekManifest }
 import { SnapshotManager } from './history/SnapshotManager'
 import { SearchEngine } from './search/SearchEngine'
 import { ParserFactory } from './import/parsers'
-import { ExportEngine, PdfExporter, EpubExporter } from './export'
+import { ExportEngine, PdfExporter, EpubExporter, DocxExporter } from './export'
 import { streamInlineEdit, type InlineEditRequest } from './ai/inlineEdit'
 import Store from 'electron-store'
 
@@ -800,6 +800,20 @@ export function registerIPC(
         args.outputPath,
         sendProgress
       )
+    }
+  )
+
+  ipcMain.handle(
+    IPC.EXPORT_DOCX,
+    async (_event, args: { config: ExportConfig; outputPath: string }) => {
+      if (!projectManager.project) throw new Error('No project open')
+
+      const win = BrowserWindow.getFocusedWindow()
+      const sendProgress = (progress: unknown) => {
+        if (win) win.webContents.send(IPC.EXPORT_PROGRESS, progress)
+      }
+
+      await DocxExporter.export(projectManager.project, args.config, args.outputPath, sendProgress)
     }
   )
 

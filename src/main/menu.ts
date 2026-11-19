@@ -71,6 +71,10 @@ export function createMenu(mainWindow: BrowserWindow): void {
           click: () => mainWindow.webContents.send('menu:export', 'epub')
         },
         {
+          label: t('exportDocx'),
+          click: () => mainWindow.webContents.send('menu:export', 'docx')
+        },
+        {
           label: t('preview'),
           accelerator: 'CmdOrCtrl+Shift+P',
           click: () => mainWindow.webContents.send('menu:preview')

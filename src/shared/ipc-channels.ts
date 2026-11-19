@@ -93,6 +93,7 @@ export const IPC = {
   // ── Export ─────────────────────────────────
   EXPORT_PDF: 'export:pdf',
   EXPORT_EPUB: 'export:epub',
+  EXPORT_DOCX: 'export:docx',
   EXPORT_PROGRESS: 'export:progress',
   EXPORT_PREVIEW_HTML: 'export:preview-html',
   DIALOG_SAVE_FILE: 'dialog:save-file',

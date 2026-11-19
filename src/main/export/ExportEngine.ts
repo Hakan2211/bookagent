@@ -529,6 +529,40 @@ export class ExportEngine {
   }
 
   /**
+   * Get raw Markdown per chapter (sections joined with a scene break), for
+   * exporters that build their own document model (DOCX).
+   */
+  static async getChaptersMarkdown(
+    project: BookProject,
+    chapterId?: string
+  ): Promise<{ title: string; markdown: string }[]> {
+    const metas = chapterId
+      ? project.manifest.chapters.filter((ch) => ch.id === chapterId)
+      : project.manifest.chapters
+    if (chapterId && metas.length === 0) throw new Error(`Chapter "${chapterId}" not found`)
+
+    const out: { title: string; markdown: string }[] = []
+    for (const meta of metas) {
+      let markdown = ''
+      if (meta.sections && meta.sections.length > 0) {
+        const parts: string[] = []
+        for (const section of meta.sections) {
+          parts.push(await project.readSection(meta.id, section.id))
+        }
+        markdown = parts.join('\n\n---\n\n')
+      } else if (meta.file.endsWith('.md')) {
+        try {
+          markdown = await project.readChapter(meta.id)
+        } catch (err: unknown) {
+          if ((err as { code?: string })?.code !== 'EISDIR') throw err
+        }
+      }
+      out.push({ title: meta.title, markdown })
+    }
+    return out
+  }
+
+  /**
    * Get chapter data suitable for EPUB generation (per-chapter HTML bodies).
    */
   static async getChaptersForEpub(

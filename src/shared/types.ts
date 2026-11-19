@@ -440,7 +440,7 @@ export interface ChatMessage {
 
 // ─── Export Types ────────────────────────────
 
-export type ExportFormat = 'pdf' | 'epub'
+export type ExportFormat = 'pdf' | 'epub' | 'docx'
 export type ExportScope = 'book' | 'chapter'
 export type PageSize = 'a4' | 'letter' | 'a5' | '6x9'
 

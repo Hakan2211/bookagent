@@ -29,6 +29,7 @@
     "@tiptap/starter-kit": "^2.11.0",
     "chokidar": "^4.0.0",
     "diff-match-patch": "^1.0.5",
+    "docx": "^9.16.0",
     "electron-store": "^10.0.0",
     "electron-updater": "^6.8.11",
     "epub-gen-memory": "^1.1.2",

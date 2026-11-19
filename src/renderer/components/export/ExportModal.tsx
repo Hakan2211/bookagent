@@ -136,14 +136,16 @@ export function ExportModal() {
         ? manifest.chapters.find((ch) => ch.id === config.chapterId)?.title || 'Chapter'
         : manifest.title
 
-    const extension = config.format === 'pdf' ? '.pdf' : '.epub'
+    const extension = `.${config.format}`
     const safeName = scopeLabel.replace(/[<>:"/\\|?*]/g, '_')
     const defaultName = `${safeName}${extension}`
 
-    const filters =
-      config.format === 'pdf'
-        ? [{ name: 'PDF Files', extensions: ['pdf'] }]
-        : [{ name: 'EPUB Files', extensions: ['epub'] }]
+    const filters = [
+      {
+        name: { pdf: 'PDF Files', epub: 'EPUB Files', docx: 'Word Documents' }[config.format],
+        extensions: [config.format]
+      }
+    ]
 
     // Show save dialog
     const outputPath = (await window.api.invoke(IPC.DIALOG_SAVE_FILE, {
@@ -157,7 +159,11 @@ export function ExportModal() {
     setExportProgress({ stage: 'preparing', percent: 0, message: t('export:startingExport') })
 
     try {
-      const ipcChannel = config.format === 'pdf' ? IPC.EXPORT_PDF : IPC.EXPORT_EPUB
+      const ipcChannel = {
+        pdf: IPC.EXPORT_PDF,
+        epub: IPC.EXPORT_EPUB,
+        docx: IPC.EXPORT_DOCX
+      }[config.format]
       await window.api.invoke(ipcChannel, { config, outputPath })
     } catch (err) {
       console.error('Export failed:', err)
@@ -210,6 +216,17 @@ export function ExportModal() {
               >
                 <BookOpen size={16} />
                 EPUB
+              </button>
+              <button
+                onClick={() => updateConfig('format', 'docx')}
+                className={`flex-1 flex items-center justify-center gap-2 h-9 rounded-[var(--radius-md)] border transition-colors font-serif text-[15px] ${
+                  config.format === 'docx'
+                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-[var(--text-on-accent)]'
+                    : 'border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'
+                }`}
+              >
+                <FileText size={16} />
+                DOCX
               </button>
             </div>
           </div>
