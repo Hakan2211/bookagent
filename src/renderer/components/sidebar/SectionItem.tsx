@@ -7,7 +7,7 @@ import { IPC } from '@shared/ipc-channels'
 import { useProjectStore } from '../../stores/projectStore'
 import { useEditorStore } from '../../stores/editorStore'
 import { useChatStore } from '../../stores/chatStore'
-import { Trash2, Pencil } from 'lucide-react'
+import { Trash2, Pencil, FileText } from 'lucide-react'
 
 interface SectionItemProps {
   chapterId: string
@@ -101,12 +101,15 @@ export function SectionItem({ chapterId, section, index, isActive, onClick }: Se
   return (
     <div className="relative group">
       <div
-        className={`w-full flex items-center gap-2 text-[14px] transition-all ${
+        className={`relative flex items-center gap-2 ml-1.5 mr-2 pl-3 pr-2 rounded-[var(--radius-sm)] transition-colors ${
           isActive
-            ? 'bg-[var(--bg-active)] text-[var(--text-primary)] border-l-4 border-l-[var(--text-accent)] shadow-[inset_0_0_0_1px_var(--border-subtle)]'
-            : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] border-l-4 border-l-transparent'
+            ? 'bg-[var(--bg-active)] text-[var(--text-primary)]'
+            : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
         }`}
       >
+        {isActive && (
+          <span className="absolute -left-[8px] top-1.5 bottom-1.5 w-[2px] rounded-full bg-[var(--accent-primary)]" />
+        )}
         <button
           onClick={onClick}
           onContextMenu={handleContextMenu}
@@ -114,21 +117,10 @@ export function SectionItem({ chapterId, section, index, isActive, onClick }: Se
             e.preventDefault()
             startRename()
           }}
-          className="flex-1 min-w-0 text-left pl-14 pr-6 py-2.5 flex items-center gap-2.5"
+          title={`${section.title} · ${section.wordCount.toLocaleString()}`}
+          className="flex-1 min-w-0 text-left py-[6px] flex items-center gap-2.5 font-serif text-[14.5px]"
         >
-          <span className="text-[11px] text-[var(--text-secondary)]/60 w-5 text-right shrink-0 tabular-nums font-medium">
-            {String(index + 1).padStart(2, '0')}
-          </span>
-          <div className="relative shrink-0">
-            <StatusBadge status={section.status} />
-            {hasPendingChanges && (
-              <span
-                className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full animate-pulse"
-                style={{ backgroundColor: 'var(--text-accent)', boxShadow: '0 0 6px var(--text-accent)' }}
-                title="Pending agent changes"
-              />
-            )}
-          </div>
+          <FileText size={13} strokeWidth={1.5} className="shrink-0 text-[var(--text-tertiary)]" />
           {isRenaming ? (
             <input
               ref={renameInputRef}
@@ -137,20 +129,18 @@ export function SectionItem({ chapterId, section, index, isActive, onClick }: Se
               onBlur={commitRename}
               onKeyDown={handleRenameKeyDown}
               onClick={(e) => e.stopPropagation()}
-              className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-active)] rounded-md px-2 py-0.5 text-[14px] text-[var(--text-primary)] outline-none"
+              className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-active)] rounded-[var(--radius-sm)] px-2 py-0.5 text-[14px] text-[var(--text-primary)] outline-none"
             />
           ) : (
             <span className="truncate flex-1">{section.title}</span>
           )}
-          {!isRenaming && (
-            <span className="text-[11px] text-[var(--text-tertiary)] shrink-0 tabular-nums group-hover:hidden">
-              {formatWordCount(section.wordCount)}
-            </span>
+          {hasPendingChanges && (
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse bg-[var(--accent-primary)] shrink-0" title="Pending agent changes" />
           )}
         </button>
         <button
           onClick={handleDelete}
-          className="shrink-0 mr-3 p-1 rounded-lg opacity-0 group-hover:opacity-100 text-[var(--text-tertiary)] hover:text-[var(--color-error)] hover:bg-[var(--bg-hover)] transition-all"
+          className="shrink-0 p-1 rounded-[var(--radius-sm)] hidden group-hover:block text-[var(--text-tertiary)] hover:text-[var(--color-error)] hover:bg-[var(--bg-active)]"
           title={t('sidebar:deleteSection')}
         >
           <Trash2 size={12} />
@@ -165,19 +155,19 @@ export function SectionItem({ chapterId, section, index, isActive, onClick }: Se
             onClick={() => setShowContextMenu(false)}
           />
           <div
-            className="absolute right-2 top-full z-50 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl py-1.5 min-w-[160px]"
+            className="absolute right-2 top-full z-50 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-[var(--radius-md)] py-1 min-w-[160px] shadow-[var(--shadow-md)]"
             style={{ boxShadow: 'var(--shadow-lg)', animation: 'slide-up 100ms ease-out' }}
           >
             <button
               onClick={startRename}
-              className="w-full text-left px-4 py-2.5 text-[14px] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
+              className="w-full text-left px-3.5 py-2 text-[13px] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
             >
               <Pencil size={14} />
               {t('common:rename')}
             </button>
             <button
               onClick={handleDelete}
-              className="w-full text-left px-4 py-2.5 text-[14px] text-[var(--color-error)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
+              className="w-full text-left px-3.5 py-2 text-[13px] text-[var(--color-error)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
             >
               <Trash2 size={14} />
               {t('common:delete')}

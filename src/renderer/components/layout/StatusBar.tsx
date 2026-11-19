@@ -5,6 +5,7 @@ import { useEditorStore } from '../../stores/editorStore'
 import { useChatStore } from '../../stores/chatStore'
 import { useUIStore } from '../../stores/uiStore'
 import type { ApiStatusState } from '../../stores/uiStore'
+import { Check } from 'lucide-react'
 
 const STATUS_CHECK_INTERVAL = 30_000
 
@@ -24,12 +25,19 @@ export function StatusBar() {
   const language = useUIStore((s) => s.language)
   const setLanguage = useUIStore((s) => s.setLanguage)
 
-  const totalWords = manifest?.chapters.reduce((sum, ch) => sum + ch.wordCount, 0) || 0
-  const targetWords = manifest?.targets.totalWords || 0
-  const hasTarget = targetWords > 0
-  const percentage = hasTarget ? Math.round((totalWords / targetWords) * 100) : 0
+  const totalWords =
+    manifest?.chapters.reduce(
+      (sum, ch) =>
+        sum + (ch.sections?.length ? ch.sections.reduce((s, sec) => s + sec.wordCount, 0) : ch.wordCount),
+      0
+    ) || 0
 
-  const activeChapter = manifest?.chapters.find((ch) => ch.id === activeChapterId)
+  // Words written this session = growth since the project was opened.
+  const sessionBase = useRef<{ title?: string; words: number } | null>(null)
+  if (manifest && sessionBase.current?.title !== manifest.title) {
+    sessionBase.current = { title: manifest.title, words: totalWords }
+  }
+  const sessionWords = sessionBase.current ? totalWords - sessionBase.current.words : 0
 
   // On mount: immediately show model name from manifest (no network),
   // then start background connectivity check
@@ -84,7 +92,7 @@ export function StatusBar() {
         statusLabel = displayName || t('common:checking')
         break
       case 'unavailable':
-        dotColor = 'var(--color-error, #ef4444)'
+        dotColor = 'var(--color-error)'
         statusLabel = displayName ? `${displayName} (${t('common:unavailable')})` : t('common:apiUnavailable')
         break
       case 'no-key':
@@ -96,85 +104,45 @@ export function StatusBar() {
   }
 
   return (
-    <div className="h-9 flex items-center px-5 gap-5 bg-[var(--bg-sidebar)] border-t border-[var(--border)] text-sm text-[var(--text-secondary)] shrink-0 select-none">
-      {/* Status */}
-      {activeChapter && (
-        <span
-          className="px-2.5 py-1 rounded-md text-xs uppercase font-semibold tracking-wide"
-          style={{
-            color:
-              activeChapter.status === 'final'
-                ? 'var(--status-final)'
-                : activeChapter.status === 'revised'
-                ? 'var(--status-revised)'
-                : activeChapter.status === 'draft'
-                ? 'var(--status-draft)'
-                : 'var(--status-outline)',
-            background:
-              activeChapter.status === 'final'
-                ? 'rgba(52, 211, 153, 0.1)'
-                : activeChapter.status === 'revised'
-                ? 'rgba(96, 165, 250, 0.1)'
-                : activeChapter.status === 'draft'
-                ? 'rgba(251, 191, 36, 0.1)'
-                : 'rgba(148, 163, 184, 0.1)'
-          }}
-        >
-          {t(('editor:status' + activeChapter.status.charAt(0).toUpperCase() + activeChapter.status.slice(1)) as any)}
-        </span>
-      )}
-
-      {/* Save indicator */}
-      {isDirty && (
-        <span className="text-[var(--color-warning)]/95 flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-warning)] animate-pulse" />
-          {t('common:unsaved')}
-        </span>
-      )}
-
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* Word count progress */}
-      {manifest && (
-        <div className="flex items-center gap-2.5">
-          {hasTarget ? (
-            <>
-              <span className="tabular-nums">
-                {totalWords.toLocaleString()} / {targetWords.toLocaleString()} {t('common:words')}
-              </span>
-              <div className="w-24 h-1.5 bg-[var(--bg-active)] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[var(--accent-primary)] rounded-full transition-all duration-500"
-                  style={{ width: `${Math.min(100, percentage)}%` }}
-                />
-              </div>
-              <span className="tabular-nums text-[var(--text-tertiary)]">{percentage}%</span>
-            </>
-          ) : (
-            <span className="tabular-nums">
-              {totalWords.toLocaleString()} {t('common:words')}
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Language toggle */}
-      <button
-        onClick={() => setLanguage(language === 'en' ? 'de' : 'en')}
-        className="px-2 py-0.5 rounded-md text-xs font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-all uppercase tracking-wide"
-        title={t('common:language')}
-      >
-        {language === 'en' ? 'EN' : 'DE'}
-      </button>
-
-      {/* API Status */}
+    <div className="h-7 grid grid-cols-[1fr_auto_1fr] items-center px-4 bg-[var(--bg-sidebar)] border-t border-[var(--border)] text-[12px] text-[var(--text-secondary)] shrink-0 select-none tabular">
+      {/* Save state */}
       <div className="flex items-center gap-1.5">
-        <div
-          className={`w-1.5 h-1.5 rounded-full ${dotPulse ? 'animate-pulse' : ''}`}
-          style={{ backgroundColor: dotColor }}
-        />
-        <span className="max-w-[160px] truncate">{statusLabel}</span>
+        {isDirty ? (
+          <>
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-warning)]" />
+            {t('common:unsaved')}
+          </>
+        ) : (
+          <>
+            <Check size={12} strokeWidth={2} className="text-[var(--text-tertiary)]" />
+            {t('common:saved')}
+          </>
+        )}
+      </div>
+
+      {/* Session progress */}
+      <div className="text-[var(--text-tertiary)]">
+        {manifest && t('common:sessionWords', { count: sessionWords, words: (sessionWords >= 0 ? '+' : '') + sessionWords.toLocaleString() })}
+      </div>
+
+      <div className="flex items-center justify-end gap-4">
+        {/* API status */}
+        <div className="flex items-center gap-1.5">
+          <span className="max-w-[180px] truncate">{statusLabel}</span>
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${dotPulse ? 'animate-pulse' : ''}`}
+            style={{ backgroundColor: dotColor }}
+          />
+        </div>
+
+        {/* Language toggle */}
+        <button
+          onClick={() => setLanguage(language === 'en' ? 'de' : 'en')}
+          className="px-1.5 rounded-[var(--radius-sm)] text-[11px] font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] uppercase tracking-wide"
+          title={t('common:language')}
+        >
+          {language === 'en' ? 'EN' : 'DE'}
+        </button>
       </div>
     </div>
   )

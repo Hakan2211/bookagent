@@ -55,5 +55,11 @@
     "upToDate": "Du bist auf dem neuesten Stand",
     "checking": "Wird geprüft…",
     "version": "Version {{version}}"
-  }
+  },
+  "themePaper": "Zu Papier (hell) wechseln",
+  "themeInk": "Zu Tinte (dunkel) wechseln",
+  "sessionWords": "Sitzung: {{words}} Wörter",
+  "library": "Zur Bibliothek",
+  "toggleSidebar": "Kapitel ein/aus (Strg+B)",
+  "toggleEditor": "Lektor-Panel ein/aus"
 }

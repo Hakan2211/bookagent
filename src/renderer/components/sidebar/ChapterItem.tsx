@@ -144,94 +144,95 @@ export function ChapterItem({ chapter, index, isActive, onClick }: ChapterItemPr
   return (
     <div className="relative">
       {/* Chapter row */}
-      <div className="group">
-        <div
-          className={`w-full flex items-center gap-3 text-[15px] transition-all ${
-            isActive && !activeSectionId
-              ? 'bg-[var(--bg-active)] text-[var(--text-primary)] border-l-4 border-l-[var(--text-accent)] shadow-[inset_0_0_0_1px_var(--border-subtle)]'
-              : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] border-l-4 border-l-transparent'
+      <div
+        className={`group relative flex items-center gap-1.5 pl-3 pr-3 mx-2 rounded-[var(--radius-sm)] transition-colors ${
+          isActive && !activeSectionId
+            ? 'bg-[var(--bg-active)] text-[var(--text-primary)]'
+            : isActive
+              ? 'text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+              : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
+        }`}
+      >
+        {isActive && !activeSectionId && (
+          <span className="absolute -left-2 top-1.5 bottom-1.5 w-[2px] rounded-full bg-[var(--accent-primary)]" />
+        )}
+        {/* Expand/collapse chevron */}
+        <button
+          onClick={hasSections ? handleChevronClick : undefined}
+          className={`shrink-0 -ml-1 p-0.5 rounded ${
+            hasSections
+              ? 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] cursor-pointer'
+              : 'text-transparent cursor-default'
           }`}
         >
-          {/* Expand/collapse chevron */}
-          <button
-            onClick={hasSections ? handleChevronClick : undefined}
-            className={`shrink-0 ml-2 p-0.5 rounded transition-all ${
-              hasSections
-                ? 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] cursor-pointer'
-                : 'text-transparent cursor-default'
-            }`}
-          >
-            <ChevronRight
-              size={14}
-              className={`transition-transform duration-150 ${isExpanded && hasSections ? 'rotate-90' : ''}`}
+          <ChevronRight
+            size={13}
+            className={`transition-transform duration-150 ${isExpanded && hasSections ? 'rotate-90' : ''}`}
+          />
+        </button>
+
+        <button
+          onClick={onClick}
+          onContextMenu={handleContextMenu}
+          onDoubleClick={(e) => {
+            e.preventDefault()
+            startRename()
+          }}
+          title={`${chapter.title} · ${totalWords.toLocaleString()}`}
+          className="flex-1 min-w-0 text-left py-[7px] flex items-center gap-2.5 font-serif text-[15px]"
+        >
+          <span className="text-[13px] text-[var(--text-tertiary)] w-4 text-right shrink-0 tabular">
+            {index + 1}
+          </span>
+          {isRenaming ? (
+            <input
+              ref={renameInputRef}
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onBlur={commitRename}
+              onKeyDown={handleRenameKeyDown}
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-active)] rounded-[var(--radius-sm)] px-2 py-0.5 text-[15px] text-[var(--text-primary)] outline-none"
             />
-          </button>
+          ) : (
+            <span className="truncate flex-1">{chapter.title}</span>
+          )}
+        </button>
 
-          <button
-            onClick={onClick}
-            onContextMenu={handleContextMenu}
-            onDoubleClick={(e) => {
-              e.preventDefault()
-              startRename()
-            }}
-            className="flex-1 min-w-0 text-left pr-6 py-3.5 flex items-center gap-3"
-          >
-            <span className="text-[12px] text-[var(--text-secondary)]/80 w-6 text-right shrink-0 tabular-nums font-medium">
-              {String(index + 1).padStart(2, '0')}
-            </span>
-            <div className="relative shrink-0">
-              <StatusBadge status={chapter.status} />
-              {hasPendingChanges && (
-                <span
-                  className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full animate-pulse"
-                  style={{ backgroundColor: 'var(--text-accent)', boxShadow: '0 0 6px var(--text-accent)' }}
-                  title="Pending agent changes"
-                />
-              )}
-            </div>
-            {isRenaming ? (
-              <input
-                ref={renameInputRef}
-                value={renameValue}
-                onChange={(e) => setRenameValue(e.target.value)}
-                onBlur={commitRename}
-                onKeyDown={handleRenameKeyDown}
-                onClick={(e) => e.stopPropagation()}
-                className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-active)] rounded-md px-2 py-0.5 text-[15px] text-[var(--text-primary)] outline-none"
+        {!isRenaming && (
+          <span className="relative shrink-0 group-hover:hidden">
+            <StatusBadge status={chapter.status} label />
+            {hasPendingChanges && (
+              <span
+                className="absolute -top-1 -left-1 w-1.5 h-1.5 rounded-full animate-pulse bg-[var(--accent-primary)]"
+                title="Pending agent changes"
               />
-            ) : (
-              <span className="truncate flex-1">{chapter.title}</span>
             )}
-            {!isRenaming && (
-              <span className="text-[12px] text-[var(--text-tertiary)] shrink-0 tabular-nums group-hover:hidden">
-                {formatWordCount(totalWords)}
-              </span>
-            )}
-          </button>
+          </span>
+        )}
 
-          {/* Add section button */}
+        {/* Hover actions replace the status so titles never get squeezed */}
+        <div className="hidden group-hover:flex items-center shrink-0">
           <button
             onClick={handleAddSection}
-            className="shrink-0 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 text-[var(--text-tertiary)] hover:text-[var(--text-accent)] hover:bg-[var(--bg-hover)] transition-all"
+            className="p-1 rounded-[var(--radius-sm)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-active)]"
             title={t('sidebar:addSection')}
           >
-            <Plus size={14} />
+            <Plus size={13} />
           </button>
-
-          {/* Delete button */}
           <button
             onClick={handleDelete}
-            className="shrink-0 mr-3 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 text-[var(--text-tertiary)] hover:text-[var(--color-error)] hover:bg-[var(--bg-hover)] transition-all"
+            className="p-1 rounded-[var(--radius-sm)] text-[var(--text-tertiary)] hover:text-[var(--color-error)] hover:bg-[var(--bg-active)]"
             title={t('sidebar:deleteChapter')}
           >
-            <Trash2 size={14} />
+            <Trash2 size={13} />
           </button>
         </div>
       </div>
 
       {/* Sections (expandable) */}
       {hasSections && isExpanded && (
-        <div className="border-l border-[var(--border-subtle)] ml-8">
+        <div className="relative ml-[30px] my-0.5 border-l border-[var(--border)]">
           {chapter.sections!.map((section, sIdx) => (
             <SectionItem
               key={section.id}
@@ -253,26 +254,26 @@ export function ChapterItem({ chapter, index, isActive, onClick }: ChapterItemPr
             onClick={() => setShowContextMenu(false)}
           />
           <div
-            className="absolute right-2 top-12 z-50 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl py-1.5 min-w-[160px]"
+            className="absolute right-2 top-12 z-50 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-[var(--radius-md)] py-1 min-w-[160px] shadow-[var(--shadow-md)]"
             style={{ boxShadow: 'var(--shadow-lg)', animation: 'slide-up 100ms ease-out' }}
           >
             <button
               onClick={startRename}
-              className="w-full text-left px-4 py-2.5 text-[14px] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
+              className="w-full text-left px-3.5 py-2 text-[13px] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
             >
               <Pencil size={14} />
               {t('common:rename')}
             </button>
             <button
               onClick={handleAddSection}
-              className="w-full text-left px-4 py-2.5 text-[14px] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
+              className="w-full text-left px-3.5 py-2 text-[13px] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
             >
               <Plus size={14} />
               {t('sidebar:addSection')}
             </button>
             <button
               onClick={handleDelete}
-              className="w-full text-left px-4 py-2.5 text-[14px] text-[var(--color-error)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
+              className="w-full text-left px-3.5 py-2 text-[13px] text-[var(--color-error)] hover:bg-[var(--bg-hover)] flex items-center gap-2.5"
             >
               <Trash2 size={14} />
               {t('common:delete')}

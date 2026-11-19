@@ -6,21 +6,60 @@ import { EditorPane } from './EditorPane'
 import { ChatPanel } from './ChatPanel'
 import { StatusBar } from './StatusBar'
 import { useUIStore } from '../../stores/uiStore'
+import { useProjectStore } from '../../stores/projectStore'
+import { TitleBar } from './TitleBar'
+import { Library, PanelLeft, PanelRight } from 'lucide-react'
+
+function TitleButton({
+  onClick,
+  title,
+  active,
+  children
+}: {
+  onClick: () => void
+  title: string
+  active?: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      className={`w-8 h-7 flex items-center justify-center rounded-[var(--radius-sm)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] ${
+        active === false ? 'text-[var(--text-tertiary)]' : 'text-[var(--text-secondary)]'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
 
 export function AppLayout() {
   const { t } = useTranslation('common')
   const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed)
   const chatPanelCollapsed = useUIStore((s) => s.chatPanelCollapsed)
+  const toggleSidebar = useUIStore((s) => s.toggleSidebar)
+  const toggleChatPanel = useUIStore((s) => s.toggleChatPanel)
+  const closeProject = useProjectStore((s) => s.closeProject)
 
   return (
     <div className="h-screen flex flex-col bg-[var(--bg-base)]">
-      {/* Title bar drag region */}
-      <div
-        className="h-10 flex items-center justify-center text-xs font-semibold text-[var(--text-secondary)]/85 select-none shrink-0 border-b border-[var(--border-subtle)]"
-        style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
-      >
-        <span className="pl-20 tracking-[0.12em] uppercase">{t('common:appName')}</span>
-      </div>
+      <TitleBar
+        right={
+          <>
+            <TitleButton onClick={closeProject} title={t('common:library')}>
+              <Library size={15} strokeWidth={1.5} />
+            </TitleButton>
+            <TitleButton onClick={toggleSidebar} title={t('common:toggleSidebar')} active={!sidebarCollapsed}>
+              <PanelLeft size={15} strokeWidth={1.5} />
+            </TitleButton>
+            <TitleButton onClick={toggleChatPanel} title={t('common:toggleEditor')} active={!chatPanelCollapsed}>
+              <PanelRight size={15} strokeWidth={1.5} />
+            </TitleButton>
+          </>
+        }
+      />
+      <div className="h-px bg-[var(--border)] shrink-0" />
 
       {/* Main content area */}
       <div className="flex-1 min-h-0">
@@ -37,7 +76,7 @@ export function AppLayout() {
               >
                 <Sidebar />
               </Panel>
-              <PanelResizeHandle className="w-px hover:w-[3px] bg-[var(--border-subtle)] hover:bg-[var(--border-active)] transition-all duration-150" />
+              <PanelResizeHandle className="w-px bg-[var(--border)]" />
             </>
           )}
 
@@ -49,10 +88,10 @@ export function AppLayout() {
           {/* Chat Panel */}
           {!chatPanelCollapsed && (
             <>
-              <PanelResizeHandle className="w-[2px] hover:w-[4px] bg-[var(--border-subtle)] hover:bg-[var(--border-active)] transition-all duration-150" />
+              <PanelResizeHandle className="w-px bg-[var(--border)]" />
               <Panel
                 id="chat"
-                defaultSize={25}
+                defaultSize={27}
                 minSize={18}
                 maxSize={40}
                 order={3}

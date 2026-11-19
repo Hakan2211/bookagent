@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IPC } from '@shared/ipc-channels'
 import { useProjectStore } from '../../stores/projectStore'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, ListTree } from 'lucide-react'
 
 export function OutlineView() {
   const { t } = useTranslation('sidebar')
@@ -27,20 +27,21 @@ export function OutlineView() {
   }
 
   return (
-    <div>
+    <div className="mt-1">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-6 py-3.5 flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+        className={`mx-2 w-[calc(100%-1rem)] text-left px-3 py-1.5 rounded-[var(--radius-sm)] font-serif text-[15px] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] flex items-center gap-2.5 ${expanded ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}
       >
+        <ListTree size={15} strokeWidth={1.5} className="text-[var(--text-tertiary)] shrink-0" />
+        <span className="flex-1">{t('sidebar:outline')}</span>
         <ChevronRight
-          size={13}
-          className={`transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
+          size={12}
+          className={`text-[var(--text-tertiary)] transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
         />
-        {t('sidebar:outline')}
       </button>
 
       {expanded && (
-        <div className="px-6 py-4 text-[14px] text-[var(--text-secondary)] whitespace-pre-wrap max-h-48 overflow-y-auto leading-relaxed">
+        <div className="px-5 pl-11 py-2 font-serif text-[14px] text-[var(--text-secondary)] whitespace-pre-wrap max-h-48 overflow-y-auto leading-relaxed">
           {content || (
             <span className="text-[var(--text-secondary)]/80 italic">{t('sidebar:noOutlineYet')}</span>
           )}

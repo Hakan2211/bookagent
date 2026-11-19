@@ -5,7 +5,9 @@
 export function markdownToHtml(md: string): string {
   if (!md) return '<p></p>'
 
+  // Files edited on Windows arrive with CRLF; paragraph splitting below expects LF.
   let html = md
+    .replace(/\r\n?/g, '\n')
     // Escape HTML entities first
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

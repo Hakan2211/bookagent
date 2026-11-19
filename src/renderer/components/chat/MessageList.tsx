@@ -23,7 +23,7 @@ export function MessageList({ children }: MessageListProps) {
   if (messages.length === 0 && !children) return null
 
   return (
-    <div ref={scrollRef} className="h-full overflow-y-auto px-6 py-5 space-y-6">
+    <div ref={scrollRef} className="h-full overflow-y-auto px-5 py-5 space-y-5">
       {messages.map((message) => (
         <ChatMessage key={message.id} message={message} />
       ))}

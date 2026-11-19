@@ -1,19 +1,16 @@
 {
   "agentWorking": "Agent arbeitet...",
   "stopAgent": "Agent stoppen",
-  "askAnything": "Frage den Agenten etwas...",
+  "askAnything": "Frag nach deinem Buch…",
   "getStarted": "Erste Schritte",
   "quickActions": "Schnellaktionen",
   "importManuscript": "Manuskript importieren",
-
   "waitingForAnswers": "Beantworte die Fragen oben...",
   "reviewPlanAbove": "Pruefe den Plan oben...",
-
   "clarifyingQuestions": "Rueckfragen",
   "clarifyingQuestionsDesc": "Hilf mir, deine Vision besser zu verstehen, damit ich genau das liefern kann, was du brauchst.",
   "typeYourAnswer": "Deine Antwort eingeben...",
   "continueWithAnswers": "Weiter",
-
   "planProposal": "Ausfuehrungsplan",
   "planExecuting": "Plan wird ausgefuehrt",
   "planComplete": "Plan abgeschlossen",
@@ -23,7 +20,6 @@
   "adjustPlan": "Anpassen",
   "submitAdjustment": "Anpassung senden",
   "adjustPlanPlaceholder": "Beschreibe, wie du den Plan anpassen moechtest...",
-
   "phase": {
     "classifying": "Anfrage wird analysiert...",
     "questioning": "Weitere Details werden gesammelt...",
@@ -33,7 +29,6 @@
     "done": "Fertig",
     "error": "Ein Fehler ist aufgetreten"
   },
-
   "newBook": {
     "createFirst": "Mein erstes Kapitel erstellen",
     "createFirstPrompt": "Hilf mir, mein erstes Kapitel zu erstellen. Frage mich nach dem Genre meines Buches, den Hauptfiguren und der Eröffnungsszene, bevor du schreibst.",
@@ -64,5 +59,9 @@
     "addForeshadowing": "Vorausdeutungen hinzufügen",
     "addForeshadowingPrompt": "Füge diesem Kapitel subtile Vorausdeutungen hinzu, die auf Ereignisse in späteren Kapiteln hinweisen. Die Hinweise sollten natürlich und nicht aufdringlich sein."
   },
-  "aiStartPrompt": "Hilf mir, mit dem Schreiben meines Buches zu beginnen. Frage mich nach dem Genre, dem Setting, den Hauptfiguren und der Eröffnungsszene, bevor du das erste Kapitel erstellst."
+  "aiStartPrompt": "Hilf mir, mit dem Schreiben meines Buches zu beginnen. Frage mich nach dem Genre, dem Setting, den Hauptfiguren und der Eröffnungsszene, bevor du das erste Kapitel erstellst.",
+  "editorTitle": "Lektor",
+  "readingContext": "Liest: {{title}}",
+  "emptyTitle": "Frag nach deinem Buch",
+  "emptyBody": "Dein Lektor kennt jedes Kapitel. Frag nach Handlung, Figuren oder einem einzelnen Satz."
 }

@@ -2,90 +2,78 @@ import React from 'react'
 import type { ChatMessage as ChatMessageType } from '@shared/types'
 import { formatTimestamp } from '../../lib/formatters'
 import { useChatStore } from '../../stores/chatStore'
-import { User, Sparkles, AlertCircle, Loader2 } from 'lucide-react'
+import { User, AlertCircle, Loader2, Check } from 'lucide-react'
+import { Monogram } from './Monogram'
 
 interface ChatMessageProps {
   message: ChatMessageType
 }
 
+/**
+ * User turns sit in a quiet raised card; the editor (AI) speaks in plain
+ * serif text beside its monogram — no bubble, like margin notes.
+ */
 export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === 'user'
   const isStreaming = message.status === 'streaming'
   const isError = message.status === 'error'
   const toolActivity = useChatStore((s) => s.toolActivity)
 
+  if (isUser) {
+    return (
+      <div className="group flex gap-3 items-start" style={{ animation: 'slide-up 200ms ease-out' }}>
+        <User size={18} strokeWidth={1.5} className="mt-2.5 shrink-0 text-[var(--text-tertiary)]" />
+        <div className="min-w-0 flex-1 rounded-[var(--radius-md)] bg-[var(--bg-elevated)] border border-[var(--border)] px-3.5 py-2.5 font-serif text-[15.5px] leading-relaxed text-[var(--text-primary)] whitespace-pre-wrap break-words">
+          {message.content}
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div
-      className={`flex gap-4 ${isUser ? 'flex-row-reverse' : ''}`}
-      style={{ animation: 'slide-up 200ms ease-out' }}
-    >
-      {/* Avatar */}
-      <div
-        className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
-          isUser
-            ? 'bg-[var(--bg-active)]'
-            : isError
-            ? 'bg-[var(--color-error)]/15'
-            : 'bg-[var(--accent-tint)]'
-        }`}
-      >
-        {isUser ? (
-          <User size={15} className="text-[var(--text-secondary)]" />
-        ) : isError ? (
-          <AlertCircle size={15} className="text-[var(--color-error)]" />
+    <div className="group flex gap-3 items-start" style={{ animation: 'slide-up 200ms ease-out' }}>
+      <div className="w-[18px] shrink-0 pt-0.5 flex justify-center">
+        {isError ? (
+          <AlertCircle size={17} strokeWidth={1.5} className="mt-0.5 text-[var(--color-error)]" />
         ) : (
-          <Sparkles size={15} className="text-[var(--text-accent)]" />
+          <Monogram size={22} />
         )}
       </div>
-
-      {/* Bubble */}
-      <div
-        className={`max-w-[80%] rounded-xl px-5 py-3.5 text-[15px] ${
-          isUser
-            ? 'bg-[var(--accent-primary)] text-[var(--text-on-accent)] shadow-[var(--elevation-2)]'
-            : isError
-            ? 'bg-[var(--color-error)]/10 text-[var(--color-error)] border border-[var(--color-error)]/30'
-            : 'bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)]'
-        }`}
-      >
-        {/* Message content */}
-        <div className="whitespace-pre-wrap break-words leading-relaxed">
+      <div className="min-w-0 flex-1">
+        <div
+          className={`font-serif text-[15.5px] leading-[1.6] whitespace-pre-wrap break-words ${
+            isError ? 'text-[var(--color-error)]' : 'text-[var(--text-primary)]'
+          }`}
+        >
           {message.content}
           {isStreaming && !toolActivity.length && (
-            <span className="inline-block w-1.5 h-4 ml-0.5 bg-[var(--text-accent)] animate-pulse rounded-sm align-text-bottom" />
+            <span className="inline-block w-[2px] h-[1.1em] ml-0.5 bg-[var(--accent-primary)] animate-pulse align-text-bottom" />
           )}
         </div>
 
-        {/* Tool activity indicator — shown during streaming when tools are running */}
+        {/* Tool activity — what the editor is doing right now */}
         {isStreaming && toolActivity.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-[var(--border)]/50 space-y-1.5">
-            {toolActivity.map((activity, i) => (
-              <div
-                key={i}
-                className={`flex items-center gap-2 text-[12px] ${
-                  i === toolActivity.length - 1
-                    ? 'text-[var(--text-accent)]'
-                    : 'text-[var(--text-tertiary)]'
-                }`}
-                style={i === toolActivity.length - 1 ? { animation: 'slide-up 150ms ease-out' } : undefined}
-              >
-                {i === toolActivity.length - 1 ? (
-                  <Loader2 size={11} className="shrink-0 animate-spin" />
-                ) : (
-                  <span className="shrink-0 w-[11px] text-center text-[var(--color-success)]">&#10003;</span>
-                )}
-                <span className="truncate">{activity}</span>
-              </div>
-            ))}
+          <div className="mt-3 pl-3 border-l border-[var(--border-strong)] space-y-1">
+            {toolActivity.map((activity, i) => {
+              const current = i === toolActivity.length - 1
+              return (
+                <div
+                  key={i}
+                  className={`flex items-center gap-2 text-[12.5px] ${current ? 'text-[var(--text-secondary)]' : 'text-[var(--text-tertiary)]'}`}
+                >
+                  {current ? (
+                    <Loader2 size={11} className="shrink-0 animate-spin text-[var(--accent-primary)]" />
+                  ) : (
+                    <Check size={11} className="shrink-0 text-[var(--color-success)]" />
+                  )}
+                  <span className="truncate">{activity}</span>
+                </div>
+              )
+            })}
           </div>
         )}
 
-        {/* Timestamp */}
-        <div
-          className={`text-[11px] mt-2 font-medium ${
-            isUser ? 'text-white/65' : 'text-[var(--text-tertiary)]'
-          }`}
-        >
+        <div className="mt-1 text-[11px] text-[var(--text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity">
           {formatTimestamp(message.timestamp)}
         </div>
       </div>

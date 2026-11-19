@@ -9,8 +9,9 @@ import { markdownToHtml, htmlToMarkdown } from '../../lib/markdown'
 import { EditorToolbar } from './EditorToolbar'
 import { SelectionMenu } from './SelectionMenu'
 import { InlineDiffView } from './InlineDiffView'
+import i18n from '../../i18n'
 
-export function TiptapEditor() {
+export function TiptapEditor({ header }: { header?: React.ReactNode }) {
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
   const activeContent = useEditorStore((s) => s.activeContent)
   const isDirty = useEditorStore((s) => s.isDirty)
@@ -30,7 +31,7 @@ export function TiptapEditor() {
         heading: { levels: [1, 2, 3] }
       }),
       Placeholder.configure({
-        placeholder: 'Start writing...'
+        placeholder: i18n.t('editor:placeholder')
       })
     ],
     editorProps: {
@@ -98,7 +99,10 @@ export function TiptapEditor() {
         />
       )}
       <div className="tiptap-editor flex-1 overflow-y-auto" ref={editorContainerRef} style={{ position: 'relative' }}>
-        <EditorContent editor={editor} />
+        <div className="manuscript-page">
+          {header && <div className="max-w-[680px] mx-auto">{header}</div>}
+          <EditorContent editor={editor} />
+        </div>
         <SelectionMenu
           position={menuPosition}
           onAction={requestInlineEdit}

@@ -13,5 +13,6 @@
   "outline": "Gliederung",
   "noOutlineYet": "Noch keine Gliederung erstellt",
   "notes": "Notizen",
-  "writeNotePlaceholder": "{{title}} hier schreiben..."
+  "writeNotePlaceholder": "{{title}} hier schreiben...",
+  "filterPlaceholder": "Kapitel suchen…"
 }

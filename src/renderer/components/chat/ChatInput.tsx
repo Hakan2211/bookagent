@@ -127,16 +127,12 @@ export function ChatInput() {
 
   return (
     <div className="relative shrink-0">
-      {/* Gradient fade separator — replaces hard border-t */}
-      <div className="absolute inset-x-0 -top-8 h-8 bg-gradient-to-b from-transparent to-[var(--bg-chat)] pointer-events-none" />
-
-      {/* Glass-morphism input container */}
-      <div className="px-4 pb-5 pt-4 bg-[var(--glass-bg)] backdrop-blur-xl border-t border-[var(--glass-border)]">
+      <div className="px-4 pb-4 pt-2">
         {/* Model selector */}
-        <div ref={modelRef} className="relative mb-3">
+        <div ref={modelRef} className="relative mb-1.5 -ml-1">
           <button
             onClick={() => setIsModelOpen(!isModelOpen)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-all duration-150"
+            className="flex items-center gap-1.5 px-1.5 py-1 rounded-[var(--radius-sm)] text-[11.5px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-all duration-150"
           >
             <span className="truncate max-w-[200px]">
               {selectedModelInfo?.name || selectedModel}
@@ -150,7 +146,7 @@ export function ChatInput() {
           {isModelOpen &&
             ReactDOM.createPortal(
               <div
-                className="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl overflow-y-auto py-1.5"
+                className="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-[var(--radius-md)] overflow-y-auto py-1"
                 style={{
                   ...menuStyle,
                   animation: 'slide-up 150ms cubic-bezier(0.16, 1, 0.3, 1)',
@@ -179,7 +175,7 @@ export function ChatInput() {
             )}
         </div>
 
-        <div className="flex items-end gap-3">
+        <div className="flex items-end gap-2 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--bg-input)] pl-4 pr-1.5 py-1.5 focus-within:border-[var(--border-active)] transition-colors">
           <textarea
             ref={textareaRef}
             value={input}
@@ -196,23 +192,23 @@ export function ChatInput() {
             }
             disabled={isAgentWorking}
             rows={1}
-            className="flex-1 bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-2xl px-5 py-4 text-[15px] resize-none outline-none shadow-[inset_0_1px_2px_rgba(0,0,0,0.2),0_0_8px_rgba(129,140,248,0.06)] focus:border-[var(--border-active)] focus:shadow-[inset_0_1px_2px_rgba(0,0,0,0.15),0_0_0_2px_var(--focus-ring-soft),0_0_20px_rgba(129,140,248,0.12)] placeholder:text-[var(--text-tertiary)]/70 disabled:opacity-50 transition-all duration-200 leading-relaxed"
+            className="flex-1 bg-transparent text-[var(--text-primary)] py-2 font-serif text-[15.5px] resize-none outline-none placeholder:text-[var(--text-tertiary)] disabled:opacity-60 leading-relaxed"
           />
           {isAgentWorking ? (
             <button
               onClick={handleCancel}
-              className="shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl bg-[var(--color-error)]/80 text-white shadow-[0_0_12px_rgba(239,68,68,0.3)] hover:bg-[var(--color-error)] hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] focus-visible:shadow-[0_0_0_2px_var(--bg-chat),0_0_0_4px_var(--focus-ring)] transition-all duration-200 active:scale-95"
+              className="shrink-0 w-9 h-9 flex items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-strong)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] active:scale-95"
               title={t('chat:stopAgent')}
             >
-              <Square size={16} />
+              <Square size={13} fill="currentColor" />
             </button>
           ) : (
             <button
               onClick={handleSend}
               disabled={!input.trim()}
-              className="shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl bg-[var(--accent-primary)] text-[var(--text-on-accent)] shadow-[var(--shadow-glow-sm)] disabled:opacity-35 disabled:shadow-none hover:bg-[var(--accent-primary-strong)] focus-visible:shadow-[0_0_0_2px_var(--bg-chat),0_0_0_4px_var(--focus-ring)] transition-all duration-200 active:scale-95"
+              className="shrink-0 w-9 h-9 flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--accent-primary)] text-[var(--text-on-accent)] disabled:opacity-35 hover:bg-[var(--accent-primary-strong)] active:scale-95"
             >
-              <SendHorizontal size={18} />
+              <SendHorizontal size={16} />
             </button>
           )}
         </div>

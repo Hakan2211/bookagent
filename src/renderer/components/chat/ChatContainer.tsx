@@ -6,6 +6,21 @@ import { AgentPhaseIndicator } from './AgentPhaseIndicator'
 import { AgentQuestionsCard } from './AgentQuestionsCard'
 import { AgentPlanCard } from './AgentPlanCard'
 import { useChatStore } from '../../stores/chatStore'
+import { useTranslation } from 'react-i18next'
+import { Monogram } from './Monogram'
+
+function ChatEmptyState() {
+  const { t } = useTranslation('chat')
+  return (
+    <div className="h-full flex flex-col items-center justify-center text-center px-8">
+      <Monogram size={40} />
+      <p className="mt-4 font-serif text-[17px] text-[var(--text-primary)]">{t('chat:emptyTitle')}</p>
+      <p className="mt-1.5 font-serif italic text-[14.5px] text-[var(--text-secondary)] max-w-[260px]">
+        {t('chat:emptyBody')}
+      </p>
+    </div>
+  )
+}
 
 export function ChatContainer() {
   const messages = useChatStore((s) => s.messages)
@@ -22,8 +37,8 @@ export function ChatContainer() {
 
   return (
     <div className="h-full flex flex-col">
-      {messages.length === 0 && <QuickActions />}
       <div className="flex-1 min-h-0 overflow-hidden">
+        {messages.length === 0 && !isAgentWorking && <ChatEmptyState />}
         <MessageList>
           {/* Multi-phase workflow UI elements — inside scroll area */}
           {isAgentWorking && agentPhase !== 'done' && agentPhase !== 'executing' && (
@@ -45,6 +60,7 @@ export function ChatContainer() {
           )}
         </MessageList>
       </div>
+      {!isAgentWorking && !currentQuestions?.length && agentPhase !== 'awaiting_plan' && <QuickActions />}
       <ChatInput />
     </div>
   )

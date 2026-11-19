@@ -13,5 +13,6 @@
   "outline": "Outline",
   "noOutlineYet": "No outline generated yet",
   "notes": "Notes",
-  "writeNotePlaceholder": "Write {{title}} here..."
+  "writeNotePlaceholder": "Write {{title}} here...",
+  "filterPlaceholder": "Search chapters…"
 }

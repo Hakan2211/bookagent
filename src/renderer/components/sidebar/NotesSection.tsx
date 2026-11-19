@@ -2,7 +2,12 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useProjectStore } from '../../stores/projectStore'
 import { IPC } from '@shared/ipc-channels'
-import { ChevronRight, FileText } from 'lucide-react'
+import { ChevronRight, FileText, Users, Globe, BookOpen } from 'lucide-react'
+
+function NoteIcon({ id }: { id: string }) {
+  const Icon = id === 'characters' ? Users : id === 'world' ? Globe : id === 'style' ? BookOpen : FileText
+  return <Icon size={15} strokeWidth={1.5} className="text-[var(--text-tertiary)] shrink-0" />
+}
 
 export function NotesSection() {
   const { t } = useTranslation('sidebar')
@@ -12,16 +17,16 @@ export function NotesSection() {
   if (!manifest) return null
 
   return (
-    <div className="mt-4">
+    <div>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-6 py-3.5 flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+        className="label-caps w-full px-5 pb-2 flex items-center gap-1.5 hover:text-[var(--text-secondary)]"
       >
+        {t('sidebar:notes')}
         <ChevronRight
-          size={13}
+          size={11}
           className={`transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
         />
-        {t('sidebar:notes')}
       </button>
 
       {expanded && (
@@ -58,14 +63,14 @@ function NoteItem({ noteId, title }: { noteId: string; title: string }) {
     <div>
       <button
         onClick={handleOpen}
-        className="w-full text-left px-6 py-3.5 pl-11 text-[15px] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] transition-all flex items-center gap-3"
+        className={`mx-2 w-[calc(100%-1rem)] text-left px-3 py-1.5 rounded-[var(--radius-sm)] font-serif text-[15px] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] flex items-center gap-2.5 ${isOpen ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}
       >
-        <FileText size={14} className="text-[var(--text-tertiary)] shrink-0" />
+        <NoteIcon id={noteId} />
         {title}
       </button>
 
       {isOpen && (
-        <div className="px-6 pb-4">
+        <div className="px-4 pt-1 pb-3">
           <textarea
             value={content}
             onChange={(e) => {
@@ -73,7 +78,7 @@ function NoteItem({ noteId, title }: { noteId: string; title: string }) {
               setIsDirty(true)
             }}
             onBlur={() => isDirty && handleSave()}
-            className="w-full h-40 text-[14px] bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-xl px-4 py-3.5 resize-y outline-none focus:border-[var(--border-active)] focus:shadow-[0_0_0_2px_var(--focus-ring-soft),var(--shadow-glow-sm)] placeholder:text-[var(--text-tertiary)]/85 transition-all leading-relaxed"
+            className="w-full h-40 text-[14px] bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)] rounded-[var(--radius-md)] px-3 py-2.5 font-serif resize-y outline-none focus:border-[var(--border-active)] placeholder:text-[var(--text-tertiary)]/85 transition-all leading-relaxed"
             placeholder={t('sidebar:writeNotePlaceholder', { title: title.toLowerCase() })}
           />
         </div>

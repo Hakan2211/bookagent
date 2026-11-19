@@ -180,10 +180,12 @@ export function EditorPane() {
   return (
     <div className="h-full flex flex-col bg-[var(--bg-editor)]">
       {isInDiffMode && <ChangeReviewBar />}
-      <ChapterHeader />
       <div className="flex-1 min-h-0 overflow-hidden">
         {isInDiffMode && pendingDiff ? (
-          <div className="h-full overflow-y-auto">
+          <div className="h-full overflow-y-auto px-14">
+            <div className="max-w-[680px] mx-auto">
+              <ChapterHeader />
+            </div>
             <DiffOverlay
               changeGroups={pendingDiff.changeGroups}
               acceptedGroupIds={acceptedGroupIds}
@@ -192,7 +194,7 @@ export function EditorPane() {
             />
           </div>
         ) : (
-          <TiptapEditor />
+          <TiptapEditor header={<ChapterHeader />} />
         )}
       </div>
     </div>

@@ -11,7 +11,7 @@ interface ProjectState {
 
   openProject: (path: string) => Promise<void>
   createProject: (path: string, metadata: BookMetadata) => Promise<void>
-  closeProject: () => void
+  closeProject: () => Promise<void>
   updateManifest: (partial: Partial<BookManifest>) => void
   refreshManifest: () => Promise<void>
   loadRecents: () => Promise<void>
@@ -77,11 +77,23 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     }
   },
 
-  closeProject: () => {
-    window.api.invoke(IPC.PROJECT_CLOSE).catch((err: unknown) => {
+  closeProject: async () => {
+    // Flush unsaved text before leaving, then clear editor state.
+    const { useEditorStore } = await import('./editorStore')
+    const editor = useEditorStore.getState()
+    if (editor.isDirty) {
+      try {
+        await editor.saveChapter()
+      } catch (err) {
+        console.error('Failed to save before closing:', err)
+      }
+    }
+    editor.reset()
+    await window.api.invoke(IPC.PROJECT_CLOSE).catch((err: unknown) => {
       console.error('Failed to close project:', err)
     })
     set({ isOpen: false, manifest: null })
+    get().loadRecents()
   },
 
   updateManifest: (partial: Partial<BookManifest>) => {

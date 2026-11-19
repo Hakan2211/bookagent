@@ -59,33 +59,30 @@ export function QuickActions() {
     heading = t('chat:quickActions')
   }
 
+  // Three short chips sit above the input; the rest are a click away in chat.
+  const visible = actions.slice(0, 3)
+
   return (
-    <div className="p-6 space-y-4">
-      <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-        {heading}
-      </p>
-      <div className="flex flex-wrap gap-3.5">
-        {actions.map((action) => (
-          <button
-            key={action.label}
-            onClick={() => sendPrompt(action.prompt)}
-            disabled={isAgentWorking}
-            className="text-[14px] px-4 py-3 rounded-xl bg-[var(--bg-input)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--border-active)] hover:shadow-[var(--shadow-xs)] transition-all disabled:opacity-50 font-medium"
-          >
-            {action.label}
-          </button>
-        ))}
-        {!hasChapters && (
-          <button
-            onClick={openImportWizard}
-            disabled={isAgentWorking}
-            className="text-[14px] px-4 py-3 rounded-xl bg-[var(--bg-input)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--border-active)] hover:shadow-[var(--shadow-xs)] transition-all disabled:opacity-50 font-medium inline-flex items-center gap-2"
-          >
-            <FileUp size={14} />
-            {t('chat:importManuscript')}
-          </button>
-        )}
-      </div>
+    <div className="px-4 pt-2 pb-1 flex flex-wrap gap-2" aria-label={heading}>
+      {visible.map((action) => (
+        <button
+          key={action.label}
+          onClick={() => sendPrompt(action.prompt)}
+          disabled={isAgentWorking}
+          className="px-2.5 py-1 rounded-[var(--radius-sm)] border border-[var(--border-strong)] font-serif text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] disabled:opacity-50"
+        >
+          {action.label}
+        </button>
+      ))}
+      {!hasChapters && (
+        <button
+          onClick={openImportWizard}
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] border border-dashed border-[var(--border-strong)] font-serif text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
+        >
+          <FileUp size={12} />
+          {t('chat:importManuscript')}
+        </button>
+      )}
     </div>
   )
 }

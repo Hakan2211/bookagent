@@ -55,5 +55,11 @@
     "upToDate": "You're up to date",
     "checking": "Checking…",
     "version": "Version {{version}}"
-  }
+  },
+  "themePaper": "Switch to Paper (light)",
+  "themeInk": "Switch to Ink (dark)",
+  "sessionWords": "Session: {{words}} words",
+  "library": "Back to library",
+  "toggleSidebar": "Toggle chapters (Ctrl+B)",
+  "toggleEditor": "Toggle editor panel"
 }

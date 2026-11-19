@@ -55,5 +55,8 @@
     "generating": "Generating...",
     "reviewChanges": "Review Changes",
     "error": "Error"
-  }
+  },
+  "placeholder": "Start writing…",
+  "clickToRename": "Click to rename",
+  "focusMode": "Focus mode (F11)"
 }
