@@ -12,12 +12,23 @@
   "dropFileHere": "Datei hier ablegen",
   "fileTypes": "PDF, DOCX, TXT oder MD",
   "browseFiles": "Dateien durchsuchen",
-  "splitAdjusterNote": "Visuelle Aufteilungsanpassung kommt in einem zukünftigen Update.",
   "wizardStep": {
     "upload": "Hochladen",
     "review": "Aufteilen",
     "confirm": "Bestätigen"
   },
   "importChapters": "{{count}} Kapitel importieren",
-  "importChapters_one": "{{count}} Kapitel importieren"
+  "importChapters_one": "{{count}} Kapitel importieren",
+  "originalDocument": "Originaldokument",
+  "dragBreaksHint": "Kapitelumbrüche zum Verschieben ziehen. Pfeiltasten verschieben einen ausgewählten Umbruch.",
+  "previousBreak": "Vorheriges Kapitel",
+  "nextBreak": "Nächstes Kapitel",
+  "chapterBreak": "Kapitelumbruch",
+  "chapterBreakBefore": "Kapitelumbruch vor {{title}}",
+  "chapterList": "Kapitelliste",
+  "mergeSplitHint": "Umbenennen, mit dem nächsten Kapitel zusammenführen oder teilen.",
+  "chapterTitle": "Kapiteltitel",
+  "mergeWithNext": "Mit nächstem Kapitel zusammenführen",
+  "splitChapter": "Kapitel teilen",
+  "newChapterTitle": "Kapitel {{n}}"
 }

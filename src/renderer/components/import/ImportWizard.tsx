@@ -2,14 +2,15 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '../common/Modal'
 import { FileUpload } from './FileUpload'
-import { ChapterPreview } from './ChapterPreview'
+import { SplitEditor } from './SplitEditor'
+import { buildModel, toChapters, type SplitModel } from './splitModel'
 import { Button } from '../common/Button'
 import { ProgressBar } from '../common/ProgressBar'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import { useUIStore } from '../../stores/uiStore'
 import { useProjectStore } from '../../stores/projectStore'
 import { IPC } from '@shared/ipc-channels'
-import type { ProposedSplit, ProposedChapter, BookMetadata } from '@shared/types'
+import type { ProposedSplit, BookMetadata } from '@shared/types'
 import { ArrowLeft, Check, Download } from 'lucide-react'
 
 type WizardStep = 'upload' | 'parsing' | 'review' | 'confirm'
@@ -57,7 +58,8 @@ export function ImportWizard() {
   const [filePath, setFilePath] = useState<string | null>(null)
   const [progress, setProgress] = useState({ step: '', percent: 0 })
   const [proposedSplit, setProposedSplit] = useState<ProposedSplit | null>(null)
-  const [chapters, setChapters] = useState<ProposedChapter[]>([])
+  const [model, setModel] = useState<SplitModel | null>(null)
+  const chapterCount = model?.starts.length ?? 0
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -81,7 +83,7 @@ export function ImportWizard() {
       })) as ProposedSplit
 
       setProposedSplit(result)
-      setChapters(result.chapters)
+      setModel(buildModel(result.chapters))
       setStep('review')
     } catch (err) {
       setError((err as Error).message)
@@ -93,7 +95,7 @@ export function ImportWizard() {
   }
 
   const handleConfirm = async () => {
-    if (!filePath || !proposedSplit) return
+    if (!filePath || !proposedSplit || !model) return
     setStep('confirm')
     setIsProcessing(true)
 
@@ -119,7 +121,7 @@ export function ImportWizard() {
       await window.api.invoke(IPC.IMPORT_CONFIRM, {
         projectPath,
         sourceFilePath: filePath,
-        confirmedChapters: chapters.map((ch) => ({
+        confirmedChapters: toChapters(model).map((ch) => ({
           title: ch.title,
           text: ch.text,
           summary: ch.summary
@@ -141,7 +143,7 @@ export function ImportWizard() {
     setStep('upload')
     setFilePath(null)
     setProposedSplit(null)
-    setChapters([])
+    setModel(null)
     setTitle('')
     setAuthor('')
     setError(null)
@@ -150,7 +152,7 @@ export function ImportWizard() {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title={t('import:importManuscript')} size="xl">
+    <Modal isOpen={isOpen} onClose={handleClose} title={t('import:importManuscript')} size="wide">
       <div className="p-6">
         <WizardSteps step={step} />
         {error && (
@@ -172,7 +174,7 @@ export function ImportWizard() {
         )}
 
         {/* Step 3: Review */}
-        {step === 'review' && proposedSplit && (
+        {step === 'review' && proposedSplit && model && (
           <div>
             <div className="grid grid-cols-2 gap-4 mb-5">
               <div>
@@ -201,7 +203,7 @@ export function ImportWizard() {
 
             <div className="mb-3 flex items-center justify-between">
               <span className="font-serif text-[18px] text-[var(--text-primary)]">
-                {t('import:chaptersDetected', { count: chapters.length, words: proposedSplit.totalWords.toLocaleString() })}
+                {t('import:chaptersDetected', { count: chapterCount, words: proposedSplit.totalWords.toLocaleString() })}
               </span>
               {proposedSplit.detectedGenre && (
                 <span className="text-xs text-[var(--text-tertiary)]">
@@ -210,14 +212,7 @@ export function ImportWizard() {
               )}
             </div>
 
-            <ChapterPreview
-              chapters={chapters}
-              onUpdateChapter={(index, updates) => {
-                const updated = [...chapters]
-                updated[index] = { ...updated[index], ...updates }
-                setChapters(updated)
-              }}
-            />
+            <SplitEditor model={model} onChange={setModel} />
 
             <div className="flex justify-between gap-2 mt-6">
               <Button variant="secondary" onClick={() => setStep('upload')}>
@@ -226,7 +221,7 @@ export function ImportWizard() {
               </Button>
               <Button variant="primary" onClick={handleConfirm} isLoading={isProcessing}>
                 <Download size={15} />
-                {t('import:importChapters', { count: chapters.length })}
+                {t('import:importChapters', { count: chapterCount })}
               </Button>
             </div>
           </div>
