@@ -40,9 +40,22 @@ export function createMainWindow(): BrowserWindow {
     }
   })
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow?.show()
-  })
+  // Show on the first of: first paint, page loaded, or a safety timeout.
+  // On Windows a hidden window is sometimes treated as occluded and never
+  // paints, so 'ready-to-show' alone can leave the app invisible forever.
+  const win = mainWindow
+  let shown = false
+  const reveal = (): void => {
+    if (shown || win.isDestroyed()) return
+    shown = true
+    clearTimeout(fallback)
+    win.show()
+    win.focus()
+  }
+  const fallback = setTimeout(reveal, 3000)
+  win.once('ready-to-show', reveal)
+  win.webContents.once('did-finish-load', reveal)
+  win.on('closed', () => clearTimeout(fallback))
 
   // Open external links in browser
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {

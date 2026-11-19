@@ -44,7 +44,23 @@ const aiRegistry = new AIRegistry()
 const snapshotManager = new SnapshotManager()
 const searchEngine = new SearchEngine()
 
+// One Kitapmi at a time: a second launch focuses the existing window.
+// (Packaged builds only, so dev runs and screenshot captures can run alongside.)
+const isPrimaryInstance = !app.isPackaged || app.requestSingleInstanceLock()
+if (!isPrimaryInstance) {
+  app.quit()
+} else {
+  app.on('second-instance', () => {
+    const win = BrowserWindow.getAllWindows()[0]
+    if (!win) return
+    if (win.isMinimized()) win.restore()
+    if (!win.isVisible()) win.show()
+    win.focus()
+  })
+}
+
 app.whenReady().then(async () => {
+  if (!isPrimaryInstance) return
   // Set app user model id for Windows
   app.setAppUserModelId('com.kitapmi.app')
 
