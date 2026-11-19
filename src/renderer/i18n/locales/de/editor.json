@@ -86,5 +86,7 @@
   "emptySub": "Schreib die erste Zeile selbst – oder lass dir vom Lektor helfen.",
   "emptyStartWriting": "Kapitel 1 beginnen",
   "emptyOutlineAI": "Buch mit KI gliedern",
-  "emptyImport": "Bestehendes Manuskript importieren"
+  "emptyImport": "Bestehendes Manuskript importieren",
+  "focusMinutes": "{{count}} Min.",
+  "focusExit": "Esc zum Beenden"
 }

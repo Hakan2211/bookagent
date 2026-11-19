@@ -58,6 +58,11 @@ export function App() {
       handleMenuEvent('menu:export', (format: string) => {
         openExportModal(format as ExportFormat)
       }),
+      handleMenuEvent('menu:toggle-focus', () => {
+        const ui = useUIStore.getState()
+        if (ui.isFocusMode) ui.setFocusMode(false)
+        else if (useEditorStore.getState().activeChapterId) ui.setFocusMode(true)
+      }),
       handleMenuEvent('menu:preview', () => {
         togglePreviewMode()
       })

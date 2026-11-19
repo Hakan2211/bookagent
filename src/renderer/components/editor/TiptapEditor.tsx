@@ -10,8 +10,9 @@ import { EditorToolbar } from './EditorToolbar'
 import { SelectionMenu } from './SelectionMenu'
 import { InlineDiffView } from './InlineDiffView'
 import i18n from '../../i18n'
+import { FocusParagraph } from './extensions/focusParagraph'
 
-export function TiptapEditor({ header }: { header?: React.ReactNode }) {
+export function TiptapEditor({ header, bare = false }: { header?: React.ReactNode; bare?: boolean }) {
   const activeChapterId = useEditorStore((s) => s.activeChapterId)
   const activeContent = useEditorStore((s) => s.activeContent)
   const isDirty = useEditorStore((s) => s.isDirty)
@@ -30,13 +31,16 @@ export function TiptapEditor({ header }: { header?: React.ReactNode }) {
       StarterKit.configure({
         heading: { levels: [1, 2, 3] }
       }),
+      FocusParagraph,
       Placeholder.configure({
         placeholder: i18n.t('editor:placeholder')
       })
     ],
     editorProps: {
       attributes: {
-        class: 'ProseMirror'
+        class: 'ProseMirror',
+        // Focus mode is about flow — no red squiggles.
+        spellcheck: bare ? 'false' : 'true'
       }
     },
     editable: !isInDiffMode,
@@ -89,7 +93,7 @@ export function TiptapEditor({ header }: { header?: React.ReactNode }) {
 
   return (
     <div className="h-full flex flex-col">
-      <EditorToolbar editor={editor} />
+      {!bare && <EditorToolbar editor={editor} />}
       {inlineEdit.isActive && (
         <InlineDiffView
           inlineEdit={inlineEdit}
@@ -103,11 +107,11 @@ export function TiptapEditor({ header }: { header?: React.ReactNode }) {
           {header && <div className="max-w-[680px] mx-auto">{header}</div>}
           <EditorContent editor={editor} />
         </div>
-        <SelectionMenu
+        {!bare && <SelectionMenu
           position={menuPosition}
           onAction={requestInlineEdit}
           containerRef={editorContainerRef}
-        />
+        />}
       </div>
     </div>
   )

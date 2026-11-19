@@ -86,5 +86,7 @@
   "emptySub": "Write the first line yourself, or let the editor help you begin.",
   "emptyStartWriting": "Start writing Chapter 1",
   "emptyOutlineAI": "Outline the book with AI",
-  "emptyImport": "Import an existing manuscript"
+  "emptyImport": "Import an existing manuscript",
+  "focusMinutes": "{{count}} min",
+  "focusExit": "Esc to exit"
 }

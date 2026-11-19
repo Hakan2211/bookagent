@@ -116,8 +116,13 @@ export function createMenu(mainWindow: BrowserWindow): void {
           click: () => mainWindow.webContents.send('menu:quick-switch')
         },
         { type: 'separator' },
+        {
+          label: 'Focus Mode',
+          accelerator: 'F11',
+          click: () => mainWindow.webContents.send('menu:toggle-focus')
+        },
         { role: 'toggleDevTools' },
-        { role: 'togglefullscreen' }
+        { role: 'togglefullscreen', accelerator: 'CmdOrCtrl+Shift+F11' }
       ]
     },
     {

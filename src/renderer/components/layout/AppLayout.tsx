@@ -8,6 +8,8 @@ import { StatusBar } from './StatusBar'
 import { useUIStore } from '../../stores/uiStore'
 import { useProjectStore } from '../../stores/projectStore'
 import { TitleBar } from './TitleBar'
+import { FocusMode } from '../editor/FocusMode'
+import { useEditorStore } from '../../stores/editorStore'
 import { Library, PanelLeft, PanelRight } from 'lucide-react'
 
 function TitleButton({
@@ -41,6 +43,9 @@ export function AppLayout() {
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
   const toggleChatPanel = useUIStore((s) => s.toggleChatPanel)
   const closeProject = useProjectStore((s) => s.closeProject)
+  const isFocusMode = useUIStore((s) => s.isFocusMode)
+  const hasChapter = useEditorStore((s) => !!s.activeChapterId)
+  const isInDiffMode = useEditorStore((s) => s.isInDiffMode)
 
   return (
     <div className="h-screen flex flex-col bg-[var(--bg-base)]">
@@ -105,6 +110,8 @@ export function AppLayout() {
 
       {/* Status bar */}
       <StatusBar />
+
+      {isFocusMode && hasChapter && !isInDiffMode && <FocusMode />}
     </div>
   )
 }

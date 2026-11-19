@@ -456,3 +456,36 @@
 .diff-delete + .diff-insert {
   margin-left: 0.18em;
 }
+
+/* ─── Focus mode ─────────────────────────── */
+
+.focus-mode .tiptap-editor {
+  padding: 50vh 2rem;
+  background: transparent;
+}
+
+.focus-mode .manuscript-page {
+  background: transparent;
+  box-shadow: none;
+}
+
+.focus-mode .ProseMirror {
+  font-size: 21px;
+}
+
+.focus-mode .ProseMirror > * {
+  opacity: 0.32;
+  transition: opacity 300ms ease;
+}
+
+.focus-mode .ProseMirror > .is-current {
+  opacity: 1;
+}
+
+.focus-vignette {
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+[data-theme='paper'] .focus-vignette {
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, transparent 55%, rgba(120, 90, 50, 0.12) 100%);
+}
