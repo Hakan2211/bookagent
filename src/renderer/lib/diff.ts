@@ -14,8 +14,7 @@ export function computeDiff(original: string, revised: string): ChangeGroup[] {
 
 export function computeFullDiff(original: string, revised: string): FullDiff {
   const dmp = new DiffMatchPatch()
-  const rawDiffs = dmp.diff_main(original, revised)
-  dmp.diff_cleanupSemantic(rawDiffs)
+  const rawDiffs = wordDiff(dmp, original, revised)
 
   const allChanges: TextChange[] = []
   let originalOffset = 0
@@ -39,6 +38,40 @@ export function computeFullDiff(original: string, revised: string): FullDiff {
     allChanges,
     changeGroups: groupChanges(allChanges)
   }
+}
+
+/**
+ * Diff on whole words instead of characters, so prose edits read as
+ * "jener → dieser" rather than "jen → dies". Each distinct token (word or
+ * whitespace run) is encoded as one char, diffed, then decoded.
+ */
+function wordDiff(dmp: DiffMatchPatch, a: string, b: string): [number, string][] {
+  const tokenToChar = new Map<string, string>()
+  const tokens: string[] = []
+  const encode = (text: string): string => {
+    let out = ''
+    for (const tok of text.match(/\s+|[^\s]+/g) ?? []) {
+      let ch = tokenToChar.get(tok)
+      if (ch === undefined) {
+        ch = String.fromCharCode(tokens.length + 1)
+        tokenToChar.set(tok, ch)
+        tokens.push(tok)
+      }
+      out += ch
+    }
+    return out
+  }
+  const ea = encode(a)
+  const eb = encode(b)
+  if (tokens.length > 60000) {
+    // Too many distinct tokens to encode in the BMP — fall back to char diff.
+    const raw = dmp.diff_main(a, b)
+    dmp.diff_cleanupSemantic(raw)
+    return raw
+  }
+  const diffs = dmp.diff_main(ea, eb, false)
+  dmp.diff_cleanupSemantic(diffs)
+  return diffs.map(([op, text]) => [op, Array.from(text, (c) => tokens[c.charCodeAt(0) - 1]).join('')])
 }
 
 function groupChanges(changes: TextChange[]): ChangeGroup[] {

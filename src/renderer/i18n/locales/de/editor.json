@@ -46,7 +46,7 @@
     "continueDesc": "Von hier aus weiterschreiben",
     "custom": "Eigene...",
     "customDesc": "Eigene Bearbeitungsanweisung eingeben",
-    "customPlaceholder": "Beschreibe, wie der Text bearbeitet werden soll...",
+    "customPlaceholder": "Sag dem Lektor, was er ändern soll…",
     "apply": "Anwenden",
     "accept": "Annehmen",
     "reject": "Verwerfen",
@@ -54,9 +54,37 @@
     "dismiss": "Schließen",
     "generating": "Wird generiert...",
     "reviewChanges": "Änderungen prüfen",
-    "error": "Fehler"
+    "error": "Fehler",
+    "tone": "Ton:",
+    "toneName": {
+      "warmer": "Wärmer",
+      "darker": "Dunkler",
+      "tense": "Spannender",
+      "simpler": "Einfacher"
+    },
+    "tonePrompt": {
+      "warmer": "Schreibe dies in einem wärmeren, zärtlicheren Ton um. Behalte die Bedeutung bei.",
+      "darker": "Schreibe dies in einem dunkleren, schwereren Ton um. Behalte die Bedeutung bei.",
+      "tense": "Schreibe dies spannender und drängender um. Behalte die Bedeutung bei.",
+      "simpler": "Schreibe dies in einfacherer, schlichterer Sprache um. Behalte die Bedeutung bei."
+    }
   },
   "placeholder": "Fang an zu schreiben…",
   "clickToRename": "Zum Umbenennen klicken",
-  "focusMode": "Fokusmodus (F11)"
+  "focusMode": "Fokusmodus (F11)",
+  "diffReplaced": "„{{from}}“ → „{{to}}“",
+  "diffAdded": "Ergänzt: „{{text}}“",
+  "diffRemoved": "Entfernt: „{{text}}“",
+  "reviewing": "{{count}} Änderungen prüfen",
+  "reviewing_one": "{{count}} Änderung prüfen",
+  "stepOf": "{{i}} von {{n}}",
+  "prevChange": "Vorherige Änderung (Strg+[)",
+  "nextChange": "Nächste Änderung (Strg+])",
+  "applySelected": "{{count}} Änderungen übernehmen",
+  "applySelected_one": "{{count}} Änderung übernehmen",
+  "emptyHeadline": "Jedes Buch beginnt mit einer Seite.",
+  "emptySub": "Schreib die erste Zeile selbst – oder lass dir vom Lektor helfen.",
+  "emptyStartWriting": "Kapitel 1 beginnen",
+  "emptyOutlineAI": "Buch mit KI gliedern",
+  "emptyImport": "Bestehendes Manuskript importieren"
 }

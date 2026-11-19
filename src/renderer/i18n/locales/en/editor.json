@@ -46,7 +46,7 @@
     "continueDesc": "Continue writing from here",
     "custom": "Custom...",
     "customDesc": "Enter a custom editing instruction",
-    "customPlaceholder": "Describe how to edit this text...",
+    "customPlaceholder": "Tell the editor what to change…",
     "apply": "Apply",
     "accept": "Accept",
     "reject": "Discard",
@@ -54,9 +54,37 @@
     "dismiss": "Dismiss",
     "generating": "Generating...",
     "reviewChanges": "Review Changes",
-    "error": "Error"
+    "error": "Error",
+    "tone": "Tone:",
+    "toneName": {
+      "warmer": "Warmer",
+      "darker": "Darker",
+      "tense": "More tense",
+      "simpler": "Simpler"
+    },
+    "tonePrompt": {
+      "warmer": "Rewrite this with a warmer, more tender tone. Keep the meaning.",
+      "darker": "Rewrite this with a darker, heavier tone. Keep the meaning.",
+      "tense": "Rewrite this to feel more tense and urgent. Keep the meaning.",
+      "simpler": "Rewrite this in simpler, plainer language. Keep the meaning."
+    }
   },
   "placeholder": "Start writing…",
   "clickToRename": "Click to rename",
-  "focusMode": "Focus mode (F11)"
+  "focusMode": "Focus mode (F11)",
+  "diffReplaced": "“{{from}}” → “{{to}}”",
+  "diffAdded": "Added “{{text}}”",
+  "diffRemoved": "Removed “{{text}}”",
+  "reviewing": "Reviewing {{count}} changes",
+  "reviewing_one": "Reviewing {{count}} change",
+  "stepOf": "{{i}} of {{n}}",
+  "prevChange": "Previous change (Ctrl+[)",
+  "nextChange": "Next change (Ctrl+])",
+  "applySelected": "Apply {{count}} changes",
+  "applySelected_one": "Apply {{count}} change",
+  "emptyHeadline": "Every book starts with a page.",
+  "emptySub": "Write the first line yourself, or let the editor help you begin.",
+  "emptyStartWriting": "Start writing Chapter 1",
+  "emptyOutlineAI": "Outline the book with AI",
+  "emptyImport": "Import an existing manuscript"
 }

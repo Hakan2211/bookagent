@@ -1,16 +1,17 @@
 import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  ListChecks,
-  Play,
   X,
-  MessageSquare,
   AlertTriangle,
-  ChevronDown,
-  ChevronUp,
   Loader2,
   Check,
-  FileText
+  FileText,
+  Split,
+  Type,
+  PenTool,
+  Pencil,
+  Trash2,
+  Search
 } from 'lucide-react'
 import type { AgentPlan, PlanStep } from '@shared/types'
 import { useChatStore } from '../../stores/chatStore'
@@ -52,131 +53,88 @@ export function AgentPlanCard({ plan, isExecuting, isComplete }: AgentPlanCardPr
     }
   }, [isAdjusting, adjustmentText, submitPlanDecision])
 
+  const touches = plan.affectedChapters.map((c) => c.title).join(', ')
+
   return (
     <div
-      className="mx-5 my-4 bg-[var(--bg-input)] border border-[var(--border-active)] rounded-xl overflow-hidden"
-      style={{
-        boxShadow: 'var(--shadow-sm), var(--shadow-glow-sm)',
-        animation: 'slide-up 200ms ease-out'
-      }}
+      className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--bg-surface)] overflow-hidden"
+      style={{ animation: 'slide-up 200ms ease-out' }}
     >
       {/* Header */}
-      <div className="px-5 pt-5 pb-3">
-        <div className="flex items-center gap-2.5 mb-3">
-          <ListChecks size={15} className="text-[var(--text-accent)]" />
-          <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-accent)]">
-            {isComplete
-              ? t('chat:planComplete')
-              : isExecuting
-              ? t('chat:planExecuting')
-              : t('chat:planProposal')}
-          </div>
-          {isExecuting && <Loader2 size={13} className="animate-spin text-[var(--text-accent)]" />}
-          {isComplete && <Check size={13} className="text-[var(--color-success)]" />}
+      <div className="px-4 pt-3.5 pb-2">
+        <div className="flex items-baseline gap-2">
+          <h3 className="font-serif text-[24px] leading-none text-[var(--text-primary)]">
+            {isComplete ? t('chat:planComplete') : isExecuting ? t('chat:planExecuting') : t('chat:planTitle')}
+          </h3>
+          <span className="font-serif italic text-[14px] text-[var(--text-secondary)]">
+            · {t('chat:planSteps', { count: plan.steps.length })}
+          </span>
+          {isExecuting && <Loader2 size={13} className="ml-auto animate-spin text-[var(--accent-primary)]" />}
+          {isComplete && <Check size={14} className="ml-auto text-[var(--color-success)]" />}
         </div>
-
-        {/* Summary */}
-        <p className="text-[15px] text-[var(--text-primary)] leading-relaxed font-medium">
-          {plan.summary}
-        </p>
-
-        {/* Estimated scope badge */}
-        {plan.estimatedScope && (
-          <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--accent-primary)]/10 text-[12px] text-[var(--text-accent)] font-medium">
-            <FileText size={11} />
-            {plan.estimatedScope}
-          </div>
+        {plan.summary && (
+          <p className="mt-2 font-serif text-[14.5px] leading-relaxed text-[var(--text-secondary)]">{plan.summary}</p>
         )}
       </div>
 
       {/* Steps */}
-      <div className="px-5">
-        <button
-          onClick={() => setStepsExpanded(!stepsExpanded)}
-          className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors w-full py-2"
-        >
-          {stepsExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-          {t('chat:planSteps', { count: plan.steps.length })}
-        </button>
-
-        {stepsExpanded && (
-          <div className="space-y-1.5 pb-3">
-            {plan.steps.map((step, index) => (
-              <StepRow key={step.id} step={step} index={index} />
-            ))}
-          </div>
-        )}
+      <div className="px-3 pb-2 space-y-1.5">
+        {plan.steps.map((step, index) => (
+          <StepRow key={step.id} step={step} index={index} />
+        ))}
       </div>
 
-      {/* Affected chapters */}
-      {plan.affectedChapters.length > 0 && (
-        <div className="px-5 pb-3">
-          <div className="flex flex-wrap gap-2">
-            {plan.affectedChapters.map((ch) => (
-              <span
-                key={ch.id}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--bg-hover)] text-[12px] text-[var(--text-secondary)] border border-[var(--border)]/50"
-              >
-                <span className="font-medium">{ch.title}</span>
-                <span className="text-[var(--text-tertiary)]">({ch.action})</span>
-              </span>
+      {/* Risks */}
+      {plan.risks && plan.risks.length > 0 && (
+        <div className="mx-4 mb-2 flex items-start gap-2 text-[12.5px] text-[var(--color-warning)]">
+          <AlertTriangle size={13} className="shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            {plan.risks.map((risk, i) => (
+              <p key={i}>{risk}</p>
             ))}
           </div>
         </div>
       )}
 
-      {/* Risks */}
-      {plan.risks && plan.risks.length > 0 && (
-        <div className="px-5 pb-3">
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/20">
-            <AlertTriangle size={13} className="text-[var(--color-warning)] shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              {plan.risks.map((risk, i) => (
-                <p key={i} className="text-[12px] text-[var(--color-warning)] leading-relaxed">
-                  {risk}
-                </p>
-              ))}
-            </div>
-          </div>
-        </div>
+      {(touches || plan.estimatedScope) && (
+        <p className="px-4 pb-3 font-serif text-[13px] text-[var(--text-tertiary)]">
+          {touches ? t('chat:touches', { list: touches }) : plan.estimatedScope}
+        </p>
       )}
 
       {/* Adjustment input */}
       {isAdjusting && showApproval && (
-        <div className="px-5 pb-3">
+        <div className="px-4 pb-3">
           <textarea
             value={adjustmentText}
             onChange={(e) => setAdjustmentText(e.target.value)}
             placeholder={t('chat:adjustPlanPlaceholder')}
             rows={3}
             autoFocus
-            className="w-full bg-[var(--bg-elevated)] text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-lg px-3.5 py-2.5 text-[13px] resize-none outline-none focus:border-[var(--border-active)] focus:shadow-[0_0_0_2px_var(--focus-ring-soft)] placeholder:text-[var(--text-tertiary)]/60 transition-all duration-200 leading-relaxed"
+            className="w-full bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border-strong)] rounded-[var(--radius-md)] px-3 py-2 font-serif text-[14px] resize-none outline-none focus:border-[var(--border-active)] placeholder:text-[var(--text-tertiary)]"
           />
         </div>
       )}
 
-      {/* Approval buttons */}
+      {/* Approval */}
       {showApproval && (
-        <div className="px-5 py-4 bg-[var(--bg-elevated)]/50 border-t border-[var(--border)]/30 flex items-center gap-2.5">
-          <button
-            onClick={handleExecute}
-            className="flex items-center gap-2 text-[13px] px-5 py-2.5 rounded-lg bg-[var(--accent-primary)] text-[var(--text-on-accent)] hover:bg-[var(--accent-primary-strong)] transition-all font-medium shadow-[var(--shadow-xs)]"
-          >
-            <Play size={13} />
-            {t('chat:executePlan')}
-          </button>
+        <div className="px-4 pb-4 grid grid-cols-2 gap-2.5">
           <button
             onClick={handleAdjust}
-            className="flex items-center gap-2 text-[13px] px-4 py-2.5 rounded-lg bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all font-medium"
+            className="h-10 rounded-[var(--radius-md)] border border-[var(--border-strong)] font-serif text-[15px] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
           >
-            <MessageSquare size={13} />
             {isAdjusting ? t('chat:submitAdjustment') : t('chat:adjustPlan')}
           </button>
           <button
-            onClick={handleCancel}
-            className="flex items-center gap-2 text-[13px] px-4 py-2.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--color-error)] transition-all font-medium ml-auto"
+            onClick={handleExecute}
+            className="h-10 inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--accent-primary)] font-serif text-[15px] text-[var(--text-on-accent)] hover:bg-[var(--accent-primary-strong)]"
           >
-            <X size={13} />
+            {t('chat:runPlan')}
+          </button>
+          <button
+            onClick={handleCancel}
+            className="col-span-2 -mt-0.5 text-[12px] text-[var(--text-tertiary)] hover:text-[var(--color-error)]"
+          >
             {t('common:cancel')}
           </button>
         </div>
@@ -185,54 +143,44 @@ export function AgentPlanCard({ plan, isExecuting, isComplete }: AgentPlanCardPr
   )
 }
 
+function iconForTool(tool: string) {
+  const t = tool.toLowerCase()
+  if (t.includes('split')) return Split
+  if (t.includes('rename')) return Type
+  if (t.includes('outline') || t.includes('note') || t.includes('summary')) return FileText
+  if (t.includes('create') || t.includes('write') || t.includes('draft') || t.includes('add')) return PenTool
+  if (t.includes('delete') || t.includes('remove')) return Trash2
+  if (t.includes('read') || t.includes('search') || t.includes('analy')) return Search
+  return Pencil
+}
+
 // ─── Step Row Component ──────────────────────
 
 function StepRow({ step, index }: { step: PlanStep; index: number }) {
+  const Icon = iconForTool(step.tool || '')
+  const status = step.status
   return (
     <div
-      className={`flex items-start gap-3 py-2 px-3 rounded-lg transition-colors ${
-        step.status === 'in_progress'
-          ? 'bg-[var(--accent-primary)]/8'
-          : step.status === 'complete'
-          ? 'bg-[var(--diff-insert-bg)]'
-          : ''
-      }`}
+      className={`flex items-center gap-3 rounded-[var(--radius-md)] px-2.5 py-2 ${
+        status === 'in_progress' ? 'bg-[var(--accent-tint)]' : 'bg-[var(--bg-hover)]'
+      } ${status === 'complete' || status === 'skipped' ? 'opacity-60' : ''}`}
     >
-      {/* Step indicator */}
-      <div className="shrink-0 mt-0.5">
-        {step.status === 'complete' ? (
-          <div className="w-5 h-5 rounded-full bg-[var(--diff-insert-bg)] flex items-center justify-center">
-            <Check size={11} className="text-[var(--color-success)]" />
-          </div>
-        ) : step.status === 'in_progress' ? (
-          <div className="w-5 h-5 rounded-full bg-[var(--accent-primary)]/20 flex items-center justify-center">
-            <Loader2 size={11} className="text-[var(--text-accent)] animate-spin" />
-          </div>
+      <div className="w-7 h-7 shrink-0 flex items-center justify-center rounded-[var(--radius-sm)] bg-[var(--bg-active)] font-serif text-[13px] text-[var(--text-primary)]">
+        {status === 'complete' ? (
+          <Check size={13} className="text-[var(--color-success)]" />
+        ) : status === 'in_progress' ? (
+          <Loader2 size={13} className="animate-spin text-[var(--accent-primary)]" />
         ) : (
-          <div className="w-5 h-5 rounded-full bg-[var(--bg-hover)] flex items-center justify-center">
-            <span className="text-[10px] font-semibold text-[var(--text-tertiary)] tabular-nums">
-              {index + 1}
-            </span>
-          </div>
+          index + 1
         )}
       </div>
-
-      {/* Step content */}
-      <div className="flex-1 min-w-0">
-        <p
-          className={`text-[13px] leading-relaxed ${
-            step.status === 'complete'
-              ? 'text-[var(--text-tertiary)]'
-              : step.status === 'in_progress'
-              ? 'text-[var(--text-primary)] font-medium'
-              : 'text-[var(--text-secondary)]'
-          }`}
-        >
+      <Icon size={17} strokeWidth={1.4} className="shrink-0 text-[var(--text-secondary)]" />
+      <div className="w-px self-stretch bg-[var(--border-strong)]" />
+      <div className="min-w-0 flex-1">
+        <p className={`font-serif text-[14.5px] leading-snug ${status === 'skipped' ? 'line-through' : ''} text-[var(--text-primary)]`}>
           {step.description}
         </p>
-        {step.target && (
-          <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">{step.target}</p>
-        )}
+        {step.target && <p className="text-[11.5px] text-[var(--text-tertiary)] truncate">{step.target}</p>}
       </div>
     </div>
   )

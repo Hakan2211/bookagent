@@ -7,7 +7,7 @@
   "importManuscript": "Import a manuscript",
   "waitingForAnswers": "Answer the questions above...",
   "reviewPlanAbove": "Review the plan above...",
-  "clarifyingQuestions": "Clarifying Questions",
+  "clarifyingQuestions": "A few questions",
   "clarifyingQuestionsDesc": "Help me understand your vision better so I can deliver exactly what you need.",
   "typeYourAnswer": "Type your answer...",
   "continueWithAnswers": "Continue",
@@ -63,5 +63,14 @@
   "editorTitle": "Editor",
   "readingContext": "Reading: {{title}}",
   "emptyTitle": "Ask about your book",
-  "emptyBody": "Your editor has read every chapter. Ask about plot, characters, or a single sentence."
+  "emptyBody": "Your editor has read every chapter. Ask about plot, characters, or a single sentence.",
+  "steps": {
+    "understand": "Understand",
+    "ask": "Ask",
+    "plan": "Plan",
+    "write": "Write"
+  },
+  "planTitle": "Plan",
+  "runPlan": "Run plan",
+  "touches": "Touches: {{list}}"
 }

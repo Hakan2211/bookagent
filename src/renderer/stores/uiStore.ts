@@ -65,6 +65,10 @@ interface UIState {
   setTheme: (theme: Theme) => void
   toggleTheme: () => void
 
+  // Change review: which change group is focused
+  diffFocusIndex: number
+  setDiffFocusIndex: (i: number) => void
+
   // Focus mode (distraction-free writing)
   isFocusMode: boolean
   setFocusMode: (on: boolean) => void
@@ -109,6 +113,9 @@ export const useUIStore = create<UIState>((set, get) => ({
     set({ theme })
   },
   toggleTheme: () => get().setTheme(get().theme === 'ink' ? 'paper' : 'ink'),
+
+  diffFocusIndex: 0,
+  setDiffFocusIndex: (i) => set({ diffFocusIndex: i }),
 
   isFocusMode: false,
   setFocusMode: (on) => set({ isFocusMode: on }),

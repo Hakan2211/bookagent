@@ -136,20 +136,26 @@
 /* ─── Diff Styles ─────────────────────────── */
 
 .diff-insert {
-  background-color: var(--diff-insert-bg);
-  color: var(--diff-insert-text);
-  border-radius: 3px;
-  padding: 2px 1px;
-  text-decoration: none;
+  color: inherit;
+  background: var(--diff-insert-bg);
+  text-decoration: underline;
+  text-decoration-color: var(--status-final);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+  border-radius: 2px;
 }
 
 .diff-delete {
-  background-color: var(--diff-delete-bg);
   color: var(--diff-delete-text);
   text-decoration: line-through;
-  border-radius: 3px;
-  padding: 2px 1px;
-  opacity: 0.75;
+  text-decoration-color: var(--accent-primary);
+  text-decoration-thickness: 1.5px;
+  border-radius: 2px;
+}
+
+.diff-focused {
+  outline: 1.5px solid var(--border-active);
+  outline-offset: 2px;
 }
 
 .diff-actions {
@@ -445,4 +451,8 @@
   opacity: 0.6;
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-sm);
+}
+
+.diff-delete + .diff-insert {
+  margin-left: 0.18em;
 }

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { MessageList } from './MessageList'
 import { ChatInput } from './ChatInput'
 import { QuickActions } from './QuickActions'
-import { AgentPhaseIndicator } from './AgentPhaseIndicator'
+import { AgentStepper } from './AgentStepper'
 import { AgentQuestionsCard } from './AgentQuestionsCard'
 import { AgentPlanCard } from './AgentPlanCard'
 import { useChatStore } from '../../stores/chatStore'
@@ -41,8 +41,8 @@ export function ChatContainer() {
         {messages.length === 0 && !isAgentWorking && <ChatEmptyState />}
         <MessageList>
           {/* Multi-phase workflow UI elements — inside scroll area */}
-          {isAgentWorking && agentPhase !== 'done' && agentPhase !== 'executing' && (
-            <AgentPhaseIndicator phase={agentPhase} />
+          {(isAgentWorking || currentPlan) && agentPhase !== 'error' && (
+            <AgentStepper phase={agentPhase} />
           )}
 
           {/* Clarifying questions card */}

@@ -7,7 +7,7 @@
   "importManuscript": "Manuskript importieren",
   "waitingForAnswers": "Beantworte die Fragen oben...",
   "reviewPlanAbove": "Pruefe den Plan oben...",
-  "clarifyingQuestions": "Rueckfragen",
+  "clarifyingQuestions": "Ein paar Fragen",
   "clarifyingQuestionsDesc": "Hilf mir, deine Vision besser zu verstehen, damit ich genau das liefern kann, was du brauchst.",
   "typeYourAnswer": "Deine Antwort eingeben...",
   "continueWithAnswers": "Weiter",
@@ -63,5 +63,14 @@
   "editorTitle": "Lektor",
   "readingContext": "Liest: {{title}}",
   "emptyTitle": "Frag nach deinem Buch",
-  "emptyBody": "Dein Lektor kennt jedes Kapitel. Frag nach Handlung, Figuren oder einem einzelnen Satz."
+  "emptyBody": "Dein Lektor kennt jedes Kapitel. Frag nach Handlung, Figuren oder einem einzelnen Satz.",
+  "steps": {
+    "understand": "Verstehen",
+    "ask": "Fragen",
+    "plan": "Planen",
+    "write": "Schreiben"
+  },
+  "planTitle": "Plan",
+  "runPlan": "Plan ausführen",
+  "touches": "Betrifft: {{list}}"
 }
