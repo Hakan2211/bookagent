@@ -24,11 +24,11 @@ type PhaseConfig = {
 
 const phaseConfig: Record<AgentPhase, PhaseConfig> = {
   classifying: { icon: Brain, colorClass: 'text-blue-400', spinning: true },
-  questioning: { icon: MessageCircleQuestion, colorClass: 'text-amber-400' },
-  planning: { icon: ListChecks, colorClass: 'text-violet-400', spinning: true },
-  awaiting_plan: { icon: Clock, colorClass: 'text-amber-400' },
-  executing: { icon: Wrench, colorClass: 'text-indigo-400', spinning: true },
-  done: { icon: Check, colorClass: 'text-emerald-400' },
+  questioning: { icon: MessageCircleQuestion, colorClass: 'text-[var(--color-warning)]' },
+  planning: { icon: ListChecks, colorClass: 'text-[var(--text-accent)]', spinning: true },
+  awaiting_plan: { icon: Clock, colorClass: 'text-[var(--color-warning)]' },
+  executing: { icon: Wrench, colorClass: 'text-[var(--text-accent)]', spinning: true },
+  done: { icon: Check, colorClass: 'text-[var(--color-success)]' },
   error: { icon: AlertCircle, colorClass: 'text-red-400' }
 }
 

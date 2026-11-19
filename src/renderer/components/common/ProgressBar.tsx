@@ -20,9 +20,9 @@ export function ProgressBar({
   const percentage = Math.min(100, Math.max(0, (value / max) * 100))
 
   const barStyles = {
-    accent: 'bg-gradient-to-r from-indigo-500 to-violet-400',
-    green: 'bg-gradient-to-r from-emerald-500 to-teal-400',
-    yellow: 'bg-gradient-to-r from-amber-500 to-orange-400'
+    accent: 'bg-[var(--accent-primary)]',
+    green: 'bg-[var(--status-final)]',
+    yellow: 'bg-[var(--status-draft)]'
   }
 
   return (

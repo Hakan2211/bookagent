@@ -50,6 +50,26 @@ app.whenReady().then(async () => {
   const mainWindow = createMainWindow()
   createMenu(mainWindow)
 
+  // Dev-only: KITAPMI_CAPTURE=out.png [KITAPMI_OPEN=projectDir] [KITAPMI_EVAL=js]
+  // renders a state and writes a screenshot — used for design QA and store shots.
+  if (!app.isPackaged && process.env.KITAPMI_CAPTURE) {
+    const wc = mainWindow.webContents
+    wc.on('console-message', (_e, _level, msg) => console.error('[renderer]', msg))
+    wc.once('did-finish-load', async () => {
+      const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+      await wait(1500)
+      if (process.env.KITAPMI_OPEN) wc.send('menu:open-project', process.env.KITAPMI_OPEN)
+      await wait(1500)
+      if (process.env.KITAPMI_EVAL) {
+        await wc.executeJavaScript(process.env.KITAPMI_EVAL).catch((e) => console.error(e))
+      }
+      await wait(Number(process.env.KITAPMI_DELAY || 1500))
+      const img = await wc.capturePage()
+      require('fs').writeFileSync(process.env.KITAPMI_CAPTURE!, img.toPNG())
+      app.exit(0)
+    })
+  }
+
   // Check GitHub Releases for new versions (packaged builds only)
   initUpdater()
 

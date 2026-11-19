@@ -154,7 +154,7 @@ export function AgentQuestionsCard({ questions }: AgentQuestionsCardProps) {
         <button
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="flex items-center gap-2 text-[13px] px-5 py-2.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:brightness-110 transition-all font-medium shadow-[var(--shadow-xs)] disabled:opacity-40 disabled:hover:brightness-100"
+          className="flex items-center gap-2 text-[13px] px-5 py-2.5 rounded-lg bg-[var(--accent-primary)] text-[var(--text-on-accent)] hover:bg-[var(--accent-primary-strong)] transition-all font-medium shadow-[var(--shadow-xs)] disabled:opacity-40 disabled:hover:brightness-100"
         >
           <Send size={13} />
           {t('chat:continueWithAnswers')}

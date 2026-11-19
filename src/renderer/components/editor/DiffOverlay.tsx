@@ -26,7 +26,7 @@ export function DiffOverlay({
             key={group.id}
             className={`rounded-xl border-l-[3px] border transition-all ${
               isAccepted
-                ? 'border-l-emerald-500 border-emerald-500/20 bg-emerald-500/5'
+                ? 'border-l-[var(--status-final)] border-[var(--status-final)]/30 bg-[var(--diff-insert-bg)]'
                 : 'border-l-red-500 border-red-500/20 bg-red-500/5'
             }`}
             style={{ boxShadow: 'var(--shadow-xs)' }}
@@ -56,8 +56,8 @@ export function DiffOverlay({
                 onClick={() => onAccept(group.id)}
                 className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-md transition-all font-medium ${
                   isAccepted
-                    ? 'bg-emerald-500 text-white shadow-sm'
-                    : 'bg-emerald-500/10 text-emerald-400/50 hover:bg-emerald-500/20 hover:text-emerald-400'
+                    ? 'bg-[var(--status-final)] text-[var(--text-on-accent)] shadow-sm'
+                    : 'bg-[var(--diff-insert-bg)] text-[var(--color-success)]/50 hover:bg-[var(--diff-insert-bg)] hover:text-[var(--color-success)]'
                 }`}
               >
                 <Check size={12} />

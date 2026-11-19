@@ -102,6 +102,7 @@ export const IPC = {
   // ── App ────────────────────────────────────
   APP_GET_DOCUMENTS_PATH: 'app:get-documents-path',
   APP_GET_VERSION: 'app:get-version',
+  APP_SET_THEME: 'app:set-theme',
 
   // ── Updates ────────────────────────────────
   UPDATE_STATUS: 'update:status',

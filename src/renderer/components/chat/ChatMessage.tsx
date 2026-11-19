@@ -26,7 +26,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             ? 'bg-[var(--bg-active)]'
             : isError
             ? 'bg-[var(--color-error)]/15'
-            : 'bg-gradient-to-br from-[var(--accent-primary)]/20 to-[var(--accent-secondary)]/20'
+            : 'bg-[var(--accent-tint)]'
         }`}
       >
         {isUser ? (
@@ -42,7 +42,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
       <div
         className={`max-w-[80%] rounded-xl px-5 py-3.5 text-[15px] ${
           isUser
-            ? 'bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-primary-strong)] text-[var(--text-on-accent)] shadow-[var(--elevation-2)]'
+            ? 'bg-[var(--accent-primary)] text-[var(--text-on-accent)] shadow-[var(--elevation-2)]'
             : isError
             ? 'bg-[var(--color-error)]/10 text-[var(--color-error)] border border-[var(--color-error)]/30'
             : 'bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border)]'
@@ -72,7 +72,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
                 {i === toolActivity.length - 1 ? (
                   <Loader2 size={11} className="shrink-0 animate-spin" />
                 ) : (
-                  <span className="shrink-0 w-[11px] text-center text-emerald-400">&#10003;</span>
+                  <span className="shrink-0 w-[11px] text-center text-[var(--color-success)]">&#10003;</span>
                 )}
                 <span className="truncate">{activity}</span>
               </div>

@@ -95,7 +95,7 @@ export function AIProviderConfig() {
           className={`p-4 rounded-xl text-sm flex items-center gap-2.5 ${
             isStatusError
               ? 'bg-red-500/10 text-red-300 border border-red-500/20'
-              : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+              : 'bg-[var(--diff-insert-bg)] text-[var(--color-success)] border border-[var(--status-final)]/30'
           }`}
           style={{ animation: 'slide-up 200ms ease-out' }}
         >
@@ -109,7 +109,7 @@ export function AIProviderConfig() {
         <div className="flex items-center gap-2.5">
           <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('settings:ai.openrouter')}</h3>
           {openrouterHasKey && (
-            <span className="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 font-medium">
+            <span className="text-[11px] px-2.5 py-1 rounded-lg bg-[var(--diff-insert-bg)] text-[var(--color-success)] font-medium">
               {t('settings:ai.connected')}
             </span>
           )}

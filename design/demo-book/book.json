@@ -1,0 +1,97 @@
+{
+  "version": "1.0",
+  "title": "Der Leuchtturm",
+  "subtitle": "",
+  "author": "Mara Lindqvist",
+  "created": "2026-10-01T09:00:00.000Z",
+  "modified": "2026-11-19T18:00:00.000Z",
+  "targets": {
+    "totalWords": 30000,
+    "chapterWords": 3000
+  },
+  "chapters": [
+    {
+      "id": "ch-01",
+      "file": "chapters/01-kapitel-1.md",
+      "title": "Ankunft",
+      "status": "final",
+      "wordCount": 122,
+      "summary": ""
+    },
+    {
+      "id": "ch-02",
+      "file": "chapters/02-kapitel-2",
+      "title": "Kapitel 2",
+      "status": "draft",
+      "wordCount": 368,
+      "summary": "",
+      "sections": [
+        {
+          "id": "sec-01",
+          "file": "chapters/02-kapitel-2/01-der-bahnhof.md",
+          "title": "Der Bahnhof",
+          "status": "draft",
+          "wordCount": 280,
+          "summary": ""
+        },
+        {
+          "id": "sec-02",
+          "file": "chapters/02-kapitel-2/02-nachts.md",
+          "title": "Nachts",
+          "status": "draft",
+          "wordCount": 88,
+          "summary": ""
+        }
+      ],
+      "_nextSectionNum": 2
+    },
+    {
+      "id": "ch-03",
+      "file": "chapters/03-kapitel-3.md",
+      "title": "Der Garten",
+      "status": "revised",
+      "wordCount": 66,
+      "summary": ""
+    },
+    {
+      "id": "ch-04",
+      "file": "chapters/04-kapitel-4.md",
+      "title": "Briefe",
+      "status": "outline",
+      "wordCount": 18,
+      "summary": ""
+    }
+  ],
+  "notes": [
+    {
+      "id": "characters",
+      "file": "notes/characters.md",
+      "title": "Characters"
+    },
+    {
+      "id": "world",
+      "file": "notes/world.md",
+      "title": "World & Settings"
+    },
+    {
+      "id": "style",
+      "file": "notes/style.md",
+      "title": "Style Guide"
+    }
+  ],
+  "style": {
+    "genre": "Literary fiction",
+    "pov": "Third person limited",
+    "tense": "",
+    "tone": "",
+    "avoidWords": [],
+    "customInstructions": ""
+  },
+  "ai": {
+    "provider": "openrouter",
+    "model": "google/gemini-3-flash-preview",
+    "keyRef": "kitapmi-openrouter-key"
+  },
+  "imports": [],
+  "_nextChapterNum": 4
+}

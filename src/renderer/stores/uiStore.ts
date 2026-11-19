@@ -3,6 +3,12 @@ import i18n from '../i18n'
 import { IPC } from '@shared/ipc-channels'
 import type { ModelInfo, ExportConfig, ExportFormat, ExportProgress } from '@shared/types'
 
+export type Theme = 'ink' | 'paper'
+
+const initialTheme: Theme = localStorage.getItem('kitapmi-theme') === 'paper' ? 'paper' : 'ink'
+document.documentElement.dataset.theme = initialTheme
+window.api.invoke(IPC.APP_SET_THEME, initialTheme)
+
 export type ApiStatusState = 'connected' | 'unavailable' | 'checking' | 'no-key'
 
 interface UIState {
@@ -54,6 +60,15 @@ interface UIState {
   loadPreview: (config: ExportConfig) => Promise<void>
 
   checkApiStatus: () => Promise<void>
+  // Theme
+  theme: Theme
+  setTheme: (theme: Theme) => void
+  toggleTheme: () => void
+
+  // Focus mode (distraction-free writing)
+  isFocusMode: boolean
+  setFocusMode: (on: boolean) => void
+
   // Language
   language: string
   setLanguage: (lang: string) => void
@@ -84,6 +99,19 @@ export const useUIStore = create<UIState>((set, get) => ({
   apiProvider: '',
   apiModel: '',
   apiModelName: '',
+
+  theme: initialTheme,
+  setTheme: (theme) => {
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem('kitapmi-theme', theme)
+    window.api.invoke(IPC.APP_SET_THEME, theme)
+    window.api.invoke(IPC.SETTINGS_SET, { theme: theme === 'paper' ? 'light' : 'dark' })
+    set({ theme })
+  },
+  toggleTheme: () => get().setTheme(get().theme === 'ink' ? 'paper' : 'ink'),
+
+  isFocusMode: false,
+  setFocusMode: (on) => set({ isFocusMode: on }),
 
   language: i18n.language?.startsWith('de') ? 'de' : 'en',
 

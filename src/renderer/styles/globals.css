@@ -1,84 +1,102 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+@import "@fontsource-variable/newsreader/opsz.css";
+@import "@fontsource-variable/newsreader/opsz-italic.css";
+@import "@fontsource-variable/inter/index.css";
 @import "tailwindcss";
 
-/* ─── Kitapmi Premium Dark Theme ────── */
+/* ─── Kitapmi "Writer's Study" theme ──────────
+   Ink (dark, default) and Paper (light, [data-theme="paper"]).
+   Reference: design/mockups/00-design-system.jpg
+   ─────────────────────────────────────────── */
+
+@theme {
+  --font-serif: 'Newsreader Variable', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
 
 :root {
-  /* ── Background Layers (deep → surface) ── */
-  --bg-base:       #0a0a18;
-  --bg-sidebar:    #141432;
-  --bg-editor:     #17173b;
-  --bg-chat:       #141432;
-  --bg-input:      #21214a;
-  --bg-hover:      #2a2a5f;
-  --bg-active:     #34346f;
-  --bg-elevated:   #1f1f45;
-  --bg-surface:    #1b1b42;
+  color-scheme: dark;
+
+  /* ── Background layers ── */
+  --bg-base:       #121110;
+  --bg-sidebar:    #161513;
+  --bg-editor:     #121110;
+  --bg-page:       #121110;   /* manuscript surface */
+  --bg-chat:       #161513;
+  --bg-input:      #1F1D1A;
+  --bg-hover:      #26231F;
+  --bg-active:     #2E2A25;
+  --bg-elevated:   #23211E;
+  --bg-surface:    #1A1917;
+  --bg-overlay:    rgba(8, 7, 6, 0.62);
 
   /* ── Text ── */
-  --text-primary:   #f2f2fa;
-  --text-secondary: #c4c6e8;
-  --text-tertiary:  #9ea3cd;
-  --text-accent:    #818cf8;
-  --text-accent-hover: #a5b4fc;
-  --text-on-accent: #f8f9ff;
+  --text-primary:   #ECE6DA;
+  --text-secondary: #A39C8F;
+  --text-tertiary:  #6F695F;
+  --text-accent:    #D27A6A;
+  --text-accent-hover: #E08E7E;
+  --text-on-accent: #FBF4EA;
 
-  /* ── Semantic Accent ── */
-  --accent-primary: #818cf8;
-  --accent-primary-strong: #6f7cff;
-  --accent-secondary: #a78bfa;
-  --color-error: #f87171;
-  --color-success: #34d399;
-  --color-warning: #fbbf24;
-  --color-info: #60a5fa;
+  /* ── Accent: Oxblood ── */
+  --accent-primary:        #A4473A;
+  --accent-primary-strong: #B5574A;
+  --accent-secondary:      #C49A3C;
+  --accent-tint:           rgba(164, 71, 58, 0.16);
+  --accent-tint-strong:    rgba(164, 71, 58, 0.28);
+  --color-error:   #D0705F;
+  --color-success: #8DAE80;
+  --color-warning: #C49A3C;
+  --color-info:    #6E9DB2;
 
-  /* ── Accent Gradient ── */
-  --gradient-accent: linear-gradient(135deg, #667eea 0%, #818cf8 50%, #a78bfa 100%);
-  --gradient-accent-hover: linear-gradient(135deg, #7c8ff7 0%, #9ba5fc 50%, #b9a5fc 100%);
-  --gradient-subtle: linear-gradient(180deg, rgba(129, 140, 248, 0.06) 0%, transparent 100%);
-  --gradient-hero:   radial-gradient(ellipse 900px 600px at 50% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+  /* Legacy gradient tokens now resolve to flat colour — no gradients in this theme. */
+  --gradient-accent: linear-gradient(var(--accent-primary), var(--accent-primary));
+  --gradient-accent-hover: linear-gradient(var(--accent-primary-strong), var(--accent-primary-strong));
+  --gradient-subtle: none;
+  --gradient-hero: none;
 
-  /* ── Diff Colors ── */
-  --diff-insert-bg:   rgba(52, 211, 153, 0.1);
-  --diff-insert-text: #6ee7b7;
-  --diff-delete-bg:   rgba(248, 113, 113, 0.1);
-  --diff-delete-text: #fca5a5;
+  /* ── Diff ── */
+  --diff-insert-bg:   rgba(122, 154, 110, 0.16);
+  --diff-insert-text: #A9C79C;
+  --diff-delete-bg:   rgba(164, 71, 58, 0.16);
+  --diff-delete-text: #D88D80;
 
-  /* ── Status Colors ── */
-  --status-outline: #94a3b8;
-  --status-draft:   #fbbf24;
-  --status-revised: #60a5fa;
-  --status-final:   #34d399;
+  /* ── Status ── */
+  --status-outline: #8A8F98;
+  --status-draft:   #C49A3C;
+  --status-revised: #5B8BA0;
+  --status-final:   #7A9A6E;
 
   /* ── Borders ── */
-  --border:        rgba(255, 255, 255, 0.2);
-  --border-subtle: rgba(255, 255, 255, 0.12);
-  --border-active: rgba(129, 140, 248, 0.72);
-  --border-glow:   rgba(129, 140, 248, 0.35);
+  --border:        #2E2B27;
+  --border-subtle: #24221F;
+  --border-strong: #3B3732;
+  --border-active: rgba(164, 71, 58, 0.75);
+  --border-glow:   rgba(164, 71, 58, 0.3);
 
-  /* ── Shadows ── */
-  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-sm:  0 2px 4px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
-  --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.25);
-  --shadow-xl:  0 16px 48px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 0 26px rgba(129, 140, 248, 0.24);
-  --shadow-glow-sm: 0 0 14px rgba(129, 140, 248, 0.17);
-  --elevation-1: 0 1px 2px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.04);
-  --elevation-2: 0 4px 14px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  --elevation-3: 0 10px 28px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.06);
-  --elevation-4: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  /* ── Shadows (soft, floating surfaces only) ── */
+  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm:  0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-md:  0 6px 16px rgba(0, 0, 0, 0.3);
+  --shadow-lg:  0 12px 32px rgba(0, 0, 0, 0.4);
+  --shadow-xl:  0 20px 56px rgba(0, 0, 0, 0.5);
+  --shadow-glow: none;
+  --shadow-glow-sm: none;
+  --elevation-1: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --elevation-2: 0 6px 16px rgba(0, 0, 0, 0.3);
+  --elevation-3: 0 12px 32px rgba(0, 0, 0, 0.4);
+  --elevation-4: 0 20px 56px rgba(0, 0, 0, 0.5);
+  --page-shadow: none;
 
   /* ── Radii ── */
   --radius-sm:  6px;
-  --radius-md:  10px;
+  --radius-md:  8px;
   --radius-lg:  12px;
-  --radius-xl:  20px;
+  --radius-xl:  14px;
   --radius-full: 9999px;
-  --radius-control: 12px;
-  --radius-card: 16px;
+  --radius-control: 8px;
+  --radius-card: 12px;
 
-  /* ── Spacing ── */
+  /* ── Spacing (8pt) ── */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -89,22 +107,87 @@
   --space-8: 32px;
 
   /* ── Focus ── */
-  --focus-ring: rgba(129, 140, 248, 0.6);
-  --focus-ring-soft: rgba(129, 140, 248, 0.24);
+  --focus-ring: rgba(210, 122, 106, 0.6);
+  --focus-ring-soft: rgba(164, 71, 58, 0.22);
 
   /* ── Scrollbar ── */
-  --scrollbar-thumb: rgba(255, 255, 255, 0.24);
+  --scrollbar-thumb: rgba(236, 230, 218, 0.14);
+  --scrollbar-thumb-hover: rgba(236, 230, 218, 0.26);
   --scrollbar-track: transparent;
 
-  /* ── Glass ── */
-  --glass-bg: rgba(18, 18, 31, 0.88);
-  --glass-border: rgba(255, 255, 255, 0.12);
+  /* ── Glass (kept for compat — now opaque) ── */
+  --glass-bg: #23211E;
+  --glass-border: #3B3732;
 
-  /* ── Transitions ── */
+  /* ── Legacy aliases used by editor.css ── */
+  --accent: var(--accent-primary);
+  --bg-primary: var(--bg-input);
+  --bg-secondary: var(--bg-surface);
+
+  /* ── Motion ── */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-fast: 150ms var(--ease-out-expo);
   --transition-smooth: 250ms var(--ease-out-expo);
   --transition-slow: 400ms var(--ease-out-expo);
+}
+
+/* ─── Paper (light) ───────────────────────── */
+[data-theme='paper'] {
+  color-scheme: light;
+
+  --bg-base:     #F6F1E7;
+  --bg-sidebar:  #EFE8DA;
+  --bg-editor:   #F6F1E7;
+  --bg-page:     #FFFDF8;
+  --bg-chat:     #EFE8DA;
+  --bg-input:    #FFFDF8;
+  --bg-hover:    #E8DFCE;
+  --bg-active:   #E1D6C2;
+  --bg-elevated: #FFFDF8;
+  --bg-surface:  #FBF7EF;
+  --bg-overlay:  rgba(42, 38, 34, 0.32);
+
+  --text-primary:   #2A2622;
+  --text-secondary: #6B6358;
+  --text-tertiary:  #978D7F;
+  --text-accent:    #A4473A;
+  --text-accent-hover: #8A3A2F;
+  --text-on-accent: #FFFDF8;
+
+  --accent-primary-strong: #8F3C30;
+  --accent-tint:        rgba(164, 71, 58, 0.1);
+  --accent-tint-strong: rgba(164, 71, 58, 0.18);
+  --color-error:   #A4473A;
+  --color-success: #5E7F52;
+  --color-warning: #A07A24;
+  --color-info:    #46778C;
+
+  --diff-insert-bg:   rgba(122, 154, 110, 0.2);
+  --diff-insert-text: #3F6634;
+  --diff-delete-bg:   rgba(164, 71, 58, 0.12);
+  --diff-delete-text: #9A3F33;
+
+  --border:        #DDD3C2;
+  --border-subtle: #E7DFD1;
+  --border-strong: #CFC3AE;
+  --border-active: rgba(164, 71, 58, 0.6);
+
+  --shadow-xs:  0 1px 2px rgba(60, 45, 30, 0.06);
+  --shadow-sm:  0 2px 6px rgba(60, 45, 30, 0.07);
+  --shadow-md:  0 6px 16px rgba(60, 45, 30, 0.08);
+  --shadow-lg:  0 12px 32px rgba(60, 45, 30, 0.12);
+  --shadow-xl:  0 20px 56px rgba(60, 45, 30, 0.16);
+  --elevation-1: 0 1px 2px rgba(60, 45, 30, 0.06);
+  --elevation-2: 0 6px 16px rgba(60, 45, 30, 0.08);
+  --elevation-3: 0 12px 32px rgba(60, 45, 30, 0.12);
+  --elevation-4: 0 20px 56px rgba(60, 45, 30, 0.16);
+  --page-shadow: 0 1px 3px rgba(60, 45, 30, 0.06), 0 12px 40px rgba(60, 45, 30, 0.08);
+
+  --focus-ring: rgba(164, 71, 58, 0.5);
+  --scrollbar-thumb: rgba(42, 38, 34, 0.16);
+  --scrollbar-thumb-hover: rgba(42, 38, 34, 0.28);
+  --glass-bg: #FFFDF8;
+  --glass-border: #DDD3C2;
 }
 
 /* ─── Base Styles ─────────────────────────── */
@@ -124,8 +207,7 @@
     overflow: hidden;
     background: var(--bg-base);
     color: var(--text-primary);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-      'Helvetica Neue', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -151,13 +233,13 @@
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.32);
+    background: var(--scrollbar-thumb-hover);
   }
 
   /* ─── Selection ───────────────────────────── */
 
   ::selection {
-    background: rgba(129, 140, 248, 0.25);
+    background: var(--accent-tint-strong);
     color: var(--text-primary);
   }
 
@@ -178,8 +260,7 @@
 
   [data-panel-resize-handle-id]:hover,
   [data-panel-resize-handle-id][data-resize-handle-active] {
-    background: rgba(129, 140, 248, 0.6);
-    box-shadow: 0 0 10px rgba(129, 140, 248, 0.3);
+    background: var(--accent-primary);
   }
 
   /* ─── Smooth default transition for interactive elements ── */
@@ -209,11 +290,27 @@
     border: 1px solid var(--glass-border);
   }
 
+  /* Was a purple gradient; the Writer's Study theme uses plain ink. */
   .text-gradient {
-    background: var(--gradient-accent);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text-primary);
+  }
+
+  .font-serif {
+    font-family: var(--font-serif);
+    font-optical-sizing: auto;
+  }
+
+  .label-caps {
+    font-family: var(--font-sans);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
   }
 }
 
@@ -235,6 +332,6 @@
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(129, 140, 248, 0.15); }
-  50% { box-shadow: 0 0 16px rgba(129, 140, 248, 0.25); }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }

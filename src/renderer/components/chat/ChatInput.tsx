@@ -210,7 +210,7 @@ export function ChatInput() {
             <button
               onClick={handleSend}
               disabled={!input.trim()}
-              className="shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)] shadow-[var(--shadow-glow-sm)] disabled:opacity-35 disabled:shadow-none hover:shadow-[var(--shadow-glow)] hover:brightness-110 focus-visible:shadow-[0_0_0_2px_var(--bg-chat),0_0_0_4px_var(--focus-ring)] transition-all duration-200 active:scale-95"
+              className="shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl bg-[var(--accent-primary)] text-[var(--text-on-accent)] shadow-[var(--shadow-glow-sm)] disabled:opacity-35 disabled:shadow-none hover:bg-[var(--accent-primary-strong)] focus-visible:shadow-[0_0_0_2px_var(--bg-chat),0_0_0_4px_var(--focus-ring)] transition-all duration-200 active:scale-95"
             >
               <SendHorizontal size={18} />
             </button>

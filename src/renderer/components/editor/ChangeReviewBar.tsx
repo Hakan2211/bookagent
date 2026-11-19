@@ -32,7 +32,7 @@ export function ChangeReviewBar() {
   return (
     <div
       className="flex items-center justify-between px-6 py-2.5 border-b border-[var(--border-active)] shrink-0"
-      style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(167, 139, 250, 0.05) 100%)' }}
+      style={{ background: 'var(--accent-tint)' }}
     >
       <div className="flex items-center gap-3 min-w-0">
         <GitCompare size={14} className="text-[var(--text-accent)] shrink-0" />

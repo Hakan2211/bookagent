@@ -72,7 +72,7 @@ export function AgentPlanCard({ plan, isExecuting, isComplete }: AgentPlanCardPr
               : t('chat:planProposal')}
           </div>
           {isExecuting && <Loader2 size={13} className="animate-spin text-[var(--text-accent)]" />}
-          {isComplete && <Check size={13} className="text-emerald-400" />}
+          {isComplete && <Check size={13} className="text-[var(--color-success)]" />}
         </div>
 
         {/* Summary */}
@@ -160,7 +160,7 @@ export function AgentPlanCard({ plan, isExecuting, isComplete }: AgentPlanCardPr
         <div className="px-5 py-4 bg-[var(--bg-elevated)]/50 border-t border-[var(--border)]/30 flex items-center gap-2.5">
           <button
             onClick={handleExecute}
-            className="flex items-center gap-2 text-[13px] px-5 py-2.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:brightness-110 transition-all font-medium shadow-[var(--shadow-xs)]"
+            className="flex items-center gap-2 text-[13px] px-5 py-2.5 rounded-lg bg-[var(--accent-primary)] text-[var(--text-on-accent)] hover:bg-[var(--accent-primary-strong)] transition-all font-medium shadow-[var(--shadow-xs)]"
           >
             <Play size={13} />
             {t('chat:executePlan')}
@@ -194,15 +194,15 @@ function StepRow({ step, index }: { step: PlanStep; index: number }) {
         step.status === 'in_progress'
           ? 'bg-[var(--accent-primary)]/8'
           : step.status === 'complete'
-          ? 'bg-emerald-500/5'
+          ? 'bg-[var(--diff-insert-bg)]'
           : ''
       }`}
     >
       {/* Step indicator */}
       <div className="shrink-0 mt-0.5">
         {step.status === 'complete' ? (
-          <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-            <Check size={11} className="text-emerald-400" />
+          <div className="w-5 h-5 rounded-full bg-[var(--diff-insert-bg)] flex items-center justify-center">
+            <Check size={11} className="text-[var(--color-success)]" />
           </div>
         ) : step.status === 'in_progress' ? (
           <div className="w-5 h-5 rounded-full bg-[var(--accent-primary)]/20 flex items-center justify-center">

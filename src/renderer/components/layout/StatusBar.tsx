@@ -145,7 +145,7 @@ export function StatusBar() {
               </span>
               <div className="w-24 h-1.5 bg-[var(--bg-active)] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-full transition-all duration-500"
+                  className="h-full bg-[var(--accent-primary)] rounded-full transition-all duration-500"
                   style={{ width: `${Math.min(100, percentage)}%` }}
                 />
               </div>

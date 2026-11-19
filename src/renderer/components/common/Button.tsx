@@ -22,7 +22,7 @@ export function Button({
 
   const variants = {
     primary:
-      'bg-gradient-to-r from-[var(--accent-primary)] via-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)] shadow-[var(--elevation-1)] hover:shadow-[var(--shadow-glow)] hover:brightness-110 active:brightness-95 active:scale-[0.98]',
+      'bg-[var(--accent-primary)] text-[var(--text-on-accent)] shadow-[var(--elevation-1)] hover:bg-[var(--accent-primary-strong)] active:brightness-95 active:scale-[0.98]',
     secondary:
       'bg-[var(--bg-input)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border)] hover:border-[var(--border-active)] shadow-[var(--shadow-xs)] hover:shadow-[var(--elevation-1)] active:scale-[0.98]',
     ghost:
